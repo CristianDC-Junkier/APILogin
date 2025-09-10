@@ -12,11 +12,14 @@ import {
     CardBody,
     Label,
 } from 'reactstrap';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
+
+import '../styles/Global.css'
+import '../styles/auth/Login.css';
 
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState('');
@@ -24,33 +27,25 @@ const Login = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = async (a) => {
+        a.preventDefault();
         setError(null);
 
-        const success = true; //const { success, error: loginError } = await login({ username, password, rememberMe });
+        const response = await login({ username, password, rememberMe });
 
-        if (success) {
-
+        if (response.success) {
+            console.log(response.data.user);
             navigate('/home');
 
-        } /*else {
-            if (loginError?.response?.data?.code === "BlockedAccount")
-                if (loginError?.response?.data?.isPermanentLock)
-                    setError(e("BlockedAccountPermanent"));
-                else
-                    setError(e("BlockedAccount", { minutes: loginError?.response?.data?.time }));
-            else
-                setError(e(loginError?.response?.data?.code));
-        }*/
+        } else {
+            setError(response?.error?.response?.data?.message);
+        }
     };
 
     return (
         <Row className="w-100 justify-content-center">
             <Col xs="12" sm="10" md="6" lg="5" xl="4" xxl="4" className="cmaxW">
                 <Card className="Card-login position-relative">
-
-                    <BackButton />
 
                     <CardBody className="p-0">
                         <h3 className="text-center mb-4 fw-bold mt-4">{"Login"}</h3>
@@ -59,9 +54,9 @@ const Login = () => {
                             <FormGroup className="mb-2">
                                 <Label className="fw-semibold">{"Correo electrónico"}</Label>
                                 <Input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     required
                                     placeholder={"Correo Electronico"}
                                     className="border-0 border-bottom border-dark rounded-0 bg-white px-3 py-2"
@@ -93,45 +88,11 @@ const Login = () => {
                                         </Label>
                                     </FormGroup>
                                 </Col>
-
-                                {/*<Col xs="5" className="text-end">
-                                    <button
-                                        type="button"
-                                        onClick={handleForgotPassword}
-                                        className="btn btn-link text-dark fw-semibold fs-6 p-0 m-0 align-baseline"
-                                        style={{ textDecoration: 'none', cursor: 'pointer', minHeight: '2.5em' }}
-                                        onMouseOver={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                                        onMouseOut={(e) => (e.currentTarget.style.textDecoration = 'none')}
-                                    >
-                                        {t("Forgot")}
-                                    </button>
-                                </Col>*/}
                             </Row>
-
-
                             <Button color="dark" type="submit" className="w-100 fw-bold mb-3 py-2 ">
                                 {"Entrar"}
                             </Button>
                         </Form>
-
-                        <hr className="my-3 border-3 border-dark py-1" />
-
-                        {/*<div className="text-center mt-4">
-                            <small className="text-dark">
-                                {t("NoAccount")}{' '}
-                                <button
-                                    type="button"
-                                    onClick={handleRegister}
-                                    className="btn btn-link text-dark p-0 m-0 align-baseline"
-                                    style={{ fontSize: '1rem', textDecoration: 'none' }}
-                                    onMouseOver={e => (e.currentTarget.style.textDecoration = 'underline')}
-                                    onMouseOut={e => (e.currentTarget.style.textDecoration = 'none')}
-                                >
-                                    {t("SignUpLog")}
-                                </button>
-                            </small>
-                        </div>*/}
-
                     </CardBody>
 
                     {error && <Alert color="danger" className="px-4 mt-3">{error}</Alert>}

@@ -2,9 +2,8 @@
 
 export const login = async (credentials) => {
     try {
-        const response = await api.post('/auth/login', credentials);
-        const { needsFillData } = response.data;
-        return { success: true, needsFillData };
+        const response = await api.post('/login', credentials);
+        return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error };
     }
@@ -16,15 +15,6 @@ export const logout = async () => {
         return { success: true };
     } catch {
         return { success: false };
-    }
-};
-
-export const register = async (credentials) => {
-    try {
-        await api.post('/auth/register', credentials);
-        return { success: true };
-    } catch (error) {
-        return { success: false, error };
     }
 };
 
@@ -40,15 +30,6 @@ export const recoverPass = async (credentials) => {
 export const resetPass = async (credentials) => {
     try {
         await api.post('/auth/resetpass', credentials);
-        return { success: true };
-    } catch (error) {
-        return { success: false, error };
-    }
-};
-
-export const unlockAccount = async (credentials) => {
-    try {
-        await api.post('/auth/unlock', credentials);
         return { success: true };
     } catch (error) {
         return { success: false, error };

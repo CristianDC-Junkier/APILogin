@@ -24,9 +24,11 @@ class AuthController {
             
             res.json({
                 success: true,
-                username: user.username,
-                usertype: user.usertype,
-                token: token
+                user: {
+                    username: user.username,
+                    usertype: user.usertype,
+                    token: token
+                }
             });
         } catch (error) {
             res.status(500).json({
