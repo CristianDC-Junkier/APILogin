@@ -20,6 +20,8 @@ yarn-error.log*
 # Sistema
 .DS_Store
 Thumbs.db
+backend/database/
+*.db
 
 # Archivos de entorno
 .env
@@ -32,3 +34,4 @@ frontend/.env
 /.vs/Login/CopilotIndices/17.14.827.52834
 /.vs/Login/FileContentIndex
 /.vs/APIRESTLogin/config/applicationhost.config
+/backend/database/data.db
