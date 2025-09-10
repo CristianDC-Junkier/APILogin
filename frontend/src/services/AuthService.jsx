@@ -1,41 +1,74 @@
-﻿// Servicio de autenticación para la aplicación frontend
-// Proporciona métodos para login, logout y verificación de autenticación
+﻿import api from './AxiosService';
 
-import axios from './AxiosService';
+export const login = async (credentials) => {
+    try {
+        const response = await api.post('/auth/login', credentials);
+        const { needsFillData } = response.data;
+        return { success: true, needsFillData };
+    } catch (error) {
+        return { success: false, error };
+    }
+};
 
-const API_URL = 'http://localhost:5000/api/auth/';
+export const logout = async () => {
+    try {
+        await api.post('/auth/logout');
+        return { success: true };
+    } catch {
+        return { success: false };
+    }
+};
 
-class AuthService {
-  // Inicia sesión con usuario y contraseña
-  login(username, password) {
-    return axios
-      .post(API_URL + 'login', { username, password })
-      .then(response => {
-        if (response.data.token) {
-          localStorage.setItem('user', JSON.stringify(response.data));
-        }
-        return response.data;
-      });
-  }
+export const register = async (credentials) => {
+    try {
+        await api.post('/auth/register', credentials);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error };
+    }
+};
 
-  // Cierra sesión eliminando el usuario del localStorage
-  logout() {
-    localStorage.removeItem('user');
-  }
+export const recoverPass = async (credentials) => {
+    try {
+        await api.post('/auth/recoverpass', credentials);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error };
+    }
+};
 
-  // Registra un nuevo usuario
-  register(username, email, password) {
-    return axios.post(API_URL + 'register', {
-      username,
-      email,
-      password,
-    });
-  }
+export const resetPass = async (credentials) => {
+    try {
+        await api.post('/auth/resetpass', credentials);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error };
+    }
+};
 
-  // Obtiene el usuario autenticado actual
-  getCurrentUser() {
-    return JSON.parse(localStorage.getItem('user'));
-  }
-}
+export const unlockAccount = async (credentials) => {
+    try {
+        await api.post('/auth/unlock', credentials);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error };
+    }
+};
 
-export default new AuthService();
+export const getProfile = async () => {
+    try {
+        const res = await api.get('/auth/profile');
+        return { success: true, data: res.data };
+    } catch {
+        return { success: false, data: null };
+    }
+};
+
+export const getRecoveryToken = async (tokenParam) => {
+    try {
+        const res = await api.get(`/auth/validatetoken?token=${tokenParam}`);
+        return { success: true, data: res.data };
+    } catch {
+        return { success: false, data: null };
+    }
+};
