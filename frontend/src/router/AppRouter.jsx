@@ -7,6 +7,8 @@ import MainLayout from '../layouts/MainLayout';
 import LoginPage from '../pages/Login';
 import HomePage from '../pages/Home';
 import NotFoundPage from '../pages/NotFound';
+import AccessDenied from '../pages/AccessDenied';
+import UserList from '../pages/Users/UserList'
 
 const AppRouter = () => {
     return (
@@ -16,6 +18,8 @@ const AppRouter = () => {
                 <Route path="/accessdenied" element={<AccessDenied />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/home" element={<HomePage />} />
+
+                <Route path="/users" element={<UserList />} />
 
                 <Route path="*" element={<NotFoundPage />} />
             </Route>

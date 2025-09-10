@@ -3,7 +3,6 @@ import {
     getProfile,
     login,
     logout,
-    register,
 } from '../services/AuthService';
 import { setSession } from '../services/SessionStateService';
 
@@ -17,7 +16,7 @@ export const AuthProvider = ({ children }) => {
      * Carga el perfil del usuario y lo establece en el contexto.
      * Devuelve el perfil si tiene éxito, o null si falla.
      */
-    const loadUser = async () => {
+    /*const loadUser = async () => {
         try {
             const { success, data } = await getProfile();
             if (success) {
@@ -38,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         loadUser();
-    }, []);
+    }, []);*/
 
     useEffect(() => {
         if (user !== null) {
@@ -52,7 +51,8 @@ export const AuthProvider = ({ children }) => {
     const contextLogin = async (credentials) => {
         const result = await login(credentials);
         if (result.success) {
-            await loadUser();
+            //await loadUser();
+            setUser(result.data.user);
         } else {
             setUser(null);
         }
@@ -67,19 +67,6 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
-    /**
-     * Registro de usuario
-     */
-    const contextRegister = async (credentials) => {
-        const result = await register(credentials);
-        if (result.success) {
-            await loadUser();
-        } else {
-            setUser(null);
-        }
-        return result;
-    };
-
     return (
         <AuthContext.Provider
             value={{
@@ -87,8 +74,7 @@ export const AuthProvider = ({ children }) => {
                 loading,
                 login: contextLogin,
                 logout: contextLogout,
-                register: contextRegister,
-                loadUser,
+                //loadUser,
             }}
         >
             {children}
