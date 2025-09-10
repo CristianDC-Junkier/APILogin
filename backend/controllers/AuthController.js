@@ -80,18 +80,20 @@ class LoginController {
             const user = await Login.findByPk(id);
             if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
 
+            if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN" ) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN"
+                });
+            }
+
             if (username) user.username = username;
             if (password) user.password = password;
             if (usertype) user.usertype = usertype;
 
             await user.save();
 
-            if (user.usertype === "SUPERADMIN" && req.user.usertype !== "SUPERADMIN") {
-                return res.status(403).json({
-                    success: false,
-                    message: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN"
-                });
-            }
+            
 
             res.json({
                 success: true,
