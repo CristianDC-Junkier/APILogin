@@ -19,7 +19,8 @@ if (MODE === 'production') {
         }
     );
 } else {
-    const dbDir = path.resolve(process.cwd(), 'database');
+    const baseDir = process.cwd().endsWith('backend') ? process.cwd() : path.join(process.cwd(), 'backend');
+    const dbDir = path.join(baseDir, 'database');
     const dbPath = path.join(dbDir, 'data.db');
 
     sequelize = new Sequelize({

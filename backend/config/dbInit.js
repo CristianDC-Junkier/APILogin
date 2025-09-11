@@ -1,8 +1,8 @@
 ﻿const sequelize = require('./db');
 const Login = require('../models/AuthModel');
-const { encrypt } = require('../utils/crypto');
 
 const USER_TYPE = ['USER', 'ADMIN', 'SUPERADMIN'];
+const LoggerController = require("../controllers/LoggerController");
 
 async function initDatabase() {
     try {
@@ -21,13 +21,11 @@ async function initDatabase() {
                 password: 'Almonte#admin',
                 usertype: superAdminType
             });
-
-            console.log('✅ Superadmin creado correctamente');
+            LoggerController.info('✅ Superadmin creado correctamente');
         }
-
-        console.log('✅ Base de datos inicializada correctamente');
+        LoggerController.info('✅ Base de datos inicializada correctamente');
     } catch (err) {
-        console.error('❌ Error inicializando la base de datos:', err.message);
+        LoggerController.error('❌ Error inicializando la base de datos:', err.message);
         process.exit(1);
     }
 }

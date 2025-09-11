@@ -1,7 +1,7 @@
 ﻿const Login = require("../models/AuthModel");
 const { generateToken } = require("../utils/JWT");
 
-class LoginController {
+class AuthController {
 
     // Login de usuario
     static async login(req, res) {
@@ -46,7 +46,12 @@ class LoginController {
             }
 
             const user = await Login.create({ username, password, usertype });
-
+            if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
+                return res.status(403).json({
+                    success: false,
+                    message: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN"
+                });
+            }
 
             res.json({
                 success: true,
@@ -134,4 +139,4 @@ class LoginController {
     }
 }
 
-module.exports = LoginController;
+module.exports = AuthController;
