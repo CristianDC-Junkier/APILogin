@@ -35,3 +35,6 @@ frontend/.env
 /.vs/Login/FileContentIndex
 /.vs/APIRESTLogin/config/applicationhost.config
 /backend/database/data.db
+/backend/obj/Debug/backend.esproj.FileListAbsolute.txt
+/backend/obj/Debug/backend.esproj.CoreCompileInputs.cache
+/frontend/obj/Debug

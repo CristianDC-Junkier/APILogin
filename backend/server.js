@@ -1,6 +1,11 @@
 ﻿const express = require("express");
 const cors = require("cors");
+const LoggerController = require("./controllers/LoggerController");
 const path = require("path");
+const dotenv = require('dotenv');
+
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // --------------------------------
 //  DATABASE (Solo en Desarrollo)
@@ -39,13 +44,12 @@ app.get("*", (req, res) => {
 async function start() {
     try {
         await initDatabase();
-        console.log('Base de datos inicializada correctamente.');
         const PORT = process.env.PORT || 5000;
         app.listen(PORT, () => {
-            console.log(`Servidor corriendo en http://localhost:${PORT}`);
+            LoggerController.info(`Servidor corriendo en http://localhost:${PORT}`);
         });
     } catch (err) {
-        console.error('Error inicializando la base de datos:', err.message);
+        LoggerController.error('Error inicializando la base de datos:', err.message);
         process.exit(1);
     }
 }
