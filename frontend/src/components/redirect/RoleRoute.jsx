@@ -9,6 +9,7 @@ const RoleRoute = ({ allowedRoles, children }) => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
+            console.log(user.usertype);
             if (!loading && (!user || !allowedRoles.includes(user.usertype))) {
                 navigate('/accessdenied', { replace: true });
             }
@@ -17,7 +18,7 @@ const RoleRoute = ({ allowedRoles, children }) => {
     }, [loading, user, navigate, allowedRoles]);
 
     if (loading) return <Spinner />;
-    if (!user || !allowedRoles.includes(user.rol)) return null;
+    if (!user || !allowedRoles.includes(user.usertype)) return null;
 
     return children;
 };

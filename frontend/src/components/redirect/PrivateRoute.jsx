@@ -15,7 +15,7 @@ const PrivateRoute = ({ children }) => {
     }, [loading, user, navigate]);
 
     if (loading) return <Spinner />;
-    return !user ? children : <Spinner />;
+    return user ? children : <Spinner />;
 };
 
 export default PrivateRoute;
