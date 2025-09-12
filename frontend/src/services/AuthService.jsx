@@ -11,27 +11,9 @@ export const login = async (credentials) => {
 
 export const logout = async () => {
     try {
-        await api.post('/auth/logout');
+        await api.post('/logout');
         return { success: true };
     } catch {
         return { success: false };
-    }
-};
-
-export const getProfile = async () => {
-    try {
-        const res = await api.get('/auth/profile');
-        return { success: true, data: res.data };
-    } catch {
-        return { success: false, data: null };
-    }
-};
-
-export const getRecoveryToken = async (tokenParam) => {
-    try {
-        const res = await api.get(`/auth/validatetoken?token=${tokenParam}`);
-        return { success: true, data: res.data };
-    } catch {
-        return { success: false, data: null };
     }
 };

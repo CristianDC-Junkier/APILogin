@@ -1,151 +1,332 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import {
-    Row, Col, Card, CardBody, CardTitle, CardText,
-    Button, Table
-} from "reactstrap";
+import { createRoot } from 'react-dom/client';
+import { Row, Col, Card, CardBody, Button, Table } from "reactstrap";
 import Swal from 'sweetalert2';
-import { getUsersDashboard, deleteUser } from "../../services/DashboardService";
-import { generateToken } from "../../services/SecurityService";
+
+import { getUsersList, createUser, modifyUser, deleteUser  } from "../../services/UserService";
 import { useAuth } from "../../hooks/useAuth";
+
 import BackButton from "../../components/utils/BackButtonComponent";
 import Spinner from '../../components/utils/Spinner';
 import Pagination from "../../components/PaginationComponent";
-import { renderCaptchaSlider } from "../../components/utils/RenderCaptchaFunction";
+import CaptchaSlider from '../../components/utils/CaptchaSliderComponent';
 
 const UserList = () => {
     const navigate = useNavigate();
-    const { getuser } = useAuth();
+    const { user: currentUser , logout } = useAuth();
+    const token = currentUser?.token;
 
-    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [allUsers, setAllUsers] = useState([]);
-    const [selectedRole, setSelectedRole] = useState("All");
+    const [selectedType, setSelectedType] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 10;
 
-    const token = currentUser?.token;
-
-    // Filtrado y paginación
-    // console.log(allUsers.map(u => u.rol?.name));
-
-    const filteredUsers = selectedRole === "All"
-        ? allUsers
-        : allUsers.filter(user => user.usertype?.name === selectedRole);
-    const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
-    const currentUsers = filteredUsers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-
-    useEffect(() => {
-        setUser(getuser());
-        //console.log(user);
-    }, [getuser]);
-
+    // Fetch usuarios
     useEffect(() => {
         const fetchData = async () => {
-            const response = await getUsersDashboard(token);
-            if (response.success) {
-                const lists  = response.data ?? {};
-                setAllUsers(lists.all ?? []);
-            }
+            if (!token) return;
+            setLoading(true);
+            const response = await getUsersList(token);
+            if (response.success) setAllUsers(response.data ?? []);
             setLoading(false);
-            console.log(response);
         };
         fetchData();
     }, [token]);
 
-    const handleCardClick = (rol) => {
-        setSelectedRole(rol);
-        setCurrentPage(1);
+    // Estadísticas
+    const stats = {
+        total: allUsers.length,
+        admin: allUsers.filter(u => u.usertype === "ADMIN" || u.usertype === "SUPERADMIN").length,
+        user: allUsers.filter(u => u.usertype === "USER").length,
     };
 
-    const openActionModal = (action, user) => {
-        const { html, didOpen } = renderCaptchaSlider(async () => {
-            const token = await generateToken(`${action.toUpperCase()}_USER`);
-            await confirmAction(action, user, token);
-        });
+    // Filtrado y paginación
+    const filteredUsers = selectedType === "All"
+        ? allUsers
+        : allUsers.filter(user =>
+            selectedType === "User"
+                ? user.usertype === "User"
+                : ["ADMIN", "SUPERADMIN"].includes(user.usertype)
+        );
+    const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+    const currentUsers = filteredUsers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
-        Swal.fire({
-            title: `${action} Usuario`,
-            html,
+    const handleCreate = async () => {
+        const tipos = [
+            { label: 'Usuario', value: 'USER' },
+            { label: 'Administrador', value: 'ADMIN' }
+        ];
+        if (currentUser.usertype === 'SUPERADMIN') {
+            tipos.push({ label: 'SuperAdmin', value: 'SUPERADMIN' });
+        }
+
+        const optionsHtml = tipos
+            .map(tipo => `<option value="${tipo.value}">${tipo.label}</option>`)
+            .join('');
+
+        const { value: formValues } = await Swal.fire({
+            title: 'Crear Usuario',
+            html: `
+        <input id="swal-username" class="swal2-input" placeholder="Usuario">
+        <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña">
+        <select id="swal-type" class="swal2-select">${optionsHtml}</select>
+        <style>
+            .swal2-input, .swal2-select {
+                width: 100%;
+                padding: 0.5em 0.75em;
+                margin: 0.25em 0;
+                border: 1px solid #333;
+                border-radius: 0.25em;
+                font-size: 1em;
+            }
+            .swal2-select {
+                margin-bottom: 1em;
+                appearance: none;
+                background-color: #fff;
+            }
+        </style>
+        `,
+            focusConfirm: false,
             showCancelButton: true,
-            showConfirmButton: false,
+            confirmButtonText: 'Crear',
             cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            didOpen
+            preConfirm: () => {
+                const username = document.getElementById('swal-username').value.trim();
+                const password = document.getElementById('swal-password').value.trim();
+                const usertype = document.getElementById('swal-type').value;
+
+                if (!username) {
+                    Swal.showValidationMessage('El nombre de usuario no puede estar vacío');
+                    return false;
+                }
+                if (!password) {
+                    Swal.showValidationMessage('La contraseña no puede estar vacía');
+                    return false;
+                }
+
+                return { username, password, usertype };
+            }
         });
-    };
 
-    const confirmAction = async (action, user, token) => {
-        try {
-            let success = false;
-            if (action === "Delete") {
-                await deleteUser(user.id, user.rol.name, user.securityStamp, token);
-                success = true;
-            } else if (action === "Lock" || action === "Unlock") {
-                //await toggleLockUser(user.id, user.securityStamp, user.username, user.email, token);
-                success = true;
-            } else if (action === "Modify") {
-                navigate(`/cultura-admin/dashboard/users/modify/${user.id}`);
-                return;
+        if (formValues) {
+            const result = await createUser(formValues, token);
+            if (result.success) {
+                Swal.fire('Éxito', 'Usuario creado correctamente', 'success');
+                const response = await getUsersList(token);
+                if (response.success) setAllUsers(response.data ?? []);
+            } else {
+                Swal.fire('Error', 'No se pudo crear el usuario', 'error');
             }
-
-            Swal.fire(
-                success ? 'Perfecto' : 'Error',
-                success ? `La acción "${action}" se realizó correctamente` : `La acción "${action}" ha fallado`,
-                success ? 'success' : 'error'
-            );
-
-            // Recargar
-            const response = await getUsersDashboard(token);
-            if (response.success) {
-                const lists = response.data ?? {};
-                setAllUsers(lists.all ?? []);
-            }
-        } catch {
-            alert("Error al ejecutar la acción");
         }
     };
 
+    const handleModify = async (userItem) => {
+        const tipos = [
+            { label: 'Usuario', value: 'USER' },
+            { label: 'Administrador', value: 'ADMIN' }
+        ];
+        if (currentUser.usertype === 'SUPERADMIN') {
+            tipos.push({ label: 'SuperAdmin', value: 'SUPERADMIN' });
+        }
+
+        const optionsHtml = tipos
+            .map(tipo => `<option value="${tipo.value}" ${userItem.usertype === tipo.value ? 'selected' : ''}>${tipo.label}</option>`)
+            .join('');
+
+        const { value: formValues } = await Swal.fire({
+            title: `${userItem.id === currentUser.id ? "Modificar su Usuario" : "Modificar Usuario"}`,
+            html: `
+        <input id="swal-username" class="swal2-input" placeholder="Usuario" value="${userItem.username}">
+        <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña" value="">
+        <select id="swal-type" class="swal2-select">${optionsHtml}</select>
+        <style>
+            .swal2-input, .swal2-select {
+                width: 100%;
+                padding: 0.5em 0.75em;
+                margin: 0.25em 0;
+                border: 1px solid #333;
+                border-radius: 0.25em;
+                font-size: 1em;
+            }
+            .swal2-select {
+                margin-bottom: 1em;
+                appearance: none;
+                background-color: #fff;
+            }
+        </style>
+        `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const username = document.getElementById('swal-username').value.trim();
+                const password = document.getElementById('swal-password').value.trim();
+                const usertype = document.getElementById('swal-type').value;
+
+                if (!username) {
+                    Swal.showValidationMessage('El nombre de usuario no puede estar vacío');
+                    return false;
+                }
+                if (!password) {
+                    Swal.showValidationMessage('La contraseña no puede estar vacía');
+                    return false;
+                }
+
+                return { username, password, usertype };
+            }
+        });
+
+        if (formValues) {
+            const result = await modifyUser({
+                id: userItem.id,
+                username: formValues.username,
+                password: formValues.password,
+                usertype: formValues.usertype
+            }, token);
+
+            if (result.success) {
+                Swal.fire('Éxito', 'Usuario modificado correctamente', 'success');
+                if (userItem.id === currentUser.id) {
+                    await logout();
+                    navigate('/login')
+                }
+                const response = await getUsersList(token);
+                if (response.success) setAllUsers(response.data ?? []);
+            } else {
+                Swal.fire('Error', 'No se pudo modificar el usuario', 'error');
+            }
+        }
+    };
+
+
+    const handleDelete = async (userItem) => {
+        try {
+            await showCaptcha(userItem.id);
+        } catch (err) {
+            Swal.fire('Atención', err.message || 'Captcha no completado', 'warning');
+            return;
+        }
+
+        try {
+            const result = await deleteUser(userItem.id, token);
+            if (result.success) {
+                Swal.fire('Éxito', 'Usuario eliminado correctamente', 'success');
+                if (userItem.id === currentUser.id) {
+                    await logout();
+                    navigate('/login')
+                }
+                const response = await getUsersList(token);
+                if (response.success) setAllUsers(response.data ?? []);
+            } else {
+                Swal.fire('Error', result.error?.message || 'No se pudo eliminar el usuario', 'error');
+            }
+        } catch (err) {
+            Swal.fire('Error', err?.message || 'Error al eliminar el usuario', 'error');
+        }
+    };
+
+
+    const showCaptcha = (idd) => {
+        return new Promise((resolve, reject) => {
+            const container = document.createElement('div');
+            const reactRoot = createRoot(container);
+            let completed = false;
+
+            reactRoot.render(
+                <CaptchaSlider
+                    onSuccess={() => {
+                        completed = true;
+                        Swal.close();
+                        resolve(true);
+                        setTimeout(() => reactRoot.unmount(), 0);
+                    }}
+                />
+            );
+
+            Swal.fire({
+                title: `Eliminar ${ idd === currentUser.id ? "su Usuario" : "el Usuario" }`, 
+                html: container,
+                showConfirmButton: true,
+                confirmButtonText: 'Continuar',
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                allowOutsideClick: false,
+                preConfirm: () => {
+                    if (!completed) {
+                        Swal.showValidationMessage('Debes completar el captcha antes de continuar');
+                        return false;
+                    }
+                }
+            }).then(() => {
+                if (!completed) {
+                    reject(new Error('Captcha no completado'));
+                    setTimeout(() => reactRoot.unmount(), 0);
+                }
+            });
+        });
+    };
+
+
+    const tipoLabels = {
+        USER: "Usuario",
+        ADMIN: "Administrador",
+        SUPERADMIN: "Super Administrador"
+    };
     const renderUserTable = () => (
-        <div className="mt-5">
-            <h5 className="mb-3 text-center">Usuarios - {selectedRole}</h5>
+        <div className="mt-4">
+            <h3 className="mb-3 p-2 text-center">{selectedType === "All" ? "Usuarios" : selectedType}</h3>
             <Table striped responsive>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Usuario</th>
-                        <th>Email</th>
-                        {selectedRole === "All" && <th>Rol</th>}
-                        <th>Bloqueado</th>
+                        <th>Tipo</th>
                         <th className="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentUsers.map((user, idx) => {
-                        const isCurrentUser = user?.userName === currentUser?.username;
+                    {currentUsers.map((userItem, idx) => {
+                        const isSuperAdminUser = userItem.usertype === "SUPERADMIN";
+                        const CanIModifySuperAdminUser = currentUser.usertype === "SUPERADMIN";
+                        const isCurrentUser = userItem.id === currentUser.id; 
 
                         return (
                             <tr key={idx}>
-                                <td>{user?.id || '\u00A0'}</td>
-                                <td>{user?.username || '\u00A0'}</td>
-                                {selectedRole === "All" && <td>{user?.usertype?.name || " "}</td>}
+                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
+                                    {userItem?.id || "\u00A0"}
+                                </td>
+                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
+                                    {userItem?.username || "\u00A0"}
+                                </td>
+                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
+                                    {tipoLabels[userItem?.usertype] || "\u00A0"}
+                                </td>
                                 <td className="text-center">
-                                    {user?.id ? (
-                                        isCurrentUser ? (
-                                            <Button color="info" size="sm" onClick={() => navigate('/cultura-admin/profile')}>
-                                                👤 Mi Perfil
+                                    <div className="d-flex justify-content-center flex-wrap m">
+                                        {((CanIModifySuperAdminUser && isSuperAdminUser) || !isSuperAdminUser) && (
+                                            <Button
+                                                color="warning"
+                                                size="sm"
+                                                style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                onClick={() => handleModify(userItem)}
+                                            >
+                                                ✏️
                                             </Button>
-                                        ) : (
-                                            <div className="d-flex justify-content-center flex-wrap gap-1">
-                                                <Button color="warning" size="sm" onClick={() => openActionModal("Modify", user)}>✏️</Button>
-                                                {user?.rol?.name !== "Admin" && (
-                                                    <Button color="primary" size="sm" onClick={() => openActionModal("Delete", user)}>
-                                                        🗑️
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        )
-                                    ) : <span className="text-muted">&nbsp;</span>}
+                                        )}
+                                        {!isSuperAdminUser && (
+                                            <Button
+                                                color="danger"
+                                                size="sm"
+                                                style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                onClick={() => handleDelete(userItem)}
+                                            >
+                                                🗑️
+                                            </Button>
+                                        )}
+                                    </div>
                                 </td>
                             </tr>
                         );
@@ -161,12 +342,88 @@ const UserList = () => {
     if (loading) return <Spinner />;
 
     return (
-        <div className="container mt-4 position-relative mb-3" style={{ minHeight: "100vh" }}>
-            <div className="position-absolute top-0 start-0">
+        <div className="container pt-4 mt-4 position-relative mb-3" style={{ minHeight: "80vh" }}>
+            {/* Back Button  */}
+            <div className="position-absolute top-0 start-0 p-3">
                 <BackButton back="/home" />
             </div>
-            <h3 className="text-center mb-5">Estadísticas de Usuarios</h3>
-            
+            {/* Crear Usuario */}
+            <div className="position-absolute top-0 end-0 my-4">
+                <Button
+                    color="transparent"
+                    style={{ color: 'black', border: 'none', padding: 0, fontWeight: 'bold' }}
+                    onClick={handleCreate}
+                >
+                    ➕ Crear Usuario
+                </Button>
+            </div>
+
+
+  
+
+            {/* Tarjetas de estadísticas */}
+            <Row className="mb-4 justify-content-center">
+                <Col xs="12" sm="3" className="mb-2">
+                    <Card
+                        className="text-center p-2 mx-2"
+                        style={{
+                            border: '2px solid #000',
+                            borderRadius: '0.5rem',
+                            height: '100px',
+                            backgroundColor: '#f8f9fa',
+                            cursor: 'pointer'
+
+                        }}
+                        onClick={() => setSelectedType("All")}
+                    >
+                        <CardBody className="p-2">
+                            <h6>Total</h6>
+                            <h4>{stats.total}</h4>
+                        </CardBody>
+                    </Card>
+                </Col>
+
+                <Col xs="12" sm="3" className="mb-2">
+                    <Card
+                        className="text-center p-2 cursor-pointer mx-2"
+                        style={{
+                            border: '2px solid #000',
+                            borderRadius: '0.5rem',
+                            height: '100px',
+                            backgroundColor: '#f8f9fa',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => setSelectedType("Admin")}
+                    >
+                        <CardBody className="p-2">
+                            <h6>Admins</h6>
+                            <h4>{stats.admin}</h4>
+                        </CardBody>
+                    </Card>
+                </Col>
+
+                <Col xs="12" sm="3" className="mb-2">
+                    <Card
+                        className="text-center p-2 cursor-pointer mx-2"
+                        style={{
+                            border: '2px solid #000',
+                            borderRadius: '0.5rem',
+                            height: '100px',
+                            backgroundColor: '#f8f9fa',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => setSelectedType("User")}
+                    >
+                        <CardBody className="p-2">
+                            <h6>Usuarios</h6>
+                            <h4>{stats.user}</h4>
+                        </CardBody>
+                    </Card>
+                </Col>
+            </Row>
+
+
+            {/* Tabla de usuarios */}
             {renderUserTable()}
         </div>
     );

@@ -9,7 +9,6 @@ const RoleRoute = ({ allowedRoles, children }) => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            console.log(user.usertype);
             if (!loading && (!user || !allowedRoles.includes(user.usertype))) {
                 navigate('/accessdenied', { replace: true });
             }

@@ -25,11 +25,25 @@ class AuthController {
             res.json({
                 success: true,
                 user: {
+                    id: user.id,
                     username: user.username,
                     usertype: user.usertype,
                     token: token
                 }
             });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: error.message
+            });
+        }
+    }
+
+    // Listar usuarios
+    static async listAll(req, res) {
+        try {
+            const users = await Login.findAll({ attributes: ["id", "username", "usertype"] });
+            res.json(users);
         } catch (error) {
             res.status(500).json({
                 success: false,
@@ -51,7 +65,7 @@ class AuthController {
             if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
                 return res.status(403).json({
                     success: false,
-                    message: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN"
+                    message: "Solo un SUPERADMIN puede crear a otro SUPERADMIN"
                 });
             }
 
@@ -62,19 +76,6 @@ class AuthController {
             });
         } catch (error) {
             res.status(400).json({ success: false, error: error.message });
-        }
-    }
-
-    // Listar usuarios
-    static async listAll(req, res) {
-        try {
-            const users = await Login.findAll({ attributes: ["id", "username", "usertype"] });
-            res.json(users);
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                error: error.message
-            });
         }
     }
 
