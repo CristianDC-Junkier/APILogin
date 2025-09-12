@@ -24,6 +24,8 @@ const UserList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 10;
 
+    const token = currentUser?.token;
+
     // Filtrado y paginación
     // console.log(allUsers.map(u => u.rol?.name));
 
@@ -35,7 +37,7 @@ const UserList = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await getUsersDashboard();
+            const response = await getUsersDashboard(token);
             if (response.success) {
                 const { counts = {}, lists = {} } = response.data ?? {};
                 setAmountStats({
@@ -47,9 +49,10 @@ const UserList = () => {
                 setAllUsers(lists.all ?? []);
             }
             setLoading(false);
+            console.log(response);
         };
         fetchData();
-    }, []);
+    }, [token]);
 
     const handleCardClick = (rol) => {
         setSelectedRole(rol);
@@ -94,7 +97,7 @@ const UserList = () => {
             );
 
             // Recargar
-            const response = await getUsersDashboard();
+            const response = await getUsersDashboard(token);
             if (response.success) {
                 const { counts = {}, lists = {} } = response.data ?? {};
                 setAmountStats({

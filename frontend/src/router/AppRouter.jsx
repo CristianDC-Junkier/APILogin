@@ -25,7 +25,7 @@ const AppRouter = () => {
                 {/* Rutas privadas */}
                 <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
                 {/* Rutas privadas por rol */}
-                <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><UserList /></RoleRoute>} />
+                <Route path="/users" element={<UserList />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Route>
         </Routes>
