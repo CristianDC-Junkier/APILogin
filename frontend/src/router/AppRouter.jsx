@@ -1,14 +1,17 @@
 ﻿import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import MainLayout from '../layouts/MainLayout';
+import PublicRoute from '../components/redirect/PublicRoute';
+import PrivateRoute from '../components/redirect/PrivateRoute';
+import RoleRoute from '../components/redirect/RoleRoute';
 
-// Importa tus componentes de página aquí
+
 import LoginPage from '../pages/Login';
 import HomePage from '../pages/Home';
 import NotFoundPage from '../pages/NotFound';
 import AccessDenied from '../pages/AccessDenied';
-import UserList from '../pages/Users/UserList'
+import UserList from '../pages/Users/UserList';
 
 const AppRouter = () => {
     return (
@@ -16,11 +19,13 @@ const AppRouter = () => {
             <Route element={<MainLayout />}>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/accessdenied" element={<AccessDenied />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/home" element={<HomePage />} />
-
-                <Route path="/users" element={<UserList />} />
-
+                <Route path="/accessdenied" element={<AccessDenied />} />
+                {/* Rutas publicas */}
+                <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+                {/* Rutas privadas */}
+                <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+                {/* Rutas privadas por rol */}
+                <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><UserList /></RoleRoute>} />
                 <Route path="*" element={<NotFoundPage />} />
             </Route>
         </Routes>

@@ -1,28 +1,41 @@
-﻿import { createRoot } from "react-dom/client";
+﻿/* eslint-disable no-unused-vars */
+import { createRoot } from "react-dom/client";
 import Swal from 'sweetalert2';
-import CaptchaSlider from './CaptchaSliderComponent'; // ✅ asegúrate de ajustar la ruta
+import CaptchaSlider from './CaptchaSliderComponent'; // ✅ ajusta la ruta
 
-export const renderCaptchaSlider = (onSuccess) => {
-    const container = document.createElement("div");
-    const reactRoot = createRoot(container);
+export const renderCaptchaSlider = () => {
+    return new Promise((resolve, reject) => {
+        const container = document.createElement("div");
+        const reactRoot = createRoot(container);
 
-    // Renderiza el CaptchaSlider y cierra el modal al completar
-    reactRoot.render(
-        <CaptchaSlider
-            onSuccess={() => {
-                onSuccess();       // Acción del captcha
-                Swal.close();      // Cierra el modal
-                setTimeout(() => {
-                    reactRoot.unmount(); // Limpia el DOM si es necesario
-                }, 0);
-            }}
-        />
-    );
+        let completed = false; // bandera para saber si completó
 
-    return {
-        html: container,
-        didOpen: () => {
-            // Se puede usar para animaciones, foco, etc.
-        }
-    };
+        reactRoot.render(
+            <CaptchaSlider
+                onSuccess={() => {
+                    completed = true;
+                    resolve();       // acción del captcha
+                    Swal.close();    // cierra el modal
+                    setTimeout(() => reactRoot.unmount(), 0);
+                }}
+            />
+        );
+
+        Swal.fire({
+            title: 'Completa el captcha',
+            html: container,
+            showConfirmButton: true,
+            allowOutsideClick: false,
+            preConfirm: () => {
+                if (!completed) {
+                    Swal.showValidationMessage('Debes completar el captcha antes de continuar');
+                    return false;
+                }
+            }
+        }).then((result) => {
+            if (!completed) {
+                reject(new Error('Captcha no completado'));
+            }
+        });
+    });
 };
