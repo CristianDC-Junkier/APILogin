@@ -1,47 +1,40 @@
 ﻿import api from './AxiosService';
 
 
-export const getUsersDashboard = async (token) => {
+export const getUsersList = async (token) => {
     try {
         const res = await api.get('/', {
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };
     } catch (error) {
-        console.log(error)
         return { success: false, error };
     }
 };
-export const getUserById = async (id) => {
+export const createUser = async (user, token) => {
     try {
-        const res = await api.get(`/api/dashboard/user`, { params: { userId: id } });
+        const res = await api.post('/', user, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error };
     }
 };
-
-export const modifyUser = async (user, client, token) => {
+export const modifyUser = async (user, token) => {
     try {
-        const res = await api.put('/api/dashboard/user', {
-            user,
-            client,
-            token
+        const res = await api.put(`/${user.id}`, user, {
+            headers: { Authorization: `Bearer ${token}` },
         });
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data || error.message };
     }
 };
-export const deleteUser = async (userId, userRol, userSecurityStamp, token) => {
+export const deleteUser = async (userId, token) => {
     try {
-        const res = await api.delete('/api/dashboard/user', {
-            data: {
-                targetUserId: userId,
-                userRol,
-                userSecurityStamp,
-                token
-            }
+        const res = await api.delete(`/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };
     } catch (error) {

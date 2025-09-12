@@ -8,7 +8,6 @@ const PrivateRoute = ({ children }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log('PrivateRoute - User:', user, 'Loading:', loading);
         if (!loading && !user) {
             navigate('/login', { replace: true });
         }

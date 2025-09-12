@@ -69,7 +69,6 @@ const Login = () => {
 
             // Hacer login
             const response = await login({ username, password, rememberMe });
-            console.log(response);
 
             if (response.success) {
                 const user = response.data.user;

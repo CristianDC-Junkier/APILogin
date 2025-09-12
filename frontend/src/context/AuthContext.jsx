@@ -1,7 +1,6 @@
 ﻿/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect } from 'react';
 import { login, logout } from '../services/AuthService';
-import { setSession } from '../services/SessionStateService';
 import CryptoJS from 'crypto-js';
 
 export const AuthContext = createContext();
@@ -20,6 +19,7 @@ export const AuthProvider = ({ children }) => {
      */
     const saveUserWithExpiry = (userData, rememberMe) => {
         const now = new Date();
+        console.log(userData);
         const item = {
             value: userData,
             expiry: now.getTime() + 60 * 60 * 1000, // expira en 1 hora
@@ -74,12 +74,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    // ---------- Actualizar sesión externa ----------
-    useEffect(() => {
-        if (user !== null) {
-            setSession(user);
-        }
-    }, [user]);
 
     // ---------- Login ----------
     const contextLogin = async (credentials) => {
