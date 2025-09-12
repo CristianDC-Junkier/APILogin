@@ -12,6 +12,7 @@ import HomePage from '../pages/Home';
 import NotFoundPage from '../pages/NotFound';
 import AccessDenied from '../pages/AccessDenied';
 import UserList from '../pages/Users/UserList';
+import ExternalWeb from '../pages/ExternalWeb';
 
 const AppRouter = () => {
     return (
@@ -19,11 +20,12 @@ const AppRouter = () => {
             <Route element={<MainLayout />}>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/accessdenied" element={<AccessDenied />} />
-                <Route path="/accessdenied" element={<AccessDenied />} />
+                
                 {/* Rutas publicas */}
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 {/* Rutas privadas */}
                 <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+                <Route path="/app" element={<PrivateRoute><ExternalWeb /></PrivateRoute>} />
                 {/* Rutas privadas por rol */}
                 <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><UserList /></RoleRoute>} />
 

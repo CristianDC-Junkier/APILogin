@@ -73,9 +73,9 @@ const Login = () => {
             if (response.success) {
                 const user = response.data.user;
                 if (user.usertype === 'USER') {
-                    navigate('/home');
+                    navigate('/app');
                 } else {
-                    navigate('/users');
+                    navigate('/home');
                 }
             } else {
                 Swal.fire('Error', response?.error?.response?.data?.message || 'Login fallido', 'error');
