@@ -21,20 +21,7 @@ export const getUserById = async (id) => {
         return { success: false, error };
     }
 };
-export const toggleLockUser = async (userId, userSecurityStamp, username, email, token) => {
-    try {
-        const res = await api.put('/api/dashboard/user/toggle', {
-            targetUserId: userId,
-            userSecurityStamp,
-            username,
-            email,
-            token
-        });
-        return { success: true, data: res.data };
-    } catch (error) {
-        return { success: false, error: error.response?.data || error.message };
-    }
-};
+
 export const modifyUser = async (user, client, token) => {
     try {
         const res = await api.put('/api/dashboard/user', {
@@ -60,25 +47,6 @@ export const deleteUser = async (userId, userRol, userSecurityStamp, token) => {
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data || error.message };
-    }
-};
-
-
-export const getClientsDashboard = async () => {
-    try {
-        const res = await api.get('/api/dashboard/clients');
-        return { success: true, data: res.data };
-    } catch (error) {
-        return { success: false, error };
-    }
-};
-
-export const getEventsDashboard = async () => {
-    try {
-        const res = await api.get('/api/dashboard/events');
-        return { success: true, data: res.data };
-    } catch (error) {
-        return { success: false, error };
     }
 };
 
@@ -124,14 +92,6 @@ export const downloadLogFile = async (folder, file) => {
         link.remove();
 
         return { success: true };
-    } catch (error) {
-        return { success: false, error };
-    }
-};
-export const getSystemMetrics = async () => {
-    try {
-        const res = await api.get('/api/dashboard/system');
-        return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error };
     }
