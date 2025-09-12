@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { Row, Col, Card, CardBody, Button, Table } from "reactstrap";
 import Swal from 'sweetalert2';
 
-import { getUsersList, createUser, modifyUser, deleteUser  } from "../../services/UserService";
+import { getUsersList, createUser, modifyUser, deleteUser } from "../../services/UserService";
 import { useAuth } from "../../hooks/useAuth";
 
 import BackButton from "../../components/utils/BackButtonComponent";
@@ -14,7 +14,7 @@ import CaptchaSlider from '../../components/utils/CaptchaSliderComponent';
 
 const UserList = () => {
     const navigate = useNavigate();
-    const { user: currentUser , logout } = useAuth();
+    const { user: currentUser, logout } = useAuth();
     const token = currentUser?.token;
 
     const [loading, setLoading] = useState(true);
@@ -29,7 +29,19 @@ const UserList = () => {
             if (!token) return;
             setLoading(true);
             const response = await getUsersList(token);
-            if (response.success) setAllUsers(response.data ?? []);
+            if (response.success) {
+                setAllUsers(response.data ?? []);
+            }
+            else {
+                if (handleError(response)) {
+                    Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
+                        .then(() => {
+                            logout();
+                            navigate('/login');
+                        });
+                    return;
+                }
+            }
             setLoading(false);
         };
         fetchData();
@@ -47,11 +59,20 @@ const UserList = () => {
         ? allUsers
         : allUsers.filter(user =>
             selectedType === "User"
-                ? user.usertype === "User"
+                ? user.usertype === "USER"
                 : ["ADMIN", "SUPERADMIN"].includes(user.usertype)
         );
     const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
     const currentUsers = filteredUsers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
+    const handleError = (result) => {
+        if (result.error.response?.data?.message === "Token inválido") {
+            return true;
+        }
+        return false;
+    };
+
+
 
     const handleCreate = async () => {
         const tipos = [
@@ -117,7 +138,17 @@ const UserList = () => {
                 const response = await getUsersList(token);
                 if (response.success) setAllUsers(response.data ?? []);
             } else {
-                Swal.fire('Error', 'No se pudo crear el usuario', 'error');
+                if (handleError(result)) {
+                    Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
+                        .then(() => {
+                            logout();
+                            navigate('/login');
+                        });
+                    return;
+                }
+                else {
+                    Swal.fire('Error', 'No se pudo crear el usuario', 'error');
+                }
             }
         }
     };
@@ -196,7 +227,17 @@ const UserList = () => {
                 const response = await getUsersList(token);
                 if (response.success) setAllUsers(response.data ?? []);
             } else {
-                Swal.fire('Error', 'No se pudo modificar el usuario', 'error');
+                if (handleError(result)) {
+                    Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
+                        .then(() => {
+                            logout();
+                            navigate('/login');
+                        });
+                    return;
+                }
+                else {
+                    Swal.fire('Error', 'No se pudo modificar el usuario', 'error');
+                }
             }
         }
     };
@@ -220,11 +261,32 @@ const UserList = () => {
                 }
                 const response = await getUsersList(token);
                 if (response.success) setAllUsers(response.data ?? []);
-            } else {
-                Swal.fire('Error', result.error?.message || 'No se pudo eliminar el usuario', 'error');
+            }
+            else {
+                if (handleError(result)) {
+                    Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
+                        .then(() => {
+                            logout();
+                            navigate('/login');
+                        });
+                    return;
+                }
+                else {
+                    Swal.fire('Error', result.error?.message || 'No se pudo eliminar el usuario', 'error');
+                }
             }
         } catch (err) {
-            Swal.fire('Error', err?.message || 'Error al eliminar el usuario', 'error');
+            if (handleError(err)) {
+                Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
+                    .then(() => {
+                        logout();
+                        navigate('/login');
+                    });
+                return;
+            }
+            else {
+                Swal.fire('Error', err?.message || 'Error al eliminar el usuario', 'error');
+            }
         }
     };
 
@@ -247,7 +309,7 @@ const UserList = () => {
             );
 
             Swal.fire({
-                title: `Eliminar ${ idd === currentUser.id ? "su Usuario" : "el Usuario" }`, 
+                title: `Eliminar ${idd === currentUser.id ? "su Usuario" : "el Usuario"}`,
                 html: container,
                 showConfirmButton: true,
                 confirmButtonText: 'Continuar',
@@ -277,7 +339,7 @@ const UserList = () => {
     };
     const renderUserTable = () => (
         <div className="mt-4">
-            <h3 className="mb-3 p-2 text-center">{selectedType === "All" ? "Usuarios" : selectedType}</h3>
+            <h3 className="mb-3 p-2 text-center">{selectedType === "All" ? "Todos los Usuarios" : selectedType}</h3>
             <Table striped responsive>
                 <thead>
                     <tr>
@@ -291,7 +353,7 @@ const UserList = () => {
                     {currentUsers.map((userItem, idx) => {
                         const isSuperAdminUser = userItem.usertype === "SUPERADMIN";
                         const CanIModifySuperAdminUser = currentUser.usertype === "SUPERADMIN";
-                        const isCurrentUser = userItem.id === currentUser.id; 
+                        const isCurrentUser = userItem.id === currentUser.id;
 
                         return (
                             <tr key={idx}>
@@ -359,7 +421,7 @@ const UserList = () => {
             </div>
 
 
-  
+
 
             {/* Tarjetas de estadísticas */}
             <Row className="mb-4 justify-content-center">
@@ -412,7 +474,7 @@ const UserList = () => {
                             backgroundColor: '#f8f9fa',
                             cursor: 'pointer'
                         }}
-                        onClick={() => setSelectedType("User")}
+                        onClick={() => setSelectedType("Usuarios")}
                     >
                         <CardBody className="p-2">
                             <h6>Usuarios</h6>

@@ -12,13 +12,13 @@ function adminOnly(req, res, next) {
         const payload = verifyToken(token);
 
         if (payload.usertype !== "ADMIN" && payload.usertype !== "SUPERADMIN") {
-            return res.status(403).json({ success: false, message: "No tienes permisos" });
+            return res.status(401).json({ success: false, message: "No tienes permisos" });
         }
 
         req.user = payload; 
         next();
     } catch (err) {
-        return res.status(403).json({ success: false, message: "Token inválido" });
+        return res.status(401).json({ success: false, message: "Token inválido" });
     }
 }
 

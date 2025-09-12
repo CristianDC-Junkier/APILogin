@@ -1,6 +1,6 @@
 ﻿/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect } from 'react';
-import { login, logout } from '../services/AuthService';
+import { login } from '../services/AuthService';
 import CryptoJS from 'crypto-js';
 
 export const AuthContext = createContext();
@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
      */
     const saveUserWithExpiry = (userData, rememberMe) => {
         const now = new Date();
-        console.log(userData);
         const item = {
             value: userData,
             expiry: now.getTime() + 60 * 60 * 1000, // expira en 1 hora
@@ -91,7 +90,6 @@ export const AuthProvider = ({ children }) => {
 
     // ---------- Logout ----------
     const contextLogout = async () => {
-        await logout();
         setUser(null);
         sessionStorage.removeItem("user");
         localStorage.removeItem("user");

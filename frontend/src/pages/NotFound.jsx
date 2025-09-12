@@ -4,7 +4,7 @@
 const NotFound = () => {
 
     return (
-        <div class="row vh-100 d-flex align-items-center justify-content-center">
+        <div class="row vh-80 d-flex align-items-center justify-content-center">
             <div class="col">
                 <img
                     src="/src/assets/ayto_almonte.png"
