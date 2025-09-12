@@ -2,7 +2,7 @@
 const sequelize = require("../config/db");
 const { encrypt, decrypt } = require("../utils/crypto");
 
-const Login = sequelize.define("Login", {
+const Login = sequelize.define("User", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,

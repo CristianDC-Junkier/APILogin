@@ -65,14 +65,25 @@ const CaptchaSlider = ({ onSuccess }) => {
             }
         };
 
+        const handleStart = () => {
+            if (window.getSelection) window.getSelection().removeAllRanges();
+            if (document.activeElement) document.activeElement.blur();
+        };
+
         updateVisual();
         slider.addEventListener("input", updateVisual);
         slider.addEventListener("change", handleChange);
+        slider.addEventListener("pointerdown", handleStart); 
+        slider.addEventListener("mousedown", handleStart);   
+
         return () => {
             slider.removeEventListener("input", updateVisual);
             slider.removeEventListener("change", handleChange);
+            slider.removeEventListener("pointerdown", handleStart);
+            slider.removeEventListener("mousedown", handleStart);
         };
     }, [onSuccess]);
+
 
     return (
         <div className="custom-slider-container mt-3">
