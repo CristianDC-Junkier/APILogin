@@ -1,6 +1,5 @@
 ﻿import React from 'react';
 import { Button } from 'reactstrap';
-import '../styles/home.css'; 
 
 const getPaginationNumbers = (page, totalPages) => {
     const pages = [];
