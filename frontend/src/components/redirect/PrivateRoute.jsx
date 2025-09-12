@@ -9,13 +9,13 @@ const PrivateRoute = ({ children }) => {
 
     useEffect(() => {
         console.log('PrivateRoute - User:', user, 'Loading:', loading);
-        if (!loading && user === null) {
+        if (!loading && !user) {
             navigate('/login', { replace: true });
         }
     }, [loading, user, navigate]);
 
     if (loading) return <Spinner />;
-    return !user ? children : <Spinner />;
+    return user ? children : <Spinner />;
 };
 
 export default PrivateRoute;
