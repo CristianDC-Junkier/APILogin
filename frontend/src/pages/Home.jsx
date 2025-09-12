@@ -1,10 +1,64 @@
 ﻿import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import HomeButtonComponent from '../components/user/HomeButtonComponent';
+import LogoutButton from '../components/user/LogoutComponent';
+import { useAuth } from '../hooks/useAuth';
+import {
+    Container,
+    Row,
+    Col,
+} from 'reactstrap';
+import {
+    faUsers,
+    faGlobeEurope,
+    faScroll,
+} from '@fortawesome/free-solid-svg-icons';
 
 const Home = () => {
+    const [loadingLogout, setLoadingLogout] = useState(false);
 
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    const actions = [
+        { label: 'Continuar a la aplicación', icon: faGlobeEurope, action: () => navigate('/app') },
+        { label: 'Gestión de Usuarios', icon: faUsers, action: () => navigate('/users') },
+        { label: 'Acceder Logs', icon: faScroll, action: () => alert('Has pulsado: Logs') },
+        //{ label: 'Mis Recibos', icon: faReceipt, action: () => alert('Has pulsado: Mis Recibos') },
+    ];
+
+    const handleLogout = async () => {
+        setLoadingLogout(true);
+        try {
+            await logout();
+            navigate('/');
+        } finally {
+            setLoadingLogout(false);
+        }
+    };
 
     return (
-        <h2>Hola Mundo</h2>
+        <Container
+            fluid
+            className="d-flex flex-column py-4"
+            style={{
+                minHeight: '70vh',
+            }}
+        >
+
+            <div className="d-flex flex-column justify-content-center align-items-center" style={{ flexGrow: 1 }}>
+                <Row className="g-3 mb-4 w-100">
+                    {actions.map(({ label, icon, action }, idx) => (
+                        <Col xs="6" md="4" key={idx} className="d-flex justify-content-center">
+                            <HomeButtonComponent label={label} icon={icon} onClick={action} />
+                        </Col>
+                    ))}
+                </Row>
+            </div>
+            <div>
+                <LogoutButton onClick={handleLogout} loading={loadingLogout} />
+            </div>
+        </Container>
     );
 };
 
