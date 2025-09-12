@@ -10,10 +10,10 @@ const PublicRoute = ({ children }) => {
     useEffect(() => {
         if (!loading && user) {
                 if (user.usertype === 'ADMIN' || user.usertype === 'SUPERADMIN') {
-                    navigate('/users');
+                    navigate('/home');
                 }
                 else if (user.usertype === 'USER') {
-                    navigate('/home');
+                    navigate('/app');
                 } else {
                     navigate('/login');
                 }
