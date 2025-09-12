@@ -1,12 +1,15 @@
-﻿import api from './AxiosService';
+﻿/* eslint-disable react-hooks/rules-of-hooks */
+import api from './AxiosService';
 
 
-
-export const getUsersDashboard = async () => {
+export const getUsersDashboard = async (token) => {
     try {
-        const res = await api.get('/api/dashboard/users');
+        const res = await api.get('/', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
         return { success: true, data: res.data };
     } catch (error) {
+        console.log(error)
         return { success: false, error };
     }
 };
