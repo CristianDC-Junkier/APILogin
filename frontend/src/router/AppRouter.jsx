@@ -21,11 +21,12 @@ const AppRouter = () => {
                 <Route path="/accessdenied" element={<AccessDenied />} />
                 <Route path="/accessdenied" element={<AccessDenied />} />
                 {/* Rutas publicas */}
-                <Route path="/login" element={<LoginPage />} />
+                <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 {/* Rutas privadas */}
                 <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
                 {/* Rutas privadas por rol */}
                 <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><UserList /></RoleRoute>} />
+
                 <Route path="*" element={<NotFoundPage />} />
             </Route>
         </Routes>

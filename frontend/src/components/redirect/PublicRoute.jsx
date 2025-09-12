@@ -17,8 +17,6 @@ const PublicRoute = ({ children }) => {
                 } else {
                     navigate('/login');
                 }
-            
-
         }
     }, [loading, user, navigate]);
 

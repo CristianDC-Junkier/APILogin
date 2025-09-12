@@ -18,24 +18,6 @@ export const logout = async () => {
     }
 };
 
-export const recoverPass = async (credentials) => {
-    try {
-        await api.post('/auth/recoverpass', credentials);
-        return { success: true };
-    } catch (error) {
-        return { success: false, error };
-    }
-};
-
-export const resetPass = async (credentials) => {
-    try {
-        await api.post('/auth/resetpass', credentials);
-        return { success: true };
-    } catch (error) {
-        return { success: false, error };
-    }
-};
-
 export const getProfile = async () => {
     try {
         const res = await api.get('/auth/profile');
