@@ -1,5 +1,4 @@
-﻿/* eslint-disable react-hooks/rules-of-hooks */
-import api from './AxiosService';
+﻿import api from './AxiosService';
 
 
 export const getUsersDashboard = async (token) => {

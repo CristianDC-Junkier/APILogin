@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 
 const MainLayout = () => (
     <div className="d-flex flex-column min-vh-100">
-        <Container tag="main" className="flex-grow-1">
+        <Container tag="main" className="flex-grow-1 d-flex flex-column justify-content-center align-items-center">
             <Outlet />
         </Container>
         <Footer />
