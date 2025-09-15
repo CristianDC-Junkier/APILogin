@@ -18,6 +18,7 @@ function adminOnly(req, res, next) {
         req.user = payload; 
         next();
     } catch (err) {
+        LoggerController.warn('Token inválido: ' + err.message);
         return res.status(401).json({ success: false, message: "Token inválido" });
     }
 }
