@@ -25,16 +25,15 @@ const ExternalWeb = () => {
     };
 
     return (
-        <div className="iframe">
-            <div>
+        <div >
+            <div className="iframe">
                 <iframe
                     title="Web View"
                     src={URL}
-                    style={{ width: '100%', height: '750px' }}
+                    style={{ width: '1250px', height: '750px' }}
                 />
             </div>
-            <div>
-                {console.log(user) }
+            <div className="logoutbottom d-flex justify-content-end">
                 {!(user.usertype === 'USER') && <BackButton back="/home" />}
                 {user.usertype === 'USER' && <LogoutButton onClick={handleLogout} loading={loadingLogout} />}
             </div>
