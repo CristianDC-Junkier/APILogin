@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
-import { Row, Col, Card, CardBody, Button, Table } from "reactstrap";
+import { Container, Row, Col, Card, CardBody, CardTitle, CardText, Button, Table } from "reactstrap";
 import Swal from 'sweetalert2';
 
 import { getUsersList, createUser, modifyUser, deleteUser } from "../../services/UserService";
@@ -21,9 +21,8 @@ const UserList = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [selectedType, setSelectedType] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 10;
+    const rowsPerPage = 5;
 
-    // Fetch usuarios
     useEffect(() => {
         const fetchData = async () => {
             if (!token) return;
@@ -45,7 +44,7 @@ const UserList = () => {
             setLoading(false);
         };
         fetchData();
-    }, [token,logout,navigate]);
+    }, [token, logout, navigate]);
 
     // Estadísticas
     const stats = {
@@ -58,7 +57,7 @@ const UserList = () => {
     const filteredUsers = selectedType === "All"
         ? allUsers
         : allUsers.filter(user =>
-            selectedType === "User"
+            selectedType === "Usuarios"
                 ? user.usertype === "USER"
                 : ["ADMIN", "SUPERADMIN"].includes(user.usertype)
         );
@@ -240,7 +239,6 @@ const UserList = () => {
         }
     };
 
-
     const handleDelete = async (userItem) => {
         try {
             await showCaptcha(userItem.id);
@@ -288,7 +286,6 @@ const UserList = () => {
         }
     };
 
-
     const showCaptcha = (idd) => {
         return new Promise((resolve, reject) => {
             const container = document.createElement('div');
@@ -335,80 +332,98 @@ const UserList = () => {
         ADMIN: "Administrador",
         SUPERADMIN: "Super Administrador"
     };
-    const renderUserTable = () => (
-        <div className="mt-4">
-            <h3 className="mb-3 p-2 text-center">{selectedType === "All" ? "Todos los Usuarios" : selectedType}</h3>
-            <Table striped responsive>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Tipo</th>
-                        <th className="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentUsers.map((userItem, idx) => {
-                        const isSuperAdminUser = userItem.usertype === "SUPERADMIN";
-                        const CanIModifySuperAdminUser = currentUser.usertype === "SUPERADMIN";
-                        const isCurrentUser = userItem.id === currentUser.id;
+    const renderUserTable = () => {
+        // Número de filas que deben aparecer
+        const emptyRows = rowsPerPage - currentUsers.length;
 
-                        return (
-                            <tr key={idx}>
-                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
-                                    {userItem?.id || "\u00A0"}
-                                </td>
-                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
-                                    {userItem?.username || "\u00A0"}
-                                </td>
-                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
-                                    {tipoLabels[userItem?.usertype] || "\u00A0"}
-                                </td>
-                                <td className="text-center">
-                                    <div className="d-flex justify-content-center flex-wrap m">
-                                        {((CanIModifySuperAdminUser && isSuperAdminUser) || !isSuperAdminUser) && (
-                                            <Button
-                                                color="warning"
-                                                size="sm"
-                                                style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
-                                                onClick={() => handleModify(userItem)}
-                                            >
-                                                ✏️
-                                            </Button>
-                                        )}
-                                        {!isSuperAdminUser && (
-                                            <Button
-                                                color="danger"
-                                                size="sm"
-                                                style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
-                                                onClick={() => handleDelete(userItem)}
-                                            >
-                                                🗑️
-                                            </Button>
-                                        )}
-                                    </div>
-                                </td>
+        return (
+            <div className="mt-2 mb-2">
+                <h3 className="mb-3 p-2 text-center">
+                    {selectedType === "All" ? "Todos los Usuarios" : selectedType}
+                </h3>
+                <Table striped responsive>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Tipo</th>
+                            <th className="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {currentUsers.map((userItem, idx) => {
+                            const isSuperAdminUser = userItem.usertype === "SUPERADMIN";
+                            const CanIModifySuperAdminUser = currentUser.usertype === "SUPERADMIN";
+                            const isCurrentUser = userItem.id === currentUser.id;
+
+                            return (
+                                <tr key={idx}>
+                                    <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
+                                        {userItem?.id || "\u00A0"}
+                                    </td>
+                                    <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
+                                        {userItem?.username || "\u00A0"}
+                                    </td>
+                                    <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
+                                        {tipoLabels[userItem?.usertype] || "\u00A0"}
+                                    </td>
+                                    <td className="text-center">
+                                        <div className="d-flex justify-content-center flex-wrap m">
+                                            {((CanIModifySuperAdminUser && isSuperAdminUser) || !isSuperAdminUser) && (
+                                                <Button
+                                                    color="warning"
+                                                    size="sm"
+                                                    style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                    onClick={() => handleModify(userItem)}
+                                                >
+                                                    ✏️
+                                                </Button>
+                                            )}
+                                            {!isSuperAdminUser && (
+                                                <Button
+                                                    color="danger"
+                                                    size="sm"
+                                                    style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                    onClick={() => handleDelete(userItem)}
+                                                >
+                                                    🗑️
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+
+                        {/* Filas vacías */}
+                        {emptyRows > 0 && [...Array(emptyRows)].map((_, idx) => (
+                            <tr key={`empty-${idx}`} style={{ height: '44px' }}>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </Table>
-            {totalPages > 1 && (
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-            )}
-        </div>
-    );
+                        ))}
+                    </tbody>
+                </Table>
+                {totalPages > 1 && (
+                    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                )}
+            </div>
+        );
+    };
 
     if (loading) return <Spinner />;
 
     return (
-        <div className="container pt-4 mt-4 position-relative mb-3" style={{ minHeight: "80vh" }}>
-            {/* Back Button  */}
+        <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
+            {/* Botón Volver arriba a la izquierda */}
             <div className="position-absolute top-0 start-0 p-3">
                 <BackButton back="/home" />
             </div>
-            {/* Crear Usuario */}
-            <div className="position-absolute top-0 end-0 my-4">
+
+            {/* Botón Crear Usuario arriba a la derecha */}
+            <div className="position-absolute top-0 end-0 p-3">
                 <Button
                     color="transparent"
                     style={{ color: 'black', border: 'none', padding: 0, fontWeight: 'bold' }}
@@ -418,74 +433,42 @@ const UserList = () => {
                 </Button>
             </div>
 
-
-
-
             {/* Tarjetas de estadísticas */}
-            <Row className="mb-4 justify-content-center">
-                <Col xs="12" sm="3" className="mb-2">
-                    <Card
-                        className="text-center p-2 mx-2"
-                        style={{
-                            border: '2px solid #000',
-                            borderRadius: '0.5rem',
-                            height: '100px',
-                            backgroundColor: '#f8f9fa',
-                            cursor: 'pointer'
-
-                        }}
-                        onClick={() => setSelectedType("All")}
-                    >
-                        <CardBody className="p-2">
-                            <h6>Total</h6>
-                            <h4>{stats.total}</h4>
-                        </CardBody>
-                    </Card>
-                </Col>
-
-                <Col xs="12" sm="3" className="mb-2">
-                    <Card
-                        className="text-center p-2 cursor-pointer mx-2"
-                        style={{
-                            border: '2px solid #000',
-                            borderRadius: '0.5rem',
-                            height: '100px',
-                            backgroundColor: '#f8f9fa',
-                            cursor: 'pointer'
-                        }}
-                        onClick={() => setSelectedType("Admin")}
-                    >
-                        <CardBody className="p-2">
-                            <h6>Admins</h6>
-                            <h4>{stats.admin}</h4>
-                        </CardBody>
-                    </Card>
-                </Col>
-
-                <Col xs="12" sm="3" className="mb-2">
-                    <Card
-                        className="text-center p-2 cursor-pointer mx-2"
-                        style={{
-                            border: '2px solid #000',
-                            borderRadius: '0.5rem',
-                            height: '100px',
-                            backgroundColor: '#f8f9fa',
-                            cursor: 'pointer'
-                        }}
-                        onClick={() => setSelectedType("Usuarios")}
-                    >
-                        <CardBody className="p-2">
-                            <h6>Usuarios</h6>
-                            <h4>{stats.user}</h4>
-                        </CardBody>
-                    </Card>
-                </Col>
+            <Row className="mb-1 mt-4 justify-content-center g-2">
+                {[
+                    { label: "Total", value: stats.total },
+                    { label: "Admins", value: stats.admin },
+                    { label: "Usuarios", value: stats.user }
+                ].map((metric, idx) => (
+                    <Col key={idx} xs={6} md={3}>
+                        <Card
+                            className="shadow-sm border-info"
+                            style={{
+                                border: '2px solid blue',
+                                borderRadius: '0.5rem',
+                                height: '100px',
+                                backgroundColor: '#f8f9fa',
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                                if (metric.label === "Total") setSelectedType("All");
+                                else if (metric.label === "Admins") setSelectedType("Admin");
+                                else if (metric.label === "Usuarios") setSelectedType("Usuarios");
+                            }}
+                        >
+                            <CardBody className="p-2 text-center">
+                                <CardTitle tag="h6">{metric.label}</CardTitle>
+                                <CardText className="fs-4 fw-bold">{metric.value}</CardText>
+                            </CardBody>
+                        </Card>
+                    </Col>
+                ))}
             </Row>
 
 
             {/* Tabla de usuarios */}
             {renderUserTable()}
-        </div>
+        </Container>
     );
 };
 

@@ -23,7 +23,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pageNumbers = getPaginationNumbers(currentPage, totalPages);
 
     return (
-        <div className="pagination-controls d-flex justify-content-center mt-4 flex-wrap gap-2">
+        <div className="pagination-controls d-flex justify-content-center mt-0 flex-wrap gap-2">
             {pageNumbers.map((item, index) => {
                 if (item === '...') {
                     return <span key={index} className="pagina-text px-2">...</span>;

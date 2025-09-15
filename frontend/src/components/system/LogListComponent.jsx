@@ -13,7 +13,10 @@ export default function LogListComponent({ logs, selectedLog, onSelectLog, onDow
     };
 
     return (
-        <ListGroup flush>
+        <ListGroup flush
+            style={{
+                overflowY: 'auto',
+            }} >
             {logs.map((log, index) => {
                 const displayName = log.includes('-') ? log.split('-').slice(1).join('-') : log;
                 const tooltipId = `tooltip-${index}`;

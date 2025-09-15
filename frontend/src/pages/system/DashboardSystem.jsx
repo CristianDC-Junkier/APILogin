@@ -104,55 +104,57 @@ export default function DashboardSystem() {
     if (loading) return <Spinner />;
 
     return (
-        <Container className="container mt-4 position-relative">
-            <h3 className="text-center mb-5">Estadísticas del Servidor</h3>
+        <Container className="mt-4 d-flex flex-column" style={{ minHeight: '70vh' }}>
+            <h3 className="text-center mb-4">Estadísticas del Servidor</h3>
+
             <div className="position-absolute top-0 start-0">
                 <BackButton back="/home" />
             </div>
-            <Row className="mb-3 text-center g-2">
-                <Col md={3}>
-                    <Card className="border-warning shadow-sm">
-                        <CardBody>
-                            <CardTitle tag="h6">CPU Usage (%)</CardTitle>
-                            <CardText className="fs-4 fw-bold">
-                                {typeof cpuUsage === 'number' ? `${cpuUsage.toFixed(2)}%` : 'Cargando...'}
-                            </CardText>
-                        </CardBody>
-                    </Card>
-                </Col>
-                <Col md={3}>
-                    <Card className="border-warning shadow-sm">
-                        <CardBody>
-                            <CardTitle tag="h6">Memoria Usada (MB)</CardTitle>
-                            <CardText className="fs-4 fw-bold">
-                                {typeof memoryUsed === 'number' ? memoryUsed.toFixed(2) : 'Cargando...'}
-                            </CardText>
-                        </CardBody>
-                    </Card>
-                </Col>
-                <Col md={3}>
-                    <Card className="border-info shadow-sm">
-                        <CardBody>
-                            <CardTitle tag="h6">Threads Activos</CardTitle>
-                            <CardText className="fs-4 fw-bold">
-                                {threadsCount !== null ? threadsCount : 'Cargando...'}
-                            </CardText>
-                        </CardBody>
-                    </Card>
-                </Col>
-                <Col md={3}>
-                    <Card className="border-primary shadow-sm">
-                        <CardBody>
-                            <CardTitle tag="h6">Uptime</CardTitle>
-                            <CardText className="fs-4 fw-bold">
-                                {uptimeSeconds !== null ? formatUptime(uptimeSeconds) : 'Cargando...'}
-                            </CardText>
-                        </CardBody>
-                    </Card>
-                </Col>
+
+            {/* Métricas */}
+            <Row className="mb-2 text-center g-2">
+                {[
+                    { label: "CPU Usage (%)", value: cpuUsage, type: "warning" },
+                    { label: "Memoria Usada (MB)", value: memoryUsed, type: "warning" },
+                    { label: "Threads Activos", value: threadsCount, type: "info" },
+                    { label: "Uptime", value: uptimeSeconds !== null ? formatUptime(uptimeSeconds) : null, type: "primary" }
+                ].map((metric, idx) => (
+                    <Col key={idx} xs={6} md={3}>
+                        <Card className={`border-${metric.type} shadow-sm`}>
+                            <CardBody>
+                                <CardTitle tag="h6">{metric.label}</CardTitle>
+                                <CardText className="fs-4 fw-bold">
+                                    {metric.value !== null && metric.value !== undefined
+                                        ? typeof metric.value === "number"
+                                            ? `${metric.value.toFixed(2)}%`
+                                            : metric.value
+                                        : "Cargando..."}
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                    </Col>
+                ))}
             </Row>
-            <Row className="mt-5 mb-3 h-100 d-none d-lg-flex" style={{ height: 'calc(100vh - 200px)' }}>
-                <Col lg="3" className="border-end overflow-auto d-flex flex-column">
+
+            {/* Escritorio */}
+            <Row
+                className="d-none d-lg-flex flex-grow-1"
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flex: 1,
+                    height: 'auto',
+                    overflow: 'hidden'
+                }}
+            >
+                <Col
+                    lg="3"
+                    style={{
+                        height: 'calc(55vh)', 
+                        overflowY: 'auto',
+                        paddingRight: '0.5rem'
+                    }}
+                >
                     <LogListComponent
                         logs={logs}
                         selectedLog={selectedLog}
@@ -160,23 +162,48 @@ export default function DashboardSystem() {
                         onDownloadLog={handleDownloadLog}
                     />
                 </Col>
-                <Col lg="9" className="d-flex flex-column">
+                <Col
+                    lg="9"
+                    style={{
+                        height: 'calc(55vh)', 
+                        overflowY: 'auto',
+                        paddingLeft: '1rem'
+                    }}
+                >
                     <LogViewerComponent content={logContent} />
                 </Col>
             </Row>
+
+            {/* Móvil */}
             <Row className="d-flex d-lg-none flex-column">
-                <Col xs="12" className="mb-3" style={{ maxHeight: '80vh', overflowY: 'auto', width: '100%' }}>
+                <Col
+                    xs="12"
+                    style={{
+                        marginBottom: '0.5rem',
+                        maxHeight: '50vh',
+                        overflowY: 'auto'
+                    }}
+                >
                     <LogViewerComponent content={logContent} />
                 </Col>
-                <Row xs="12" className="w-100 mb-3">
-                    <Col xs="12">
-                        <LogListComponent
-                            logs={logs}
-                            selectedLog={selectedLog}
-                            onSelectLog={handleSelectLog}
-                        />
-                    </Col>
-                </Row>
+                <Col xs="12">
+                    <hr/>
+                </Col>
+                <Col
+                    xs="12"
+                    style={{
+                        paddingTop: '0.5rem',
+                        marginBottom: '1rem',
+                        maxHeight: '50vh',
+                        overflowY: 'auto'
+                    }}
+                >
+                    <LogListComponent
+                        logs={logs}
+                        selectedLog={selectedLog}
+                        onSelectLog={handleSelectLog}
+                    />
+                </Col>
             </Row>
         </Container>
     );
