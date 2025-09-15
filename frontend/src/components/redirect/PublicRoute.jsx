@@ -1,7 +1,7 @@
 ﻿import React, { useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../utils/Spinner';
+import Spinner from '../utils/SpinnerComponent';
 
 const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();

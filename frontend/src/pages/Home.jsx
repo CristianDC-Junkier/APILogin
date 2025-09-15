@@ -23,8 +23,7 @@ const Home = () => {
     const actions = [
         { label: 'Continuar a la aplicación', icon: faGlobeEurope, action: () => navigate('/app') },
         { label: 'Gestión de Usuarios', icon: faUsers, action: () => navigate('/users') },
-        { label: 'Acceder Logs', icon: faScroll, action: () => alert('Has pulsado: Logs') },
-        //{ label: 'Mis Recibos', icon: faReceipt, action: () => alert('Has pulsado: Mis Recibos') },
+        { label: 'Acceder Logs', icon: faScroll, action: () => navigate('/logs') },
     ];
 
     const handleLogout = async () => {
