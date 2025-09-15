@@ -88,6 +88,8 @@
 /* ------------------- */
 
 .client-button {
+    height: auto ;
+    width: 360px;
     cursor: pointer;
     border: none;
     background: white;
