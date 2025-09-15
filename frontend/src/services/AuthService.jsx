@@ -8,3 +8,12 @@ export const login = async (credentials) => {
         return { success: false, error };
     }
 };
+
+export const logout = async () => {
+    try {
+        await api.post('/logout');
+        return { success: true };
+    } catch {
+        return { success: false };
+    }
+};

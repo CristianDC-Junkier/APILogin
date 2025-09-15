@@ -90,7 +90,7 @@
 .client-button {
     cursor: pointer;
     border: none;
-    background: lightgrey;
+    background: white;
     padding: 25px 30px; /* Más padding */
     text-align: center;
     text-transform: uppercase;

@@ -54,7 +54,7 @@ const Home = () => {
                     ))}
                 </Row>
             </div>
-            <div>
+            <div className="d-flex justify-content-end">
                 <LogoutButton onClick={handleLogout} loading={loadingLogout} />
             </div>
         </Container>

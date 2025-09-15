@@ -90,25 +90,24 @@ const UserList = () => {
         const { value: formValues } = await Swal.fire({
             title: 'Crear Usuario',
             html: `
-        <input id="swal-username" class="swal2-input" placeholder="Usuario">
-        <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña">
-        <select id="swal-type" class="swal2-select">${optionsHtml}</select>
-        <style>
-            .swal2-input, .swal2-select {
-                width: 100%;
-                padding: 0.5em 0.75em;
-                margin: 0.25em 0;
-                border: 1px solid #333;
-                border-radius: 0.25em;
-                font-size: 1em;
-            }
-            .swal2-select {
-                margin-bottom: 1em;
-                appearance: none;
-                background-color: #fff;
-            }
-        </style>
-        `,
+                <input id="swal-username" class="swal2-input" placeholder="Usuario">
+                <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña">
+                <select id="swal-type" class="swal2-select">${optionsHtml}</select>
+                <style>
+                    .swal2-input, .swal2-select {
+                        width: 100%;
+                        padding: 0.5em 0.75em;
+                        margin: 0.25em 0;
+                        border: 1px solid #333;
+                        border-radius: 0.25em;
+                        font-size: 1em;
+                    }
+                    .swal2-select {
+                        margin-bottom: 1em;
+                        appearance: none;
+                        background-color: #fff;
+                    }
+                </style>`,
             focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Crear',
@@ -169,25 +168,24 @@ const UserList = () => {
         const { value: formValues } = await Swal.fire({
             title: `${userItem.id === currentUser.id ? "Modificar su Usuario" : "Modificar Usuario"}`,
             html: `
-        <input id="swal-username" class="swal2-input" placeholder="Usuario" value="${userItem.username}">
-        <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña" value="">
-        <select id="swal-type" class="swal2-select">${optionsHtml}</select>
-        <style>
-            .swal2-input, .swal2-select {
-                width: 100%;
-                padding: 0.5em 0.75em;
-                margin: 0.25em 0;
-                border: 1px solid #333;
-                border-radius: 0.25em;
-                font-size: 1em;
-            }
-            .swal2-select {
-                margin-bottom: 1em;
-                appearance: none;
-                background-color: #fff;
-            }
-        </style>
-        `,
+                <input id="swal-username" class="swal2-input" placeholder="Usuario" value="${userItem.username}">
+                <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña" value="">
+                <select id="swal-type" class="swal2-select">${optionsHtml}</select>
+                <style>
+                    .swal2-input, .swal2-select {
+                        width: 100%;
+                        padding: 0.5em 0.75em;
+                        margin: 0.25em 0;
+                        border: 1px solid #333;
+                        border-radius: 0.25em;
+                        font-size: 1em;
+                    }
+                    .swal2-select {
+                        margin-bottom: 1em;
+                        appearance: none;
+                        background-color: #fff;
+                    }
+                </style>`,
             focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
