@@ -22,7 +22,9 @@ app.use(express.json());
 //            BACKEND
 // --------------------------------
 const AuthRoutes = require('./routes/AuthRoutes');
+const SystemRoutes = require('./routes/SystemRoutes');
 app.use('/', AuthRoutes);
+app.use('/', SystemRoutes);
 app.use((req, res) => {
     res.status(404).json({ success: false, message: "Ruta de API no encontrada" });
 });

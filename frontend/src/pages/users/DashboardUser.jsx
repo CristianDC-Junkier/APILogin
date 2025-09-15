@@ -8,7 +8,7 @@ import { getUsersList, createUser, modifyUser, deleteUser } from "../../services
 import { useAuth } from "../../hooks/useAuth";
 
 import BackButton from "../../components/utils/BackButtonComponent";
-import Spinner from '../../components/utils/Spinner';
+import Spinner from '../../components/utils/SpinnerComponent';
 import Pagination from "../../components/PaginationComponent";
 import CaptchaSlider from '../../components/utils/CaptchaSliderComponent';
 
@@ -45,7 +45,7 @@ const UserList = () => {
             setLoading(false);
         };
         fetchData();
-    }, [token]);
+    }, [token,logout,navigate]);
 
     // Estadísticas
     const stats = {
