@@ -1,5 +1,6 @@
 ﻿const Login = require("../models/AuthModel");
 const { generateToken } = require("../utils/JWT");
+const LoggerController = require("../controllers/LoggerController");
 
 class AuthController {
 
@@ -31,7 +32,9 @@ class AuthController {
                     token: token
                 }
             });
+            LoggerController.info('Sesion iniciada por ' + user.username);
         } catch (error) {
+            LoggerController.error('Error en el login: ' + error.message);
             res.status(500).json({
                 success: false,
                 error: error.message
@@ -74,7 +77,9 @@ class AuthController {
                 message: "Usuario registrado correctamente",
                 id: user.id,
             });
+            LoggerController.info('Nuevo usuario ' + username + ' creado correctamente');
         } catch (error) {
+            LoggerController.error('Error en la creación de usuario: ' + error.message);
             res.status(400).json({ success: false, error: error.message });
         }
     }
@@ -107,7 +112,9 @@ class AuthController {
                 success: true,
                 message: "Usuario actualizado correctamente"
             });
+            LoggerController.info('Usuario actualizado correctamente');
         } catch (error) {
+            LoggerController.error('Error en el modificar usuario: ' + error.message);
             res.status(500).json({
                 success: false,
                 error: error.message
@@ -133,7 +140,9 @@ class AuthController {
                 success: true,
                 message: "Usuario eliminado correctamente"
             });
+            LoggerController.info('Usuario eliminado correctamente');
         } catch (error) {
+            LoggerController.error('Error en la eliminación de usuario: ' + error.message);
             res.status(500).json({
                 success: false,
                 error: error.message

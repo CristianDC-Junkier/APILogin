@@ -46,6 +46,7 @@ const SystemController = {
 
             res.json(logs);
         } catch (error) {
+            LoggerController.error('Error en el acceso a los archivo de logs: ' + error.message);
             res.status(500).json({
                 success: false,
                 error: error.message
@@ -67,10 +68,12 @@ const SystemController = {
                 const content = fs.readFileSync(logPath, "utf-8");
                 res.type("text/plain").send(content);
             } catch (err) {
+                LoggerController.error('Error al leer el archivo log: ' + err.message);
                 res.status(500).json({ code: "No se pudo leer el archivo log" });
             }
 
         } catch (error) {
+            LoggerController.error('Error al abrir archivo de log: ' + error.message);
             res.status(500).json({
                 success: false,
                 error: error.message
@@ -91,9 +94,11 @@ const SystemController = {
             try {
                 res.download(logPath, log);
             } catch (err) {
+                LoggerController.error('Error al descargar el archivo log: ' + err.message);
                 res.status(500).json({ code: "No se pudo descargar el archivo log" });
             }
         } catch (error) {
+            LoggerController.error('Error al descargar el archivo log: ' + error.message);
             res.status(500).json({
                 success: false,
                 error: error.message
@@ -117,6 +122,7 @@ const SystemController = {
                 UptimeSeconds: uptimeSeconds
             });
         } catch (error) {
+            LoggerController.error('Error al obtener las métricas del sistema: ' + err.message);
             res.status(500).json({ success: false, error: error.message });
         }
     },

@@ -93,13 +93,13 @@ const Login = () => {
                         <h3 className="text-center mb-4 fw-bold mt-4">Login</h3>
                         <Form onSubmit={handleSubmit} className="px-4">
                             <FormGroup className="mb-2">
-                                <Label className="fw-semibold">Correo electrónico</Label>
+                                <Label className="fw-semibold">Usuario</Label>
                                 <Input
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
-                                    placeholder="Correo Electrónico"
+                                    placeholder="Usuario"
                                     className="border-0 border-bottom border-dark rounded-0 bg-white px-3 py-2"
                                 />
                             </FormGroup>
