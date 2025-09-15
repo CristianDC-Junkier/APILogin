@@ -5,23 +5,28 @@
 .logout-button {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: 0.3rem;
     background-color: #dc3545;
     border: none;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: width 0.3s ease, border-radius 0.3s ease, padding-left 0.3s ease;
-    padding: 0;
+    padding-left: 12px;
 }
 
-    .logout-button:hover,
-    .logout-button:focus {
+    .logout-button:not(:hover) {
+        width: 44px;
+        border-radius: 0.3rem;
+        transition: width 0.3s ease, border-radius 0.3s ease;
+    }
+
+    .logout-button:hover, .logout-button:focus {
         width: 140px;
+        height: 44px;
         border-radius: 0.5rem;
         justify-content: flex-start;
-        padding-left: 12px;
+        transition: width 0.3s ease, border-radius 0.3s ease;
     }
 
 .logout-content {
@@ -41,7 +46,7 @@
     font-size: 1rem;
     opacity: 0;
     transform: translateX(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.1s ease;
     white-space: nowrap;
     pointer-events: none;
 }
@@ -50,6 +55,7 @@
 .logout-button:focus .logout-text {
     opacity: 1;
     transform: translateX(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .logout-button:hover .logout-content,
