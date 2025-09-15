@@ -44,11 +44,12 @@ const Home = () => {
                 minHeight: '70vh',
             }}
         >
-            <div className="d-flex justify-content-start ms-4 ps-2">
-                <Col xs="6" md="1">
+            <Row className="align-items-center m-0 p-0">
+                <Col className="d-flex justify-content-start p-2">
                     <LogoutButton onClick={handleLogout} loading={loadingLogout} />
                 </Col>
-            </div>
+            </Row>
+
             <div className="d-flex flex-column justify-content-center align-items-center" style={{ flexGrow: 1 }}>
                 <Row className="g-3 mb-4 w-100">
                     {actions.map(({ label, icon, action }, idx) => (
@@ -58,7 +59,7 @@ const Home = () => {
                     ))}
                 </Row>
             </div>
-            
+
         </Container>
     );
 };
