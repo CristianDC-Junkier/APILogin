@@ -32,16 +32,17 @@ const ExternalWeb = () => {
         >
             {/* Botonera arriba */}
             <Row className="align-items-center m-0 p-0">
-                <Col className="d-flex justify-content-start p-0">
-                    {user.usertype !== "USER" && (
+                {user.usertype !== "USER" && (
+                    <Col className="d-flex justify-content-start p-0">
                         <BackButton back="/home" />
-                    )}
-                </Col>
-                <Col className="d-flex justify-content-start p-0">
-                    {user.usertype === "USER" && (
+
+                    </Col>
+                )}
+                {user.usertype === "USER" && (
+                    <Col className="d-flex justify-content-start p-2">
                         <LogoutButton onClick={handleLogout} loading={loadingLogout} />
-                    )}
-                </Col>
+                    </Col>
+                )}
             </Row>
 
             {/* Iframe que ocupa todo el espacio sobrante */}
