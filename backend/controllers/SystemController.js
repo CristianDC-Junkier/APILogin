@@ -1,41 +1,28 @@
 ﻿const fs = require("fs");
 const path = require("path");
 const os = require("os");
-
-// Configuración
 const logBasePath = path.join(__dirname, '../logs'); 
-function getCpuUsagePercent(interval = 100) {
-    return new Promise((resolve) => {
-        const startMeasure = os.cpus();
 
-        setTimeout(() => {
-            const endMeasure = os.cpus();
 
-            let idleDiff = 0;
-            let totalDiff = 0;
-
-            for (let i = 0; i < startMeasure.length; i++) {
-                const startCpu = startMeasure[i].times;
-                const endCpu = endMeasure[i].times;
-
-                const idle = endCpu.idle - startCpu.idle;
-                const total = (endCpu.user - startCpu.user) +
-                    (endCpu.nice - startCpu.nice) +
-                    (endCpu.sys - startCpu.sys) +
-                    (endCpu.irq - startCpu.irq) +
-                    idle;
-
-                idleDiff += idle;
-                totalDiff += total;
-            }
-            const usagePercent = 100 - (idleDiff / totalDiff) * 100;
-            resolve(Math.round(usagePercent * 100) / 100); 
-        }, interval);
-    });
-}
-
+/**
+ * Controlador para la gestión del sistema y logs de la aplicación.
+ * 
+ * Proporciona métodos para:
+ *  - Listar archivos de logs.
+ *  - Obtener contenido de un log específico.
+ *  - Descargar logs.
+ *  - Obtener métricas del sistema (CPU, memoria, hilos, uptime).
+ * 
+ */
 const SystemController = {
-    // Obtener Logs
+
+    /**
+     * Listar todos los archivos de log disponibles
+     * 
+     * @param {Object} req Objeto de petición Express
+     * @param {Object} res Objeto de respuesta Express
+     * @returns {Array<string>} Lista de nombres de archivos de log, ordenados por fecha descendente
+     */
     getLogs: (req, res) => {
         try {
             const logs = fs
@@ -54,7 +41,14 @@ const SystemController = {
         }
     },
 
-    // Obtener contenido de un archivo log
+    /**
+    * Obtener contenido de un archivo log específico
+    * 
+    * @param {Object} req Objeto de petición Express
+    * @param {Object} res Objeto de respuesta Express
+    * @param {string} req.params.log Nombre del archivo de log
+    * @returns {string} Contenido del log en texto plano
+    */
     getLog: (req, res) => {
         try {
             const { log } = req.params;
@@ -81,7 +75,13 @@ const SystemController = {
         }
     },
 
-    // Descargar un archivo log
+    /**
+     * Descargar un archivo de log
+     * 
+     * @param {Object} req Objeto de petición Express
+     * @param {Object} res Objeto de respuesta Express
+     * @param {string} req.params.log Nombre del archivo de log
+     */
     downloadLog: (req, res) => {
         try {
             const { log } = req.params;
@@ -106,7 +106,17 @@ const SystemController = {
         }
     },
 
-    // Obtener métricas del sistema
+    /**
+     * Obtener métricas del sistema
+     * 
+     * @param {Object} req Objeto de petición Express
+     * @param {Object} res Objeto de respuesta Express
+     * @returns {Object} Métricas del sistema:
+     *  - CpuUsagePercent {number} Porcentaje de uso de CPU
+     *  - MemoryUsedMB {number} Memoria usada en MB
+     *  - ThreadsCount {number} Número de hilos de CPU
+     *  - UptimeSeconds {number} Tiempo de actividad del proceso en segundos
+     */
     getSystemMetrics: async (req, res) => {
         try {
             const memoryUsedMB = Math.round((process.memoryUsage().rss / 1024 / 1024) * 100) / 100;
@@ -127,6 +137,42 @@ const SystemController = {
         }
     },
 };
+
+/**
+ * Calcula el porcentaje de uso de CPU en un intervalo dado.
+ * 
+ * @param {number} interval Intervalo de muestreo en ms (default: 100)
+ * @returns {Promise<number>} Porcentaje de CPU usado, redondeado a dos decimales
+ */
+function getCpuUsagePercent(interval = 100) {
+    return new Promise((resolve) => {
+        const startMeasure = os.cpus();
+
+        setTimeout(() => {
+            const endMeasure = os.cpus();
+
+            let idleDiff = 0;
+            let totalDiff = 0;
+
+            for (let i = 0; i < startMeasure.length; i++) {
+                const startCpu = startMeasure[i].times;
+                const endCpu = endMeasure[i].times;
+
+                const idle = endCpu.idle - startCpu.idle;
+                const total = (endCpu.user - startCpu.user) +
+                    (endCpu.nice - startCpu.nice) +
+                    (endCpu.sys - startCpu.sys) +
+                    (endCpu.irq - startCpu.irq) +
+                    idle;
+
+                idleDiff += idle;
+                totalDiff += total;
+            }
+            const usagePercent = 100 - (idleDiff / totalDiff) * 100;
+            resolve(Math.round(usagePercent * 100) / 100);
+        }, interval);
+    });
+}
 
 module.exports = SystemController;
 
