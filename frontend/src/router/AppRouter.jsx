@@ -2,6 +2,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import MainLayout from '../layouts/MainLayout';
+import ExternalLayout from '../layouts/ExternalLayout';
+
 import PublicRoute from '../components/redirect/PublicRoute';
 import PrivateRoute from '../components/redirect/PrivateRoute';
 import RoleRoute from '../components/redirect/RoleRoute';
@@ -28,13 +30,16 @@ const AppRouter = () => {
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 {/* Rutas privadas */}
                 <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-                <Route path="/app" element={<PrivateRoute><ExternalWeb /></PrivateRoute>} />
                 {/* Rutas privadas por rol */}
                 <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashBoardUser /></RoleRoute>} />
                 <Route path="/logs" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashboardSystem /></RoleRoute>} />
 
                 <Route path="*" element={<NotFoundPage />} />
             </Route>
+            <Route element={<ExternalLayout />}>
+                <Route path="/app" element={<PrivateRoute><ExternalWeb /></PrivateRoute>} />
+            </Route>
+
         </Routes>
     );
 };
