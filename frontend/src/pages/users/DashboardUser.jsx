@@ -418,7 +418,7 @@ const UserList = () => {
     return (
         <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
             {/* Botón Volver arriba a la izquierda */}
-            <div className="position-absolute top-0 start-0 p-3">
+            <div className="position-absolute top-0 start-0">
                 <BackButton back="/home" />
             </div>
 

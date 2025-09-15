@@ -11,7 +11,6 @@ const BackButton = ({ back = '/' }) => {
 
     return (
         <Button
-            className="position-absolute top-0 start-0 m-3 p-0"
             onClick={handleBack}
             style={{
                 backgroundColor: 'transparent',
