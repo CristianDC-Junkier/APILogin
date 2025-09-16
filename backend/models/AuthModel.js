@@ -2,7 +2,18 @@
 const sequelize = require("../config/db");
 const { encrypt, decrypt } = require("../utils/crypto");
 
-const Login = sequelize.define("User", {
+/**
+ * Modelo Sequelize para usuarios del sistema.
+ * 
+ * Campos:
+ * - id        → Identificador único autoincremental.
+ * - username  → Nombre de usuario único y obligatorio.
+ * - password  → Contraseña cifrada automáticamente al guardar.
+ *               - Al asignar (set): se cifra usando utilidades de crypto.
+ *               - Al obtener (get): se descifra para su uso interno.
+ * - usertype  → Rol del usuario. Valores posibles: 'USER' (por defecto), 'ADMIN', 'SUPERADMIN'.
+ */
+const User = sequelize.define("User", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -28,8 +39,8 @@ const Login = sequelize.define("User", {
     usertype: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'USER'
+        defaultValue: "USER",
     },
 });
 
-module.exports = Login;
+module.exports = User;
