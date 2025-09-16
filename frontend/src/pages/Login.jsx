@@ -18,6 +18,10 @@ import CaptchaSlider from '../components/utils/CaptchaSliderComponent';
 import '../styles/Global.css';
 import '../styles/auth/Login.css';
 
+/**
+ * Página de inicio de sesión
+ */
+
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -26,6 +30,7 @@ const Login = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
 
+    //Función que gestiona el Captcha
     const showCaptcha = () => {
         return new Promise((resolve, reject) => {
             const container = document.createElement('div');
@@ -60,6 +65,7 @@ const Login = () => {
         });
     };
 
+    //Función encargada de gestionar la información aportada por el usuario
     const handleSubmit = async (e) => {
         e.preventDefault();
 

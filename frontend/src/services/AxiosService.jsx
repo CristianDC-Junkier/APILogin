@@ -1,11 +1,13 @@
 ﻿// src/services/AxiosService.js
 import axios from 'axios';
 
+/**
+ * Servicio encargado de conectar con el servidor
+ */
+
 const api = axios.create({
     baseURL: 'http://localhost:5000',
     withCredentials: false,
 });
-
-
 
 export default api;
