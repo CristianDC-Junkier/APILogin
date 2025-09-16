@@ -19,6 +19,11 @@ import DashBoardUser from '../pages/users/DashboardUser';
 import DashboardSystem from '../pages/system/DashboardSystem';
 import ExternalWeb from '../pages/ExternalWeb';
 
+/**
+ * Encargado de definir las rutas de acceso a las distintas páginas y
+ * limitar su acceso dependiendo de los permisos del usuario
+ */
+
 const AppRouter = () => {
     return (
         <Routes>

@@ -12,6 +12,10 @@ import Spinner from '../../components/utils/SpinnerComponent';
 import Pagination from "../../components/PaginationComponent";
 import CaptchaSlider from '../../components/utils/CaptchaSliderComponent';
 
+/**
+ * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
+ */
+
 const UserList = () => {
     const navigate = useNavigate();
     const { user: currentUser, logout } = useAuth();
@@ -23,6 +27,7 @@ const UserList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5;
 
+    //Función encargada de obtener la información para la tabla
     useEffect(() => {
         const fetchData = async () => {
             if (!token) return;
@@ -72,7 +77,7 @@ const UserList = () => {
     };
 
 
-
+    //Función que gestiona la creación de un usuario
     const handleCreate = async () => {
         const tipos = [
             { label: 'Usuario', value: 'USER' },
@@ -151,6 +156,7 @@ const UserList = () => {
         }
     };
 
+    //Función que gestiona la modificación de un usuario
     const handleModify = async (userItem) => {
         const tipos = [
             { label: 'Usuario', value: 'USER' },
@@ -239,6 +245,7 @@ const UserList = () => {
         }
     };
 
+    //Función que gestiona la eliminación de un usuario
     const handleDelete = async (userItem) => {
         try {
             await showCaptcha(userItem.id);
@@ -286,6 +293,7 @@ const UserList = () => {
         }
     };
 
+    //Función que gestiona el Captcha
     const showCaptcha = (idd) => {
         return new Promise((resolve, reject) => {
             const container = document.createElement('div');
@@ -332,6 +340,8 @@ const UserList = () => {
         ADMIN: "Administrador",
         SUPERADMIN: "Super Administrador"
     };
+
+    //Función encargada de mostrar la tabla
     const renderUserTable = () => {
         // Número de filas que deben aparecer
         const emptyRows = rowsPerPage - currentUsers.length;

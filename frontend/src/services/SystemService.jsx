@@ -1,6 +1,21 @@
 ﻿import api from './AxiosService';
 
-// Obtener todos los logs
+/**
+ * Servicio en cargado de obtener información del estado del servidor 
+ * y los logs que contienen las acciones realizadas por los usuarios
+ * 
+ * Proporciona métodos para:
+ *   - Obtener un listado de los logs presentes en el servidor
+ *   - Obtener el contenido de un log seleccionado
+ *   - Descargar un log seleccionado
+ *   - Obtener las estadísticas del servidor
+ */
+
+/**
+ * Solicitud para obtener un listado con todos los logs
+ * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @returns {JSON} - Devuelve la información recibida de la llamada
+ */
 export const getLogs = async (token) => {
     try {
         const res = await api.get('/logs', {
@@ -12,7 +27,12 @@ export const getLogs = async (token) => {
     }
 };
 
-// Obtener contenido de un log
+/**
+ * Solicitud para obtener el contenido de un log
+ * @param {Object} log - Log del que se quiere obtener la información
+ * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @returns {JSON} - Devuelve la información recibida de la llamada
+ */
 export const getLog = async (log,token) => {
     try {
         const res = await api.get(`/logs/${encodeURIComponent(log)}`, {
@@ -24,7 +44,12 @@ export const getLog = async (log,token) => {
     }
 };
 
-// Descargar un log
+/**
+ * Solicitud para descargar un log
+ * @param {Object} log - Log que se quiere descargar
+ * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @returns {JSON} - Devuelve la información recibida de la llamada
+ */
 export const downloadLog = async (log,token) => {
     try {
         const res = await api.get(
@@ -50,7 +75,11 @@ export const downloadLog = async (log,token) => {
     }
 };
 
-// Obtener métricas del sistema
+/**
+ * Solicitud para obtener las métricas del sistema
+ * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @returns {JSON} - Devuelve la información recibida de la llamada
+ */
 export const getSystemMetrics = async (token) => {
     try {
         const res = await api.get('/system',{

@@ -1,5 +1,9 @@
 ﻿import React from 'react';
 
+/**
+ * Página comodín usada para aparecer en caso de poner una dirección
+ * que no ha sido definida en el AppRouter
+ */
 
 const NotFound = () => {
 
