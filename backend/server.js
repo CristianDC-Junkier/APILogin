@@ -23,24 +23,26 @@ app.use(express.json());
 // --------------------------------
 const AuthRoutes = require('./routes/AuthRoutes');
 const SystemRoutes = require('./routes/SystemRoutes');
-app.use('/', AuthRoutes);
-app.use('/', SystemRoutes);
-app.use((req, res) => {
-    res.status(404).json({ success: false, message: "Ruta de API no encontrada" });
-});
+app.use('/api', AuthRoutes);
+app.use('/api', SystemRoutes);
 
 
 // --------------------------------
 //            FRONTEND
 // --------------------------------
-/*
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.use(express.static(path.join(__dirname, "../frontend/dist")));x
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+app.use((req, res, next) => {
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+    } else {
+        next();
+    }
 });
-*/
 
+app.use((req, res) => {
+    res.status(404).json({ success: false, message: "Ruta de API no encontrada" });
+});
 
 
 async function start() {
