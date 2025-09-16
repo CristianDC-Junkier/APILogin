@@ -19,7 +19,7 @@ const getPaginationNumbers = (page, totalPages) => {
     return pages;
 };
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
     const pageNumbers = getPaginationNumbers(currentPage, totalPages);
 
     return (
@@ -44,4 +44,4 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     );
 };
 
-export default Pagination;
+export default PaginationComponent;

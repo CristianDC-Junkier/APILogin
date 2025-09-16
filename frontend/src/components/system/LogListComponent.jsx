@@ -3,6 +3,21 @@ import { ListGroup, ListGroupItem, Tooltip } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faDownload } from '@fortawesome/free-solid-svg-icons';
 
+/**
+ * Componente para listar archivos de log.
+ *
+ * Props:
+ * - logs: Array de nombres de archivos de log.
+ * - selectedLog: Nombre del log actualmente seleccionado.
+ * - onSelectLog: Función que se llama al seleccionar un log.
+ * - onDownloadLog: Función que se llama al descargar un log.
+ *
+ * Funcionalidades:
+ * - Muestra la lista de logs con íconos.
+ * - Tooltip con el nombre completo del log.
+ * - Highlight del log seleccionado.
+ * - Botón de descarga con efecto visual.
+ */
 export default function LogListComponent({ logs, selectedLog, onSelectLog, onDownloadLog }) {
     const [tooltipOpen, setTooltipOpen] = useState({});
 

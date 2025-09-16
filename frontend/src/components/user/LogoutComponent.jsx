@@ -4,7 +4,16 @@ import { Button } from 'reactstrap';
 
 import '../../styles/user/UserComponents.css';
 
-const LogoutButton = ({ onClick, loading }) => {
+
+/**
+ * Botón de cierre de sesión.
+ *
+ * Props:
+ * - onClick: Función que se ejecuta al hacer clic en el botón.
+ * - loading: Boolean que indica si la acción está en proceso, deshabilitando el botón.
+ *
+ */
+const LogoutButtonComponent = ({ onClick, loading }) => {
     return (
         <Button
             onClick={onClick}
@@ -20,4 +29,4 @@ const LogoutButton = ({ onClick, loading }) => {
     );
 };
 
-export default LogoutButton;
+export default LogoutButtonComponent;

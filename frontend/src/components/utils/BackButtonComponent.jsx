@@ -2,7 +2,14 @@
 import { Button } from 'reactstrap';
 import { FaArrowLeft } from 'react-icons/fa';
 
-const BackButton = ({ back = '/' }) => {
+/**
+ * Botón de retroceso/back.
+ *
+ * Props:
+ * - back: Ruta a la que se navegará al hacer clic (por defecto '/').
+ *
+ */
+const BackButtonComponent = ({ back = '/' }) => {
     const navigate = useNavigate(); 
 
     const handleBack = () => {
@@ -27,4 +34,4 @@ const BackButton = ({ back = '/' }) => {
     );
 };
 
-export default BackButton;
+export default BackButtonComponent;

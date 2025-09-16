@@ -5,25 +5,36 @@ import CryptoJS from 'crypto-js';
 
 export const AuthContext = createContext();
 
-// 🔐 Clave para cifrar (mejor usar variable de entorno .env)
-const SECRET_KEY = "WopMzMtUjl6jYV86gRG6LyKhIf83W0JI";
+const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
 
+/**
+ * Proveedor de autenticación.
+ *
+ * Props:
+ * - children: Componentes que consumen el contexto AuthContext.
+ *
+ * Funcionalidades:
+ * - Guarda y recupera usuario en storage (session/local) cifrado con AES.
+ * - Maneja expiración de sesión.
+ * - Proporciona métodos login y logout para consumir en cualquier componente.
+ */
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null); // Usuario actual
+    const [loading, setLoading] = useState(true); // Estado de carga inicial
 
     /**
-     * Guarda el usuario encriptado en storage (local o session)
-     * @param {Object} userData - Usuario
-     * @param {boolean} rememberMe - Si es true => localStorage, si no => sessionStorage
+     * Guarda el usuario en storage cifrado con expiración.
+     * @param {Object} userData - Información del usuario.
+     * @param {boolean} rememberMe - true → localStorage, false → sessionStorage.
      */
     const saveUserWithExpiry = (userData, rememberMe) => {
         const now = new Date();
         const item = {
             value: userData,
-            expiry: now.getTime() + 60 * 60 * 1000, // expira en 1 hora
+            expiry: now.getTime() + 60 * 60 * 1000, // Expira en 1 hora
         };
 
+        // Cifrar con AES
         const encrypted = CryptoJS.AES.encrypt(
             JSON.stringify(item),
             SECRET_KEY
@@ -38,8 +49,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     /**
-     * Recupera el usuario desde storage (sessionStorage > localStorage)
-     * y valida expiración + desencriptado
+     * Recupera el usuario desde storage y valida expiración.
+     * @returns {Object|null} Usuario descifrado o null si expira/no existe.
      */
     const getUserWithExpiry = () => {
         const encrypted =
@@ -58,23 +69,29 @@ export const AuthProvider = ({ children }) => {
                 return null;
             }
             return decrypted.value;
-        } catch (error) {
-            console.error("❌ Error desencriptando usuario:", error);
+        } catch {
+            // En caso de error de descifrado → limpiar storage
             sessionStorage.removeItem("user");
             localStorage.removeItem("user");
             return null;
         }
     };
 
-    // ---------- Restaurar usuario al cargar la app ----------
+    /**  
+     * Restaurar usuario al cargar la app 
+     */
     useEffect(() => {
         const storedUser = getUserWithExpiry();
         if (storedUser) setUser(storedUser);
         setLoading(false);
     }, []);
 
-
-    // ---------- Login ----------
+    /** 
+     * Loguear usuario
+     * 
+     * @param {Object} credentials - { username, password, rememberMe }
+     * @return {Object} Resultado del login { success: boolean, data/message }
+     */ 
     const contextLogin = async (credentials) => {
         const result = await login(credentials);
         if (result.success) {
@@ -88,7 +105,9 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
-    // ---------- Logout ----------
+    /**
+     * Cerrar sesión
+     */
     const contextLogout = async () => {
         setUser(null);
         sessionStorage.removeItem("user");
