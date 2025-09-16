@@ -10,7 +10,15 @@ import LogListComponent from '../../components/system/LogListComponent';
 import LogViewerComponent from '../../components/system/LogViewerComponent';
 import Spinner from '../../components/utils/SpinnerComponent';
 
+/**
+ * Página encarga de mostrar los logs y las estdísticas del servidor
+ */
 
+/**
+ * Función que da formato a una cantidad de tiempo recibida
+ * @param {int} totalSeconds - cantidad de tiempo en segundos
+ * @returns {String} - tiempo con formato horas:minutos:segundos
+ */
 function formatUptime(totalSeconds) {
     const hrs = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
@@ -33,6 +41,7 @@ export default function DashboardSystem() {
     const [threadsCount, setThreadsCount] = useState(null);
     const [uptimeSeconds, setUptimeSeconds] = useState(null);
 
+    //Función encargada de obtener la información para la tabla
     useEffect(() => {
         const fetchLogs = async () => {
             if (!token) return;
@@ -49,6 +58,7 @@ export default function DashboardSystem() {
         fetchLogs();
     }, [token]);
 
+    //Función encargada de obtener la información del estado del servidor
     useEffect(() => {
         const fetchMetrics = async () => {
             if (!token) return;
@@ -70,7 +80,7 @@ export default function DashboardSystem() {
         return () => clearInterval(interval);
     }, [token]);
 
-
+    //Función encargada de mostrar la información del log seleccionado
     const handleSelectLog = async (log) => {
         setSelectedLog(log);
         const res = await getLog(log, token);
@@ -81,6 +91,7 @@ export default function DashboardSystem() {
         }
     };
 
+    //Función encargada de gestionar la descarga del log seleccionado
     const handleDownloadLog = (log) => {
         downloadLog(log, token).then(({ success, error }) => {
             if (!success) {
