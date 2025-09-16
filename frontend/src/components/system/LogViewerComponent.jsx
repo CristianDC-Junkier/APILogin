@@ -1,6 +1,17 @@
 ﻿import React from 'react';
 import { Card, CardBody } from "reactstrap";
 
+/**
+ * Componente para visualizar el contenido de un log.
+ *
+ * Props:
+ * - content: String con el contenido completo del log.
+ *
+ * Funcionalidades:
+ * - Renderiza cada línea del log.
+ * - Colorea las etiquetas [INFO], [WARN], [ERROR] según su nivel.
+ * - Mantiene formato de texto monoespaciado y saltos de línea.
+ */
 export default function LogViewerComponent({ content }) {
     // Función para renderizar cada línea con color según el nivel
     const renderLine = (line, index) => {

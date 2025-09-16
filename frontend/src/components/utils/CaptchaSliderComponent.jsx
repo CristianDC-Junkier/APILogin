@@ -1,8 +1,9 @@
-﻿// CaptchaSlider.js
+﻿
 import React, { useEffect, useRef } from "react";
 
-
-
+/**
+ * Inyecta estilos CSS para el slider CAPTCHA una sola vez.
+ */
 const sliderStyleId = "captcha-slider-style";
 const injectStyles = () => {
     if (document.getElementById(sliderStyleId)) return;
@@ -35,7 +36,19 @@ const injectStyles = () => {
     document.head.appendChild(style);
 };
 
-const CaptchaSlider = ({ onSuccess }) => {
+
+/**
+ * Componente CAPTCHA tipo slider.
+ *
+ * Props:
+ * - onSuccess: Función que se ejecuta cuando el slider llega a 100%.
+ *
+ * Funcionalidades:
+ * - Usuario debe arrastrar la flecha hasta el final.
+ * - Feedback visual cambia según progreso.
+ * - Si no se completa correctamente, el slider se reinicia y muestra mensaje de error.
+ */
+const CaptchaSliderComponent = ({ onSuccess }) => {
     const sliderRef = useRef(null);
     const feedbackRef = useRef(null);
 
@@ -45,6 +58,9 @@ const CaptchaSlider = ({ onSuccess }) => {
         const slider = sliderRef.current;
         const feedback = feedbackRef.current;
 
+        /**
+         * Actualiza visualmente el slider y el mensaje de feedback.
+         */
         const updateVisual = () => {
             const val = parseInt(slider.value);
             slider.style.background = `linear-gradient(to right, #0d6efd ${val}%, #ddd ${val}%)`;
@@ -54,6 +70,10 @@ const CaptchaSlider = ({ onSuccess }) => {
             feedback.className = `mt-2 ${val < 100 ? "text-muted" : "text-success fw-bold"}`;
         };
 
+        /**
+         * Maneja la validación al soltar el slider.
+         * Si el valor es 100, llama a onSuccess. Si no, reinicia el slider.
+         */
         const handleChange = () => {
             if (parseInt(slider.value) === 100) {
                 onSuccess();
@@ -65,6 +85,9 @@ const CaptchaSlider = ({ onSuccess }) => {
             }
         };
 
+        /**
+         * Previene selección de texto y focus accidental mientras se arrastra.
+         */
         const handleStart = () => {
             if (window.getSelection) window.getSelection().removeAllRanges();
             if (document.activeElement) document.activeElement.blur();
@@ -95,5 +118,5 @@ const CaptchaSlider = ({ onSuccess }) => {
     );
 };
 
-export default CaptchaSlider;
+export default CaptchaSliderComponent;
 
