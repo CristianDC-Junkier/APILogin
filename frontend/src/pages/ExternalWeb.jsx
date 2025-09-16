@@ -5,6 +5,10 @@ import { useAuth } from "../hooks/useAuth";
 import BackButton from "../components/utils/BackButtonComponent";
 import LogoutButton from "../components/user/LogoutComponent";
 
+/**
+ * Página que muestra la aplicación externa
+ */
+
 const URL = import.meta.env.VITE_URL;
 
 const ExternalWeb = () => {
@@ -12,6 +16,7 @@ const ExternalWeb = () => {
     const navigate = useNavigate();
     const { logout, user } = useAuth();
 
+    //Función que gestiona el cierre de sesión
     const handleLogout = async () => {
         setLoadingLogout(true);
         try {

@@ -6,7 +6,7 @@ import CryptoJS from 'crypto-js';
 export const AuthContext = createContext();
 
 // 🔐 Clave para cifrar (mejor usar variable de entorno .env)
-const SECRET_KEY = "WopMzMtUjl6jYV86gRG6LyKhIf83W0JI";
+const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
