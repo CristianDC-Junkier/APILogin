@@ -29,6 +29,7 @@ const LoggerController = require("../controllers/LoggerController");
 async function initDatabase() {
     try {
         // Crear tabla si no existe
+        await sequelize.authenticate();
         await sequelize.sync();
 
         // Comprobar si existe el superadmin
@@ -47,7 +48,8 @@ async function initDatabase() {
         }
         LoggerController.info('✅ Base de datos inicializada correctamente');
     } catch (err) {
-        LoggerController.error('❌ Error inicializando la base de datos:', err.message);
+        const message = err instanceof Error ? (err.message || err.stack) : JSON.stringify(err);
+        LoggerController.errorCritical('❌ Error inicializando la base de datos:' + message);
         process.exit(1);
     }
 }

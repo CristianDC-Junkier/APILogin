@@ -4,14 +4,13 @@ const LoggerController = require("./controllers/LoggerController");
 const path = require("path");
 const dotenv = require('dotenv');
 
-
 dotenv.config({ path: path.resolve(__dirname, '.env') });
+const basePath = '/visor-sig';
 
 // --------------------------------
 //  DATABASE (Solo en Desarrollo)
 // --------------------------------
 const { initDatabase } = require("./config/dbInit");
-
 
 const app = express();
 
@@ -23,28 +22,28 @@ app.use(express.json());
 // --------------------------------
 const AuthRoutes = require('./routes/AuthRoutes');
 const SystemRoutes = require('./routes/SystemRoutes');
-app.use('/api', AuthRoutes);
-app.use('/api', SystemRoutes);
+app.use(`${basePath}/api`, AuthRoutes);
+app.use(`${basePath}/api`, SystemRoutes);
 
+// Inicializar LoggerController
+LoggerController.init();
 
 // --------------------------------
 //            FRONTEND
 // --------------------------------
-app.use(express.static(path.join(__dirname, "../frontend/dist")));x
 
-app.use((req, res, next) => {
-    if (!req.path.startsWith('/api')) {
-        res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
-    } else {
-        next();
-    }
+//app.use(basePath, express.static(path.join(__dirname, "./dist")));
+//app.use(basePath, (req, res) => {
+//    res.sendFile(path.join(__dirname, "./dist/index.html"));
+//})
+
+app.use('/', (req, res) => {
+    res.status(404).json({ success: false, message: "Ruta no encontrada" });
 });
 
-app.use((req, res) => {
-    res.status(404).json({ success: false, message: "Ruta de API no encontrada" });
-});
-
-
+// --------------------------------
+//         INICIALIZACIÓN
+// --------------------------------
 async function start() {
     try {
         await initDatabase();
@@ -53,7 +52,8 @@ async function start() {
             LoggerController.info(`Servidor corriendo en http://localhost:${PORT}`);
         });
     } catch (err) {
-        LoggerController.error('Error inicializando la base de datos:', err.message);
+        const message = err instanceof Error ? (err.message || err.stack) : JSON.stringify(err);
+        LoggerController.errorCritical('❌ Error inicializando la base de datos: ' + message);
         process.exit(1);
     }
 }
