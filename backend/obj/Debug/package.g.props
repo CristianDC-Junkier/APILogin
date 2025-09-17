@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <PackageJsonName Condition="$(PackageJsonName) == ''">backend</PackageJsonName>
+    <PackageJsonName Condition="$(PackageJsonName) == ''">visor-sig</PackageJsonName>
     <PackageJsonVersion Condition="$(PackageJsonVersion) == ''">1.0.0</PackageJsonVersion>
-    <PackageJsonMain Condition="$(PackageJsonMain) == ''">app.js</PackageJsonMain>
-    <PackageJsonScriptsTest Condition="$(PackageJsonScriptsTest) == ''">echo "Error: no test specified" &amp;&amp; exit 1</PackageJsonScriptsTest>
+    <PackageJsonMain Condition="$(PackageJsonMain) == ''">server.js</PackageJsonMain>
+    <PackageJsonScriptsStart Condition="$(PackageJsonScriptsStart) == ''">node server.js</PackageJsonScriptsStart>
     <PackageJsonKeywords Condition="$(PackageJsonKeywords) == ''">[]</PackageJsonKeywords>
     <PackageJsonAuthor Condition="$(PackageJsonAuthor) == ''"></PackageJsonAuthor>
     <PackageJsonLicense Condition="$(PackageJsonLicense) == ''">ISC</PackageJsonLicense>
@@ -14,6 +14,7 @@
     <PackageJsonDependenciesDotenv Condition="$(PackageJsonDependenciesDotenv) == ''">^17.2.2</PackageJsonDependenciesDotenv>
     <PackageJsonDependenciesExpress Condition="$(PackageJsonDependenciesExpress) == ''">^5.1.0</PackageJsonDependenciesExpress>
     <PackageJsonDependenciesJsonwebtoken Condition="$(PackageJsonDependenciesJsonwebtoken) == ''">^9.0.2</PackageJsonDependenciesJsonwebtoken>
+    <PackageJsonDependenciesMariadb Condition="$(PackageJsonDependenciesMariadb) == ''">^3.4.5</PackageJsonDependenciesMariadb>
     <PackageJsonDependenciesMysql2 Condition="$(PackageJsonDependenciesMysql2) == ''">^3.14.5</PackageJsonDependenciesMysql2>
     <PackageJsonDependenciesSequelize Condition="$(PackageJsonDependenciesSequelize) == ''">^6.37.7</PackageJsonDependenciesSequelize>
     <PackageJsonDependenciesSqlite3 Condition="$(PackageJsonDependenciesSqlite3) == ''">^5.1.7</PackageJsonDependenciesSqlite3>
