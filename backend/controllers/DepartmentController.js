@@ -1,58 +1,22 @@
 ﻿
-const { UserAccount } = require("../models/Relations");
-const { generateToken } = require("../utils/JWT");
+const { Department } = require("../models/Relations");
 const LoggerController = require("../controllers/LoggerController");
 
 /**
  * Controlador de autenticación y gestión de usuarios.
  * 
- * Proporciona métodos estáticos para:      // FALTA TERMINAR
- *  - Login de usuarios                     // Ahora tiene que devolver sus departamentos
- *  - Listar todos los usuarios             // Ahora tiene que devolver sus departamentos
- *  - Crear un usuario
- *  - Modificar un usuario
- *  - Eliminar un usuario
- *  - Añadir departamentos a un usuario     // Falta terminar
- *  - Eliminar departamentos de un usuario  // Falta terminar
+ * Proporciona métodos estáticos para:                 // FALTA TERMINAR
+ *  - Listar todos los departamentos                   // Ahora tiene que devolver sus links
+ *  - Crear un departamento 
+ *  - Modificar un departamento
+ *  - Eliminar un departamento
+ *  - Añadir links a un departamento                   // Falta terminar
+ *  - Eliminar links de un departamento                // Falta terminar
  */
-class AuthController {
+class DepartmentController {
 
     /**
-     * Inicia sesión con un usuario existente.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { body: { username, password } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - JSON con información del usuario y token si es exitoso,
-     *                   o mensajes de error en caso de credenciales inválidas o falta de datos.
-     */
-    static async login(req, res) {
-        try {
-            const { username, password } = req.body;
-
-            if (!username || !password) {
-                return res.status(400).json({ success: false, message: "Usuario y contraseña requeridos" });
-            }
-
-            const user = await UserAccount.findOne({ where: { username } });
-            if (!user || user.password !== password) {
-                return res.status(401).json({ success: false, message: "Credenciales incorrectas" });
-            }
-
-            const token = generateToken({ id: user.id, username: user.username, usertype: user.usertype });
-
-            res.json({
-                success: true,
-                user: { id: user.id, username: user.username, usertype: user.usertype, token }
-            });
-            LoggerController.info('Sesion iniciada por ' + user.username);
-        } catch (error) {
-            LoggerController.error('Error en el login: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
-        }
-    }
-
-    /**
-     * Lista todos los usuarios existentes.
+     * Lista todos los departamentos existentes.
      * 
      * @param {Object} req - Objeto de petición de Express.
      * @param {Object} res - Objeto de respuesta de Express.
@@ -60,7 +24,7 @@ class AuthController {
      */
     static async list(req, res) {
         try {
-            const users = await UserAccount.findAll({ attributes: ["id", "username", "usertype"] });
+            const users = await Department.findAll({ attributes: ["id", "username", "usertype"] });
             res.json(users);
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
@@ -68,7 +32,7 @@ class AuthController {
     }
 
     /**
-     * Crea un nuevo usuario en la base de datos.
+     * Crea un nuevo departamento en la base de datos.
      * 
      * @param {Object} req - Objeto de petición de Express, con { body: { username, password, usertype } }.
      * @param {Object} res - Objeto de respuesta de Express.
@@ -87,7 +51,7 @@ class AuthController {
                 return res.status(403).json({ success: false, message: "Solo un SUPERADMIN puede crear a otro SUPERADMIN" });
             }
 
-            const user = await UserAccount.create({ username, password, usertype });
+            const user = await Department.create({ username, password, usertype });
 
             res.json({ success: true, message: "Usuario registrado correctamente", id: user.id });
             LoggerController.info('Nuevo usuario ' + username + ' creado correctamente');
@@ -98,7 +62,7 @@ class AuthController {
     }
 
     /**
-     * Modifica un usuario existente.
+     * Modifica un departamento existente.
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { username, password, usertype } }.
      * @param {Object} res - Objeto de respuesta de Express.
@@ -109,7 +73,7 @@ class AuthController {
             const { id } = req.params;
             const { username, password, usertype } = req.body;
 
-            const user = await UserAccount.findByPk(id);
+            const user = await Department.findByPk(id);
             if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
 
             if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
@@ -131,7 +95,7 @@ class AuthController {
     }
 
     /**
-     * Elimina un usuario existente.
+     * Elimina un departamento existente.
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
      * @param {Object} res - Objeto de respuesta de Express.
@@ -141,7 +105,7 @@ class AuthController {
         try {
             const { id } = req.params;
 
-            const user = await UserAccount.findByPk(id);
+            const user = await Department.findByPk(id);
             if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
 
             if (user.usertype === 'SUPERADMIN') {
@@ -159,20 +123,20 @@ class AuthController {
     }
 
     /**
-     * Añade un departamento a un usuario.
+     * Añade un link a un departamento.
      * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
+     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
      * @param {Object} res - Objeto de respuesta de Express.
      * @returns {JSON} - Mensaje de éxito o error.
      */
-    static async addDepartment(req, res) {
+    static async addLink(req, res) {
         try {
             const { id } = req.params;
-            const { departmentId } = req.body;
-            const user = await UserAccount.findByPk(id);
+            const { linkId } = req.body;
+            const department = await Department.findByPk(id);
            
         } catch (error) {
-            LoggerController.error('Error al añadir departamento al usuario: ' + error.message);
+            LoggerController.error('Error al añadir link al departamento: ' + error.message);
             res.status(500).json({ success: false, error: error.message });
         }
     }
@@ -180,21 +144,21 @@ class AuthController {
     /**
      * Elimina un departamento de un usuario.
      * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
+     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
      * @param {Object} res - Objeto de respuesta de Express.
      * @returns {JSON} - Mensaje de éxito o error.
      */
-    static async delDepartment(req, res) {
+    static async delLink(req, res) {
         try {
             const { id } = req.params;
-            const { departmentId } = req.body;
-            const user = await UserAccount.findByPk(id);
+            const { linkId } = req.body;
+            const department = await Department.findByPk(id);
 
         } catch (error) {
-            LoggerController.error('Error al añadir departamento al usuario: ' + error.message);
+            LoggerController.error('Error al eliminar el link del departamento: ' + error.message);
             res.status(500).json({ success: false, error: error.message });
         }
     }
 }
 
-module.exports = AuthController;
+module.exports = DepartmentController;

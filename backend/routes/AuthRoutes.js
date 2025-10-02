@@ -9,30 +9,27 @@ const { adminOnly } = require("../middlewares/Auth");
  * Rutas para gestión de usuarios.
  *
  * Endpoints:
- * - POST   /login      → Iniciar sesión y obtener token JWT.
- * - GET    /           → Listar todos los usuarios (solo ADMIN o SUPERADMIN).
- * - POST   /           → Crear un nuevo usuario (solo ADMIN o SUPERADMIN).
- * - PUT    /:id        → Actualizar datos de un usuario por ID (solo ADMIN o SUPERADMIN).
- * - DELETE /:id        → Eliminar un usuario por ID (solo ADMIN o SUPERADMIN).
- *
+ * - POST   /login               → Iniciar sesión y obtener token JWT.
+ * - GET    /                    → Listar todos los usuarios (solo ADMIN o SUPERADMIN).
+ * - POST   /                    → Crear un nuevo usuario (solo ADMIN o SUPERADMIN).
+ * - PUT    /:id                 → Actualizar datos de un usuario por ID (solo ADMIN o SUPERADMIN).
+ * - DELETE /:id                 → Eliminar un usuario por ID (solo ADMIN o SUPERADMIN).
+ * - PUT    /add-department/:id  → Añadir un departamento a un usuario (solo ADMIN o SUPERADMIN).
+ * - PUT    /del-department/:id  → Eliminar un departamento a un usuario (solo ADMIN o SUPERADMIN).
+ * 
  * Middleware:
  * - `adminOnly` → Restringe el acceso a usuarios con roles de administrador.
  */
 
 
-// Loguear usuario (acceso público)
 router.post("/login", AuthController.login);
 
-// Obtener todos los usuarios (solo admins)
-router.get("/", adminOnly, AuthController.listAll);
-
-// Crear un nuevo usuario (solo admins)
+router.get("/", adminOnly, AuthController.list);
 router.post("/", adminOnly, AuthController.create);
-
-// Modificar un usuario existente (solo admins)
 router.put("/:id", adminOnly, AuthController.update);
-
-// Eliminar un usuario (solo admins)
 router.delete("/:id", adminOnly, AuthController.delete);
+
+router.put("/add-department/:id", adminOnly, AuthController.addDepartment);
+router.put("/del-department/:id", adminOnly, AuthController.delDepartment);
 
 module.exports = router;
