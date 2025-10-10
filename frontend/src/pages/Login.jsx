@@ -25,7 +25,7 @@ import '../styles/auth/Login.css';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(false);
+    const [remember, setRemember] = useState(false);
 
     const navigate = useNavigate();
     const { login } = useAuth();
@@ -71,10 +71,10 @@ const Login = () => {
 
         try {
             // Mostrar captcha obligatorio
-            await showCaptcha();
+            //await showCaptcha();                                      DURANTE DESARROLLO
 
             // Hacer login
-            const response = await login({ username, password, rememberMe });
+            const response = await login({ username, password, remember });
 
             if (response.success) {
                 const user = response.data.user;
@@ -84,11 +84,10 @@ const Login = () => {
                     navigate('/home');
                 }
             } else {
-                console.error('Login error:', response.error);
-                Swal.fire('Error', response?.error?.response?.data?.message || 'Login fallido', 'error');
+                Swal.fire('Error', response.error || 'Login fallido', 'error');
             }
         } catch (err) {
-            Swal.fire('Error', err?.response?.data?.message || 'Captcha no completado', 'error');
+            Swal.fire('Error', err?.error || err?.message || 'Captcha no completado', 'error');
         }
     };
 
@@ -129,8 +128,8 @@ const Login = () => {
                                         <Input
                                             type="checkbox"
                                             id="rememberMe"
-                                            checked={rememberMe}
-                                            onChange={(e) => setRememberMe(e.target.checked)}
+                                            checked={remember}
+                                            onChange={(e) => setRemember(e.target.checked)}
                                         />
                                         <Label for="rememberMe" check className="fw-semibold ms-2">
                                             Recuerdame

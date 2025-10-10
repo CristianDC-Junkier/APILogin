@@ -18,10 +18,9 @@ import CaptchaSlider from '../../components/utils/CaptchaSliderComponent';
 
 const UserList = () => {
     const navigate = useNavigate();
-    const { user: currentUser, logout } = useAuth();
-    const token = currentUser?.token;
+    const { user: currentUser, token, logout } = useAuth();
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [allUsers, setAllUsers] = useState([]);
     const [selectedType, setSelectedType] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
@@ -34,7 +33,7 @@ const UserList = () => {
             setLoading(true);
             const response = await getUsersList(token);
             if (response.success) {
-                setAllUsers(response.data ?? []);
+                setAllUsers(response.data.users ?? []);
             }
             else {
                 if (handleError(response)) {
@@ -139,7 +138,7 @@ const UserList = () => {
             if (result.success) {
                 Swal.fire('Éxito', 'Usuario creado correctamente', 'success');
                 const response = await getUsersList(token);
-                if (response.success) setAllUsers(response.data ?? []);
+                if (response.success) setAllUsers(response.data.users ?? []);
             } else {
                 if (handleError(result)) {
                     Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
@@ -209,17 +208,12 @@ const UserList = () => {
                     return false;
                 }
 
-                return { username, password, usertype };
+                return { id: userItem.id, username, password, usertype, version: userItem.version };
             }
         });
 
         if (formValues) {
-            const result = await modifyUser({
-                id: userItem.id,
-                username: formValues.username,
-                password: formValues.password,
-                usertype: formValues.usertype
-            }, token);
+            const result = await modifyUser(formValues, token);
 
             if (result.success) {
                 Swal.fire('Éxito', 'Usuario modificado correctamente', 'success');
@@ -228,7 +222,7 @@ const UserList = () => {
                     navigate('/login')
                 }
                 const response = await getUsersList(token);
-                if (response.success) setAllUsers(response.data ?? []);
+                if (response.success) setAllUsers(response.data.users ?? []);
             } else {
                 if (handleError(result)) {
                     Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
@@ -255,7 +249,7 @@ const UserList = () => {
         }
 
         try {
-            const result = await deleteUser(userItem.id, token);
+            const result = await deleteUser(userItem.id, token, userItem.version);
             if (result.success) {
                 Swal.fire('Éxito', 'Usuario eliminado correctamente', 'success');
                 if (userItem.id === currentUser.id) {
@@ -263,7 +257,7 @@ const UserList = () => {
                     navigate('/login')
                 }
                 const response = await getUsersList(token);
-                if (response.success) setAllUsers(response.data ?? []);
+                if (response.success) setAllUsers(response.data.users ?? []);
             }
             else {
                 if (handleError(result)) {

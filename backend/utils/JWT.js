@@ -10,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
  * @param {string|number} [expiresIn="1h"] - Tiempo de expiración.
  * @returns {string} Token JWT firmado.
  */
-function generateToken(payload) {
+async function generateToken(payload) {
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
     if (payload.remember) {
         await RefreshToken.create({ token, userId: payload.id })

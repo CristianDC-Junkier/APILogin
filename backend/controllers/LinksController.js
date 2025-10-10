@@ -119,18 +119,18 @@ class LinksController {
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Array de links asociados al departamento o mensaje de error.
     */
-    static async getLinksByDepartments(req, res) {
+    static async getLinksByDepartment(req, res) {
         try {
-            const { departmentIds } = req.body; // recibir array de IDs de departamentos
+            const { departmentId } = req.body; // recibir array de IDs de departamentos
 
             // Validación básica
-            if (!Array.isArray(departmentIds) || departmentIds.length === 0) {
+            if (!Array.isArray(departmentId) || departmentId.length === 0) {
                 return res.status(400).json({ error: "Se requiere un array de IDs de departamentos" });
             }
 
             // Buscar departamentos con sus links asociados
-            const departments = await Department.findAll({
-                where: { id: departmentIds },
+            const departmentsAll = await Department.findAll({
+                where: { id: departmentId },
                 include: [
                     {
                         model: Links,

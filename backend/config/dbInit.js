@@ -41,7 +41,7 @@ async function initDatabase() {
 
             await Login.create({
                 username: 'admin',
-                password: 'Almonte#admin',
+                password: 'admin',
                 usertype: superAdminType
             });
             LoggerController.info('✅ Superadmin creado correctamente');

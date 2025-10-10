@@ -70,8 +70,6 @@ class UserAccountController {
                 },            
                 departments: user.departments,
             });
-
-
         } catch (error) {
             LoggerController.error('Error recogiendo el usuario con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
@@ -119,8 +117,7 @@ class UserAccountController {
     static async update(req, res) {
         try {
             const { id } = req.params;
-            const { version } = req.query;
-            const { username, password, usertype } = req.body;
+            const { username, password, usertype, version } = req.body;
 
             const user = await UserAccount.findByPk(id);
             if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
@@ -128,7 +125,6 @@ class UserAccountController {
             if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
                 return res.status(403).json({ error: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN" });
             }
-
             if (user.version != version) return res.status(403).json({ error: "El usuario ha sido modificado anteriormente" });
 
             if (user.id !== 1 ) {
@@ -140,7 +136,7 @@ class UserAccountController {
             await user.save();
 
             LoggerController.info(`Usuario con id ${user.id} actualizado correctamente por el usuario con id ${req.user.id}`);
-            res.json({ id: targetUserId });
+            res.json({ id: user.id });
         } catch (error) {
             LoggerController.error('Error modificando al usuario con id ' + user.id + '  por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);

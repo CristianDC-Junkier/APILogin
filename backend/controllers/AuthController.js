@@ -31,8 +31,8 @@ class AuthController {
                 return res.status(400).json({ error: "Usuario y contraseña requeridos" });
             }
 
-
-            const user = await UserAccount.findByPk(userId, {
+            const user = await UserAccount.findOne({
+                where: { username },
                 include: [
                     {
                         model: Department,
@@ -47,9 +47,9 @@ class AuthController {
                 return res.status(404).json({ error: "Credenciales incorrectas" });
             }
 
-            const token = generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
-
+            const token = await generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
             LoggerController.info('Sesion iniciada por ' + user.username + 'con id ' + user.id);
+
             res.json({
                 token,
                 user: {

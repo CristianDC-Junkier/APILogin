@@ -14,7 +14,7 @@ export const login = async (credentials) => {
         const response = await api.post('/login', credentials);
         return { success: true, data: response.data };
     } catch (error) {
-        return { success: false, error };
+        return { success: false, error: error.response?.data?.error };
     }
 };
 
@@ -22,11 +22,28 @@ export const login = async (credentials) => {
  * Solicitud de cierre de sesión del usuario actualmente conectado
  * @returns {JSNO} - Contiene un booleano con true en caso de exito y false en caso de error
  */
-export const logout = async () => {
+export const logout = async (token) => {
     try {
-        await api.post('/logout');
-        return { success: true };
-    } catch {
-        return { success: false };
+        const response = await api.get('/logout', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+};
+
+/**
+* Solicitud de la versión del usuario
+* @returns {JSON} - Devuelve la información recibida de la llamada
+*/
+export const getVersion = async (token) => {
+    try {
+        const response = await api.get('/version', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
     }
 };
