@@ -18,7 +18,7 @@ class AuthController {
     /**
     * Inicia sesión con un usuario existente.
     * 
-    * @param {Object} req - Objeto de petición de Express, con { body: { username, password } }.
+    * @param {Object} req - Objeto de petición de Express, con { body: { username, password, remember } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - JSON con información del usuario y token si es exitoso,
     *                   o mensajes de error en caso de credenciales inválidas o falta de datos.
@@ -60,9 +60,9 @@ class AuthController {
                 },
                 departments: user.departments,
             });
-            LoggerController.info('Sesion iniciada por ' + user.username);
+            LoggerController.info('Sesion iniciada por ' + user.username + 'con id ' + user.id);
         } catch (error) {
-            LoggerController.error('Error en el login: ' + error.message);
+            LoggerController.error('Error en el login - ' + error.message);
             res.status(500).json({error: error.message });
         }
     }
@@ -76,6 +76,7 @@ class AuthController {
     * @param {Object} req - Objeto de petición de Express.
     *   - Debe contener la cabecera "Authorization: Bearer <token>".
     * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de exito o error.
     */
     static async logout(req, res) {
         try {
@@ -88,7 +89,7 @@ class AuthController {
             // Buscar el token exacto comparando desencriptado
             const tokenToDelete = userTokens.find(t => t.token === token);
 
-            LoggerController.info("Sesión cerrada correctamente por " + userName);
+            LoggerController.info("Sesión cerrada correctamente por " + userName + " con id " + userId);
 
             if (tokenToDelete) {
                 // Eliminar el token correspondiente
@@ -109,6 +110,7 @@ class AuthController {
     * 
     * @param {Object} req - Objeto de petición de Express.
     * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Perfil del usuario con sus departamentos, o mensaje de error.
     */
     static async getProfile(req, res) {
         try {
@@ -140,7 +142,7 @@ class AuthController {
 
 
         } catch (error) {
-            LoggerController.error(`Error obteniendo usuario: ${error.message}`);
+            LoggerController.error(`Error obteniendo perfil: ${error.message}`);
             res.status(500).json({ error: error.message });
         }
     }
@@ -150,6 +152,7 @@ class AuthController {
     * 
     * @param {Object} req - Objeto de petición de Express.
     * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Versión del usuario o mensaje de error.
     */
     static async getVersion(req, res) {
         try {
@@ -163,7 +166,7 @@ class AuthController {
 
         } catch (error) {
             LoggerController.error("Error recuperando la versión del usuario: " + error.message);
-            res.status(500).json({ error: "Error recuperando la fecha del listín" });
+            res.status(500).json({ error: error.message });
         }
     }
 }
