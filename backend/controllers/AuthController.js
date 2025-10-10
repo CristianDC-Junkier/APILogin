@@ -1,198 +1,169 @@
 ﻿
-const { UserAccount } = require("../models/Relations");
+const { UserAccount, Department, RefreshToken } = require("../models/Relations");
+
 const { generateToken } = require("../utils/JWT");
 const LoggerController = require("../controllers/LoggerController");
 
 /**
  * Controlador de autenticación y gestión de usuarios.
  * 
- * Proporciona métodos estáticos para:      // FALTA TERMINAR
- *  - Login de usuarios                     // Ahora tiene que devolver sus departamentos
- *  - Listar todos los usuarios             // Ahora tiene que devolver sus departamentos
- *  - Crear un usuario
- *  - Modificar un usuario
- *  - Eliminar un usuario
- *  - Añadir departamentos a un usuario     // Falta terminar
- *  - Eliminar departamentos de un usuario  // Falta terminar
+ * Proporciona métodos estáticos para:      
+ *  - Login de usuarios                                
+ *  - Login de usuario
+ *  - Recoger perfil del usuario
+ *  - Recoger version del usuario 
  */
 class AuthController {
 
     /**
-     * Inicia sesión con un usuario existente.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { body: { username, password } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - JSON con información del usuario y token si es exitoso,
-     *                   o mensajes de error en caso de credenciales inválidas o falta de datos.
-     */
+    * Inicia sesión con un usuario existente.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { body: { username, password } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - JSON con información del usuario y token si es exitoso,
+    *                   o mensajes de error en caso de credenciales inválidas o falta de datos.
+    */
     static async login(req, res) {
         try {
-            const { username, password } = req.body;
+            const { username, password, remember } = req.body;
 
             if (!username || !password) {
-                return res.status(400).json({ success: false, message: "Usuario y contraseña requeridos" });
+                return res.status(400).json({ error: "Usuario y contraseña requeridos" });
             }
 
-            const user = await UserAccount.findOne({ where: { username } });
+
+            const user = await UserAccount.findByPk(userId, {
+                include: [
+                    {
+                        model: Department,
+                        as: 'departments',
+                        attributes: ['id', 'name'],
+                        through: { attributes: [] }
+                    },
+                ],
+            });
+
             if (!user || user.password !== password) {
-                return res.status(401).json({ success: false, message: "Credenciales incorrectas" });
+                return res.status(404).json({ error: "Credenciales incorrectas" });
             }
 
-            const token = generateToken({ id: user.id, username: user.username, usertype: user.usertype });
+            const token = generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
 
             res.json({
-                success: true,
-                user: { id: user.id, username: user.username, usertype: user.usertype, token }
+                token,
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    forcePwdChange: user.forcePwdChange,
+                    version: user.version,
+                },
+                departments: user.departments,
             });
             LoggerController.info('Sesion iniciada por ' + user.username);
         } catch (error) {
             LoggerController.error('Error en el login: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            res.status(500).json({error: error.message });
         }
     }
-
     /**
-     * Lista todos los usuarios existentes.
-     * 
-     * @param {Object} req - Objeto de petición de Express.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Array de usuarios con sus atributos: id, username y usertype.
-     */
-    static async list(req, res) {
+    * Cierra la sesión de un usuario eliminando su refresh token.
+    * 
+    * El access token (JWT de 1h) no se elimina explícitamente, ya que expira
+    * automáticamente. El refresh token asociado al usuario se borra de la base
+    * de datos para evitar que se puedan generar nuevos access tokens.
+    *
+    * @param {Object} req - Objeto de petición de Express.
+    *   - Debe contener la cabecera "Authorization: Bearer <token>".
+    * @param {Object} res - Objeto de respuesta de Express.
+    */
+    static async logout(req, res) {
         try {
-            const users = await UserAccount.findAll({ attributes: ["id", "username", "usertype"] });
-            res.json(users);
-        } catch (error) {
-            res.status(500).json({ success: false, error: error.message });
-        }
-    }
+            const userId = req.user.id;
+            const userName = req.user.username;
 
-    /**
-     * Crea un nuevo usuario en la base de datos.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { body: { username, password, usertype } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del usuario creado o mensaje de error.
-     *                   Solo un SUPERADMIN puede crear otro SUPERADMIN.
-     */
-    static async create(req, res) {
-        try {
-            const { username, password, usertype } = req.body;
+            // Buscar todos los refresh tokens del usuario
+            const userTokens = await RefreshToken.findAll({ where: { userId } });
 
-            if (!username || !password) {
-                return res.status(400).json({ success: false, message: "Usuario y contraseña requeridos" });
+            // Buscar el token exacto comparando desencriptado
+            const tokenToDelete = userTokens.find(t => t.token === token);
+
+            LoggerController.info("Sesión cerrada correctamente por " + userName);
+
+            if (tokenToDelete) {
+                // Eliminar el token correspondiente
+                await RefreshToken.destroy({ where: { id: tokenToDelete.id } });
+                return res.json({ message: "Logout exitoso" });
+            } else {
+                // No existe token de refresco asociado (no "recordar sesión")
+                return res.json({ message: "Logout exitoso" });
             }
-
-            if ((usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
-                return res.status(403).json({ success: false, message: "Solo un SUPERADMIN puede crear a otro SUPERADMIN" });
-            }
-
-            const user = await UserAccount.create({ username, password, usertype });
-
-            res.json({ success: true, message: "Usuario registrado correctamente", id: user.id });
-            LoggerController.info('Nuevo usuario ' + username + ' creado correctamente');
         } catch (error) {
-            LoggerController.error('Error en la creación de usuario: ' + error.message);
-            res.status(400).json({ success: false, error: error.message });
+            LoggerController.error("Error en el logout: " + error.message);
+            res.status(500).json({ error: "Error al cerrar sesión" });
         }
     }
 
     /**
-     * Modifica un usuario existente.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { username, password, usertype } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. Solo un SUPERADMIN puede modificar otro SUPERADMIN.
-     */
-    static async update(req, res) {
+    * Recoge el perfil del usuario.
+    * 
+    * @param {Object} req - Objeto de petición de Express.
+    * @param {Object} res - Objeto de respuesta de Express.
+    */
+    static async getProfile(req, res) {
         try {
-            const { id } = req.params;
-            const { username, password, usertype } = req.body;
+            const userId = req.user.id;
 
-            const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+            const user = await UserAccount.findByPk(userId, {
+                include: [
+                    {
+                        model: Department,
+                        as: 'departments',
+                        attributes: ['id', 'name'],
+                        through: { attributes: [] }
+                    },
+                ],
+            });
 
-            if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
-                return res.status(403).json({ success: false, message: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN" });
-            }
+            if (!user) return res.status(409).json({ error: "Usuario no encontrado" });
 
-            if (username) user.username = username;
-            if (password) user.password = password;
-            if (usertype) user.usertype = usertype;
+            res.json({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    forcePwdChange: user.forcePwdChange,
+                    version: user.version,
+                },
+                departments: user.departments,
+            });
 
-            await user.save();
 
-            res.json({ success: true, message: "Usuario actualizado correctamente" });
-            LoggerController.info('Usuario actualizado correctamente');
         } catch (error) {
-            LoggerController.error('Error en el modificar usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error(`Error obteniendo usuario: ${error.message}`);
+            res.status(500).json({ error: error.message });
         }
     }
 
     /**
-     * Elimina un usuario existente.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. No se puede eliminar al SUPERADMIN.
-     */
-    static async delete(req, res) {
+    * Recoge la versión del usuario.
+    * 
+    * @param {Object} req - Objeto de petición de Express.
+    * @param {Object} res - Objeto de respuesta de Express.
+    */
+    static async getVersion(req, res) {
         try {
-            const { id } = req.params;
+            const userVersion = await UserAccount.findByPk(req.user.id, {
+                attributes: ['version']
+            });
 
-            const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+            const version = userVersion?.version;
 
-            if (user.usertype === 'SUPERADMIN') {
-                return res.status(403).json({ success: false, message: "No puedes eliminar al SUPERADMIN" });
-            }
-
-            await user.destroy();
-
-            res.json({ success: true, message: "Usuario eliminado correctamente" });
-            LoggerController.info('Usuario eliminado correctamente');
-        } catch (error) {
-            LoggerController.error('Error en la eliminación de usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
-        }
-    }
-
-    /**
-     * Añade un departamento a un usuario.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error.
-     */
-    static async addDepartment(req, res) {
-        try {
-            const { id } = req.params;
-            const { departmentId } = req.body;
-            const user = await UserAccount.findByPk(id);
-           
-        } catch (error) {
-            LoggerController.error('Error al añadir departamento al usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
-        }
-    }
-
-    /**
-     * Elimina un departamento de un usuario.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error.
-     */
-    static async delDepartment(req, res) {
-        try {
-            const { id } = req.params;
-            const { departmentId } = req.body;
-            const user = await UserAccount.findByPk(id);
+            return res.json({ version });
 
         } catch (error) {
-            LoggerController.error('Error al añadir departamento al usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error("Error recuperando la versión del usuario: " + error.message);
+            res.status(500).json({ error: "Error recuperando la fecha del listín" });
         }
     }
 }

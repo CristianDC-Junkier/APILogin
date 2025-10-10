@@ -1,4 +1,5 @@
 ﻿const jwt = require("jsonwebtoken");
+const { RefreshToken } = require("../models/Relations");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -9,8 +10,12 @@ const JWT_SECRET = process.env.JWT_SECRET;
  * @param {string|number} [expiresIn="1h"] - Tiempo de expiración.
  * @returns {string} Token JWT firmado.
  */
-function generateToken(payload, expiresIn = "1h") {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn });
+function generateToken(payload) {
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+    if (payload.remember) {
+        await RefreshToken.create({ token, userId: payload.id })
+    };
+    return token;
 }
 
 /**
@@ -20,8 +25,49 @@ function generateToken(payload, expiresIn = "1h") {
  * @returns {Object} Payload del token.
  * @throws {Error} Si el token es inválido o expiró.
  */
-function verifyToken(token) {
-    return jwt.verify(token, JWT_SECRET);
+async function verifyToken(token) {
+    try {
+        return jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+        if (err.name === "TokenExpiredError") {
+            // Si expiró, buscamos el refresh token en BD
+            const refresh = await RefreshToken.findOne({ where: { token } });
+            if (!refresh) {
+                throw new Error("Token expirado y no existe refresh token");
+            }
+
+            // Comprobar si el refresh token está caducado
+            const now = new Date();
+            if (refresh.expireDate && refresh.expireDate < now) {
+                await RefreshToken.destroy({ where: { id: refresh.id } });
+                throw new Error("Refresh token caducado");
+            } else {
+                token = jwt.sign(jwt.decode(token), JWT_SECRET, { expiresIn: '1h' });
+                await RefreshToken.update(
+                    { token: token },
+                    { where: { id: refresh.id } });
+                return jwt.verify(token, JWT_SECRET);
+            }
+        } else {
+            throw err;
+        }
+    }
 }
 
-module.exports = { generateToken, verifyToken };
+/**
+ * Retorna el contenido de un token JWT.
+ * 
+ * @param {string} token - Token JWT a decodificar.
+ * @returns {Object} Payload del token.
+ * @throws {Error} Si el token es inválido.
+ */
+async function decodeToken(token) {
+    try {
+        return jwt.decode(token, JWT_SECRET);
+    } catch (err) {
+        throw err;
+    }
+
+}
+
+module.exports = { generateToken, verifyToken, decodeToken };
