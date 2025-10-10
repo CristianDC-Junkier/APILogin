@@ -4,9 +4,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import ExternalLayout from '../layouts/ExternalLayout';
 
-import PublicRoute from '../components/redirect/PublicRoute';
-import PrivateRoute from '../components/redirect/PrivateRoute';
-import RoleRoute from '../components/redirect/RoleRoute';
+import PublicRoute from './PublicRoute';
+import PrivateRoute from './PrivateRoute';
+import RoleRoute from './RoleRoute';
 
 
 import LoginPage from '../pages/Login';
@@ -19,6 +19,10 @@ import DashBoardUser from '../pages/users/DashboardUser';
 import DashboardSystem from '../pages/system/DashboardSystem';
 import ExternalWeb from '../pages/ExternalWeb';
 
+import PrivacityPage from '../pages/politics/Privacity';
+import CookiesPage from '../pages/politics/Cookies';
+import CompromisePage from '../pages/politics/Compromise';
+
 /**
  * Encargado de definir las rutas de acceso a las distintas páginas y
  * limitar su acceso dependiendo de los permisos del usuario
@@ -30,7 +34,11 @@ const AppRouter = () => {
             <Route element={<MainLayout />}>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/accessdenied" element={<AccessDenied />} />
-                
+
+                <Route path="/privacity-politic" element={<PrivacityPage />} />
+                <Route path="/cookies-politic" element={<CookiesPage />} />
+                <Route path="/data-compromise" element={<CompromisePage />} />
+
                 {/* Rutas publicas */}
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 {/* Rutas privadas */}

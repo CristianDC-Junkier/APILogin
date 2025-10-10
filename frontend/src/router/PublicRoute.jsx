@@ -1,7 +1,7 @@
 ﻿import React, { useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../hooks/UseAuth';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../utils/SpinnerComponent';
+import SpinnerComponent from '../components/utils/SpinnerComponent';
 
 /**
  * Componente de ruta pública.
@@ -34,8 +34,8 @@ const PublicRoute = ({ children }) => {
         }
     }, [loading, user, navigate]);
 
-    if (loading) return <Spinner />;
-    return !user ? children : <Spinner />;
+    if (loading) return <SpinnerComponent />;
+    return !user ? children : <SpinnerComponent />;
 };
 
 export default PublicRoute;

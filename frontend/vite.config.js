@@ -9,7 +9,7 @@ export default () => {
             port: 61938,
             proxy: {
                 '/visor-sig/api': {
-                    target: 'https://localhost:5000',  
+                    target: 'http://localhost:5000',  
                     changeOrigin: true,
                     secure: false,
                 },
