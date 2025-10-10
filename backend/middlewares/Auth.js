@@ -15,7 +15,7 @@ const { verifyToken } = require("../utils/JWT");
  * @param {Object} res - Objeto de respuesta de Express.
  * @param {Function} next - Función para pasar al siguiente middleware.
  */
-function adminOnly(req, res, next) {
+async function adminOnly(req, res, next) {
     const authHeader = req.headers["authorization"];
 
     if (!authHeader) {
@@ -29,7 +29,7 @@ function adminOnly(req, res, next) {
     }
 
     try {
-        const payload = verifyToken(token);
+        const payload = await verifyToken(token);
 
         if (!payload || !payload.usertype) {
             return res.status(401).json({ error: "Token inválido" });
@@ -60,31 +60,22 @@ function adminOnly(req, res, next) {
  * @param {Object} res - Objeto de respuesta de Express.
  * @param {Function} next - Función para pasar al siguiente middleware.
  */
-function isAuthenticated(req, res, next) {
-    const authHeader = req.headers["authorization"];
-
-    if (!authHeader) {
-        return res.status(401).json({ error: "Token requerido" });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    if (!token) {
-        return res.status(401).json({ error: "Token requerido" });
-    }
-
+async function isAuthenticated(req, res, next) {
     try {
-        const payload = verifyToken(token);
+        const authHeader = req.headers["authorization"];
+        if (!authHeader) return res.status(401).json({ error: "Token requerido" });
 
+        const token = authHeader.split(" ")[1];
+        if (!token) return res.status(401).json({ error: "Token requerido" });
+
+        const payload = await verifyToken(token);
         if (!payload || !payload.id) {
-            LoggerController.warn('Token inválido: ' + err.message);
             return res.status(401).json({ error: "Token inválido" });
         }
-
         req.user = payload;
         next();
     } catch (err) {
-        LoggerController.warn('Token inválido: ' + err.message);
+        LoggerController.warn(`Token inválido: ${err.message}`);
         return res.status(401).json({ error: "Token inválido" });
     }
 }

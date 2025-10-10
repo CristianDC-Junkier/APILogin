@@ -20,12 +20,12 @@
  */
 export const getUsersList = async (token) => {
     try {
-        const res = await api.get('/', {
+        const res = await api.get('/user/', {
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };
     } catch (error) {
-        return { success: false, error };
+        return { success: false, error: error.response?.data?.error };
     }
 };
 
@@ -37,12 +37,12 @@ export const getUsersList = async (token) => {
  */
 export const createUser = async (user, token) => {
     try {
-        const res = await api.post('/', user, {
+        const res = await api.post('/user/', user, {
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };
     } catch (error) {
-        return { success: false, error };
+        return { success: false, error: error.response?.data?.error };
     }
 };
 
@@ -54,12 +54,12 @@ export const createUser = async (user, token) => {
  */
 export const modifyUser = async (user, token) => {
     try {
-        const res = await api.put(`/${user.id}`, user, {
+        const res = await api.put(`/user/${user.id}`, user, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return { success: true, data: res.data };
     } catch (error) {
-        return { success: false, error: error.response?.data || error.message };
+        return { success: false, error: error.response?.data?.error };
     }
 };
 
@@ -69,14 +69,15 @@ export const modifyUser = async (user, token) => {
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const deleteUser = async (userId, token) => {
+export const deleteUser = async (userId, token, version) => {
     try {
-        const res = await api.delete(`/${userId}`, {
+        const res = await api.delete(`/user/${userId}`, {
+            params: { version },
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };
     } catch (error) {
-        return { success: false, error: error.response?.data || error.message };
+        return { success: false, error: error.response?.data?.error };
     }
 };
 

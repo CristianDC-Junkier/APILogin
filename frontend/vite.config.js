@@ -6,7 +6,7 @@ export default () => {
     return defineConfig({
         plugins: [react()],
         server: {
-            port: 61938,
+            port: 61939,
             proxy: {
                 '/visor-sig/api': {
                     target: 'http://localhost:5000',  
