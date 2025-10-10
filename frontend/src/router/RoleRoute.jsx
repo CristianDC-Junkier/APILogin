@@ -1,7 +1,7 @@
 ﻿import React, { useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../hooks/UseAuth';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../utils/SpinnerComponent';
+import SpinnerComponent from '../components/utils/SpinnerComponent';
 
 /**
  * Componente de ruta por roles.
@@ -28,7 +28,7 @@ const RoleRoute = ({ allowedRoles, children }) => {
         return () => clearTimeout(timer);
     }, [loading, user, navigate, allowedRoles]);
 
-    if (loading) return <Spinner />;
+    if (loading) return <SpinnerComponent />;
     if (!user || !allowedRoles.includes(user.usertype)) return null;
 
     return children;

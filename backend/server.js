@@ -24,13 +24,11 @@ const AuthRoutes = require('./routes/AuthRoutes');
 const SystemRoutes = require('./routes/SystemRoutes');
 const DepartmentRoutes = require('./routes/DepartmentRoutes');
 const LinksRoutes = require('./routes/LinksRoutes');
+
 app.use(`${basePath}/api`, AuthRoutes);
 app.use(`${basePath}/api`, SystemRoutes);
 app.use(`${basePath}/api/department/`, DepartmentRoutes);
 app.use(`${basePath}/api/link/`, LinksRoutes);
-
-// Inicializar LoggerController
-LoggerController.init();
 
 // --------------------------------
 //            FRONTEND
@@ -42,7 +40,11 @@ LoggerController.init();
 //})
 
 app.use('/', (req, res) => {
-    res.status(404).json({ success: false, message: "Ruta no encontrada" });
+    res.redirect(`${basePath}/`);
+});
+
+app.get(`${basePath}/api`, (req, res) => {
+    res.redirect(`${basePath}/`);
 });
 
 // --------------------------------
