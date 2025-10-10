@@ -18,24 +18,28 @@ const { verifyToken } = require("../utils/JWT");
 function adminOnly(req, res, next) {
     const authHeader = req.headers["authorization"];
 
-    if (!authHeader) return res.status(401).json({ success: false, message: "Token requerido" });
+    if (!authHeader) return res.status(401).json({ error: "Token requerido" });
 
     const token = authHeader.split(" ")[1];
-    if (!token) return res.status(401).json({ success: false, message: "Token requerido" });
+    if (!token) return res.status(401).json({ error: "Token requerido" });
 
     try {
         const payload = verifyToken(token);
 
+        if (!payload || !payload.usertype) {
+            return res.status(401).json({ error: "Token inválido" });
+        }
+
         if (payload.usertype !== "ADMIN" && payload.usertype !== "SUPERADMIN") {
             LoggerController.error('Token inválido del usuario: ' + payload.username);
-            return res.status(401).json({ success: false, message: "No tienes permisos" });
+            return res.status(401).json({ error: "No tienes permisos" });
         }
 
         req.user = payload; 
         next();
     } catch (err) {
         LoggerController.warn('Token inválido: ' + err.message);
-        return res.status(401).json({ success: false, message: "Token inválido" });
+        return res.status(401).json({ error: "Token inválido" });
     }
 }
 
@@ -56,14 +60,14 @@ function isAuthenticated(req, res, next) {
 
     if (!authHeader) {
         LoggerController.warn('Token inválido: ' + err.message);
-        return res.status(401).json({ success: false, message: "Token requerido" });
+        return res.status(401).json({ error: "Token requerido" });
     }
 
     const token = authHeader.split(" ")[1];
 
     if (!token) {
         LoggerController.warn('Token inválido: ' + err.message);
-        return res.status(401).json({ success: false, message: "Token requerido" });
+        return res.status(401).json({ error: "Token requerido" });
     }
 
     try {
@@ -71,14 +75,14 @@ function isAuthenticated(req, res, next) {
 
         if (!payload || !payload.id) {
             LoggerController.warn('Token inválido: ' + err.message);
-            return res.status(401).json({ success: false, message: "Token inválido" });
+            return res.status(401).json({ error: "Token inválido" });
         }
 
         req.user = payload;
         next();
     } catch (err) {
         LoggerController.warn('Token inválido: ' + err.message);
-        return res.status(401).json({ success: false, message: "Token inválido" });
+        return res.status(401).json({ error: "Token inválido" });
     }
 }
 

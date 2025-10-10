@@ -5,13 +5,13 @@ const LoggerController = require("../controllers/LoggerController");
 /**
  * Controlador de autenticación y gestión de usuarios.
  * 
- * Proporciona métodos estáticos para:                 // FALTA TERMINAR
- *  - Listar todos los departamentos                   // Ahora tiene que devolver sus links
+ * Proporciona métodos estáticos para:             // FALTA TERMINAR     
+ *  - Listar todos los departamentos                   
  *  - Crear un departamento 
  *  - Modificar un departamento
  *  - Eliminar un departamento
- *  - Añadir links a un departamento                   // Falta terminar
- *  - Eliminar links de un departamento                // Falta terminar
+ *  - Añadir links a un departamento                   
+ *  - Eliminar links de un departamento                
  */
 class DepartmentController {
 

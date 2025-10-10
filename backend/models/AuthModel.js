@@ -6,14 +6,16 @@ const { encrypt, decrypt } = require("../utils/Crypto");
  * Modelo Sequelize para usuarios del sistema.
  * 
  * Campos:
- * - id        → Identificador único autoincremental.
- * - username  → Nombre de usuario único y obligatorio.
- * - password  → Contraseña cifrada automáticamente al guardar.
- *               - Al asignar (set): se cifra usando utilidades de crypto.
- *               - Al obtener (get): se descifra para su uso interno.
- * - usertype  → Rol del usuario. Valores posibles: 'USER' (por defecto), 'ADMIN', 'SUPERADMIN'.
+ * - id             → Identificador único autoincremental.
+ * - username       → Nombre de usuario único y obligatorio.
+ * - password       → Contraseña cifrada automáticamente al guardar.
+ *                    - Al asignar (set): se cifra usando utilidades de crypto.
+ *                    - Al obtener (get): se descifra para su uso interno.
+ * - usertype       → Rol del usuario. Valores posibles: 'USER' (por defecto), 'ADMIN', 'SUPERADMIN'.
+ * - version        → Contador de modificaciones del usuario, entero entre 0 y 100.
+ *                    Se incrementa automáticamente con cada cambio en este modelo o en UserData asociado.
  */
-const User = sequelize.define("User", {
+const User = sequelize.define("UserAccount", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -40,6 +42,17 @@ const User = sequelize.define("User", {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "USER",
+    },
+    forcePwdChange: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    version: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: { min: 0, max: 100000 },
     },
 });
 

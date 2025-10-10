@@ -1,5 +1,5 @@
 ﻿
-const { Links } = require("../models/Relations");
+const { Department, Links } = require("../models/Relations");
 const LoggerController = require("./LoggerController");
 
 /**
@@ -10,7 +10,7 @@ const LoggerController = require("./LoggerController");
  *  - Crear un link
  *  - Modificar un link
  *  - Eliminar un link
- *  - Obtener links por departamento                // Falta comprobar si funciona
+ *  - Obtener links por departamento               
  */
 class LinksController {
 
@@ -128,19 +128,42 @@ class LinksController {
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Array de links asociados al departamento o mensaje de error.
     */
-   static async getLinksByDepartment(req, res) {
-          try {
-                const { id } = req.params;
-    
-                const links = await Links.findAll({
-                 where: { departmentId: id }
-                });
-    
-                res.json(links);
-          } catch (error) {
-                res.status(500).json({ success: false, error: error.message });
-          }
-   }
+    static async getLinksByDepartments(req, res) {
+        try {
+            const { departmentIds } = req.body; // recibir array de IDs de departamentos
+
+            // Validación básica
+            if (!Array.isArray(departmentIds) || departmentIds.length === 0) {
+                return res.status(400).json({ error: "Se requiere un array de IDs de departamentos" });
+            }
+
+            // Buscar departamentos con sus links asociados
+            const departments = await Department.findAll({
+                where: { id: departmentIds },
+                include: [
+                    {
+                        model: Links,
+                        as: 'links',          
+                        attributes: ['id', 'name', 'url'],
+                        through: { attributes: [] } 
+                    }
+                ],
+                attributes: ['id', 'name']
+            });
+
+            const departments = departments.map(dep => ({
+                id: dep.id,
+                name: dep.name,
+                links: dep.links
+            }));
+
+            res.json({ departments });
+
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    }
+
 }
 
 module.exports = LinksController;
