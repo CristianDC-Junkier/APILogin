@@ -5,12 +5,12 @@ const LoggerController = require("./LoggerController");
 /**
  * Controlador de autenticación y gestión de links.
  * 
- * Proporciona métodos estáticos para:              // FALTA TERMINAR
+ * Proporciona métodos estáticos para:              
  *  - Listar todos los links
  *  - Crear un link
  *  - Modificar un link
  *  - Eliminar un link
- *  - Obtener links por departamento               
+ *  - Obtener todos los links por lista de departamentos               
  */
 class LinksController {
 
@@ -19,77 +19,70 @@ class LinksController {
      * 
      * @param {Object} req - Objeto de petición de Express.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Array de usuarios con sus atributos: id, username y usertype.
+     * @returns {JSON} - Array de usuarios con sus atributos: id, name y web.
      */
     static async list(req, res) {
         try {
-            const users = await Links.findAll({ attributes: ["id", "username", "usertype"] });
-            res.json(users);
+            const links = await Links.findAll({ attributes: ["id", "name", "web"] });
+            res.json(links);
         } catch (error) {
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error recogiendo los links por el usuario con id ' + req.params.id);
+            res.status(500).json({ error: error.message });
         }
     }
 
     /**
      * Crea un nuevo link en la base de datos.
      * 
-     * @param {Object} req - Objeto de petición de Express, con { body: { username, password, usertype } }.
+     * @param {Object} req - Objeto de petición de Express, con { body: { name, web } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del usuario creado o mensaje de error.
-     *                   Solo un SUPERADMIN puede crear otro SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito con id del link creado o mensaje de error.
      */
     static async create(req, res) {
         try {
-            const { username, password, usertype } = req.body;
+            const { name, web } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ success: false, message: "Usuario y contraseña requeridos" });
+            if (!name || !web) {
+                return res.status(400).json({ error: "Datos requeridos" });
             }
 
-            if ((usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
-                return res.status(403).json({ success: false, message: "Solo un SUPERADMIN puede crear a otro SUPERADMIN" });
-            }
+            const link = await Links.create({ name, web });
 
-            const user = await Links.create({ username, password, usertype });
-
-            res.json({ success: true, message: "Usuario registrado correctamente", id: user.id });
-            LoggerController.info('Nuevo usuario ' + username + ' creado correctamente');
+            LoggerController.info('Nuevo link con id' + link.id + ' creado correctamente');
+            res.json({ id: link.id });
         } catch (error) {
-            LoggerController.error('Error en la creación de usuario: ' + error.message);
-            res.status(400).json({ success: false, error: error.message });
+            LoggerController.error('Error en la creación del link por el usuario con id ' + req.params.id);
+            LoggerController.error('Error - '+ error.message);
+            res.status(400).json({ error: error.message });
         }
     }
 
     /**
      * Modifica un link existente.
      * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { username, password, usertype } }.
+     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { name, web } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. Solo un SUPERADMIN puede modificar otro SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito o error. Solo un USER no puede modificar un link.
      */
     static async update(req, res) {
         try {
             const { id } = req.params;
-            const { username, password, usertype } = req.body;
+            const { name, web } = req.body;
 
-            const user = await Links.findByPk(id);
-            if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+            const link = await Links.findByPk(id);
+            if (!link) return res.status(404).json({ error: "Link no encontrado" });
 
-            if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
-                return res.status(403).json({ success: false, message: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN" });
-            }
+            if (name) link.name = name;
+            if (web) link.web = web;
 
-            if (username) user.username = username;
-            if (password) user.password = password;
-            if (usertype) user.usertype = usertype;
+            await link.save();
 
-            await user.save();
-
-            res.json({ success: true, message: "Usuario actualizado correctamente" });
-            LoggerController.info('Usuario actualizado correctamente');
+            LoggerController.info('Link con id ' + link.id + ' modificado correctamente');
+            res.json({ id: link.id });
         } catch (error) {
-            LoggerController.error('Error en el modificar usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error en la modificación del link por el usuario con id ' + req.params.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
         }
     }
 
@@ -98,26 +91,23 @@ class LinksController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. No se puede eliminar al SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito o error. 
      */
     static async delete(req, res) {
         try {
             const { id } = req.params;
 
-            const user = await Links.findByPk(id);
-            if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+            const link = await Links.findByPk(id);
+            if (!link) return res.status(404).json({ error: "Link no encontrado" });
 
-            if (user.usertype === 'SUPERADMIN') {
-                return res.status(403).json({ success: false, message: "No puedes eliminar al SUPERADMIN" });
-            }
+            await link.destroy();
 
-            await user.destroy();
-
-            res.json({ success: true, message: "Usuario eliminado correctamente" });
-            LoggerController.info('Usuario eliminado correctamente');
+            LoggerController.info('Link con id ' + link.id + ' modificado correctamente');
+            res.json({ id: link.id });
         } catch (error) {
-            LoggerController.error('Error en la eliminación de usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error en la eliminación del link por el usuario con id ' + req.params.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
         }
     }
 
@@ -151,15 +141,17 @@ class LinksController {
                 attributes: ['id', 'name']
             });
 
-            const departments = departments.map(dep => ({
+            const formattedDepartments = departments.map(dep => ({
                 id: dep.id,
                 name: dep.name,
                 links: dep.links
             }));
 
-            res.json({ departments });
+            res.json({ departments: formattedDepartments });
 
         } catch (error) {
+            LoggerController.error('Error en la busqueda del links de departamentos por el usuario con id ' + req.params.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }

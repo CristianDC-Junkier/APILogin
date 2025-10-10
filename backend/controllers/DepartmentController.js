@@ -1,11 +1,11 @@
 ﻿
-const { Department } = require("../models/Relations");
+const { Department, Links } = require("../models/Relations");
 const LoggerController = require("../controllers/LoggerController");
 
 /**
  * Controlador de autenticación y gestión de usuarios.
  * 
- * Proporciona métodos estáticos para:             // FALTA TERMINAR     
+ * Proporciona métodos estáticos para:            //FALTA (HABRIA TMB QUE HACER LOS CAMBIOS EN EL OTRO PROGRAMA)
  *  - Listar todos los departamentos                   
  *  - Crear un departamento 
  *  - Modificar un departamento

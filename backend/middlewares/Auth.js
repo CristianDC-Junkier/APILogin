@@ -18,10 +18,15 @@ const { verifyToken } = require("../utils/JWT");
 function adminOnly(req, res, next) {
     const authHeader = req.headers["authorization"];
 
-    if (!authHeader) return res.status(401).json({ error: "Token requerido" });
+    if (!authHeader) {
+        return res.status(401).json({ error: "Token requerido" });
+    }
 
     const token = authHeader.split(" ")[1];
-    if (!token) return res.status(401).json({ error: "Token requerido" });
+
+    if (!token) {
+        return res.status(401).json({ error: "Token requerido" });
+    }
 
     try {
         const payload = verifyToken(token);
@@ -31,7 +36,7 @@ function adminOnly(req, res, next) {
         }
 
         if (payload.usertype !== "ADMIN" && payload.usertype !== "SUPERADMIN") {
-            LoggerController.error('Token inválido del usuario: ' + payload.username);
+            LoggerController.error('Token inválido, no es administador, del usuario: ' + payload.username + " con id " + payload.id);
             return res.status(401).json({ error: "No tienes permisos" });
         }
 
@@ -59,14 +64,12 @@ function isAuthenticated(req, res, next) {
     const authHeader = req.headers["authorization"];
 
     if (!authHeader) {
-        LoggerController.warn('Token inválido: ' + err.message);
         return res.status(401).json({ error: "Token requerido" });
     }
 
     const token = authHeader.split(" ")[1];
 
     if (!token) {
-        LoggerController.warn('Token inválido: ' + err.message);
         return res.status(401).json({ error: "Token requerido" });
     }
 
