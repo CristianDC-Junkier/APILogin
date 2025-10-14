@@ -4,13 +4,15 @@ import { createRoot } from 'react-dom/client';
 import { Container, Row, Col, Card, CardBody, CardTitle, CardText, Button, Table } from "reactstrap";
 import Swal from 'sweetalert2';
 
-import { getUsersList, createUser, modifyUser, deleteUser } from "../../services/UserService";
+import { getUsersList, createUser, modifyUser, deleteUser, markPWDCUser } from "../../services/UserService";
 import { useAuth } from "../../hooks/useAuth";
 
 import BackButton from "../../components/utils/BackButtonComponent";
 import Spinner from '../../components/utils/SpinnerComponent';
 import Pagination from "../../components/PaginationComponent";
 import CaptchaSlider from '../../components/utils/CaptchaSliderComponent';
+import AddModifyUserCommponent from "../../components/user/AddModifyUserComponent";
+import PWDAskComponent from "../../components/user/PWDAskComponent";
 
 /**
  * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
@@ -78,164 +80,70 @@ const UserList = () => {
 
     //Función que gestiona la creación de un usuario
     const handleCreate = async () => {
-        const tipos = [
-            { label: 'Usuario', value: 'USER' },
-            { label: 'Administrador', value: 'ADMIN' }
-        ];
-        if (currentUser.usertype === 'SUPERADMIN') {
-            tipos.push({ label: 'SuperAdmin', value: 'SUPERADMIN' });
-        }
-
-        const optionsHtml = tipos
-            .map(tipo => `<option value="${tipo.value}">${tipo.label}</option>`)
-            .join('');
-
-        const { value: formValues } = await Swal.fire({
-            title: 'Crear Usuario',
-            html: `
-                <input id="swal-username" class="swal2-input" placeholder="Usuario">
-                <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña">
-                <select id="swal-type" class="swal2-select">${optionsHtml}</select>
-                <style>
-                    .swal2-input, .swal2-select {
-                        width: 100%;
-                        padding: 0.5em 0.75em;
-                        margin: 0.25em 0;
-                        border: 1px solid #333;
-                        border-radius: 0.25em;
-                        font-size: 1em;
-                    }
-                    .swal2-select {
-                        margin-bottom: 1em;
-                        appearance: none;
-                        background-color: #fff;
-                    }
-                </style>`,
-            focusConfirm: false,
-            showCancelButton: true,
-            confirmButtonText: 'Crear',
-            cancelButtonText: 'Cancelar',
-            preConfirm: () => {
-                const username = document.getElementById('swal-username').value.trim();
-                const password = document.getElementById('swal-password').value.trim();
-                const usertype = document.getElementById('swal-type').value;
-
-                if (!username) {
-                    Swal.showValidationMessage('El nombre de usuario no puede estar vacío');
-                    return false;
+        await AddModifyUserCommponent({
+            currentUser,
+            action: "create",
+            onConfirm: async (formValues) => {
+                const result = await createUser(formValues, token);
+                if (result.success) {
+                    Swal.fire("Éxito", "Usuario creado correctamente", "success");
+                    const response = await getUsersList(token);
+                    if (response.success) setAllUsers(response.data.users ?? []);
+                } else {
+                    Swal.fire("Error", result.error || "No se pudo crear el usuario", "error");
                 }
-                if (!password) {
-                    Swal.showValidationMessage('La contraseña no puede estar vacía');
-                    return false;
-                }
-
-                return { username, password, usertype };
             }
         });
-
-        if (formValues) {
-            const result = await createUser(formValues, token);
-            if (result.success) {
-                Swal.fire('Éxito', 'Usuario creado correctamente', 'success');
-                const response = await getUsersList(token);
-                if (response.success) setAllUsers(response.data.users ?? []);
-            } else {
-                if (handleError(result)) {
-                    Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
-                        .then(() => {
-                            logout();
-                            navigate('/login');
-                        });
-                    return;
-                }
-                else {
-                    Swal.fire('Error', 'No se pudo crear el usuario', 'error');
-                }
-            }
-        }
     };
 
     //Función que gestiona la modificación de un usuario
     const handleModify = async (userItem) => {
-        const tipos = [
-            { label: 'Usuario', value: 'USER' },
-            { label: 'Administrador', value: 'ADMIN' }
-        ];
-        if (currentUser.usertype === 'SUPERADMIN') {
-            tipos.push({ label: 'SuperAdmin', value: 'SUPERADMIN' });
-        }
-
-        const optionsHtml = tipos
-            .map(tipo => `<option value="${tipo.value}" ${userItem.usertype === tipo.value ? 'selected' : ''}>${tipo.label}</option>`)
-            .join('');
-
-        const { value: formValues } = await Swal.fire({
-            title: `${userItem.id === currentUser.id ? "Modificar su Usuario" : "Modificar Usuario"}`,
-            html: `
-                <input id="swal-username" class="swal2-input" placeholder="Usuario" value="${userItem.username}">
-                <input id="swal-password" type="password" class="swal2-input" placeholder="Contraseña" value="">
-                <select id="swal-type" class="swal2-select">${optionsHtml}</select>
-                <style>
-                    .swal2-input, .swal2-select {
-                        width: 100%;
-                        padding: 0.5em 0.75em;
-                        margin: 0.25em 0;
-                        border: 1px solid #333;
-                        border-radius: 0.25em;
-                        font-size: 1em;
+        await AddModifyUserCommponent({
+            userItem,
+            currentUser,
+            action: "modify",
+            onConfirm: async (formValues) => {
+                const result = await modifyUser(userItem.id, formValues, token);
+                if (result.success) {
+                    Swal.fire('Éxito', 'Usuario modificado correctamente', 'success');
+                    if (userItem.id === currentUser.id) {
+                        await logout();
+                        navigate('/login')
                     }
-                    .swal2-select {
-                        margin-bottom: 1em;
-                        appearance: none;
-                        background-color: #fff;
-                    }
-                </style>`,
-            focusConfirm: false,
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            preConfirm: () => {
-                const username = document.getElementById('swal-username').value.trim();
-                const password = document.getElementById('swal-password').value.trim();
-                const usertype = document.getElementById('swal-type').value;
-
-                if (!username) {
-                    Swal.showValidationMessage('El nombre de usuario no puede estar vacío');
-                    return false;
+                    const response = await getUsersList(token);
+                    if (response.success) setAllUsers(response.data.users ?? []);
+                } else {
+                    Swal.fire("Error", result.error || "No se pudo crear el usuario", "error");
                 }
-                if (!password) {
-                    Swal.showValidationMessage('La contraseña no puede estar vacía');
-                    return false;
-                }
-
-                return { id: userItem.id, username, password, usertype, version: userItem.version };
             }
         });
+    };
 
-        if (formValues) {
-            const result = await modifyUser(formValues, token);
+    const handlePWDC = async (userItem) => {
+        try {
+            const password = await PWDAskComponent({ userItem });
+            if (!password) return;
 
+            const result = await markPWDCUser(userItem.id, { password }, token, userItem.version);
             if (result.success) {
-                Swal.fire('Éxito', 'Usuario modificado correctamente', 'success');
-                if (userItem.id === currentUser.id) {
-                    await logout();
-                    navigate('/login')
-                }
+                await Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: 'Contraseña reiniciada correctamente',
+                    confirmButtonColor: '#3085d6',
+                });
                 const response = await getUsersList(token);
                 if (response.success) setAllUsers(response.data.users ?? []);
             } else {
-                if (handleError(result)) {
-                    Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
-                        .then(() => {
-                            logout();
-                            navigate('/login');
-                        });
-                    return;
-                }
-                else {
-                    Swal.fire('Error', 'No se pudo modificar el usuario', 'error');
-                }
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'No se pudo reiniciar la contraseña al usuario',
+                    confirmButtonColor: '#d33',
+                });
             }
+        } catch (err) {
+            Swal.fire("Error", err.message || "No se pudo marcar contraseña temporal", "error");
         }
     };
 
@@ -373,6 +281,16 @@ const UserList = () => {
                                     </td>
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center flex-wrap m">
+                                            {((CanIModifySuperAdminUser && isSuperAdminUser) || !isSuperAdminUser) && (
+                                                <Button
+                                                    color="info"
+                                                    size="sm"
+                                                    style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                    onClick={() => handlePWDC(userItem)}
+                                                >
+                                                    🔑
+                                                </Button>
+                                            )}
                                             {((CanIModifySuperAdminUser && isSuperAdminUser) || !isSuperAdminUser) && (
                                                 <Button
                                                     color="warning"

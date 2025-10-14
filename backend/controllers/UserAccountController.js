@@ -344,7 +344,7 @@ class UserAccountController {
     */
     static async forcedPasswordChange(req, res) {
         try {
-            const { id } = req.user.id;
+            const { id } = req.user;
             const { newPassword } = req.body;
             const { version } = req.query;
 
