@@ -48,7 +48,7 @@ class AuthController {
             }
 
             const token = await generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
-            LoggerController.info('Sesion iniciada por ' + user.username + 'con id ' + user.id);
+            LoggerController.info('Sesion iniciada por ' + user.username + ' con id ' + user.id);
 
             res.json({
                 token,
@@ -88,7 +88,7 @@ class AuthController {
             // Buscar el token exacto comparando desencriptado
             const tokenToDelete = userTokens.find(t => t.token === token);
 
-            LoggerController.info("Sesión cerrada correctamente por " + userName + " con id " + userId);
+            LoggerController.info('Sesión cerrada correctamente por ' + userName + ' con id ' + userId);
 
             if (tokenToDelete) {
                 // Eliminar el token correspondiente

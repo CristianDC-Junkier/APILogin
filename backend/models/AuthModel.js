@@ -46,7 +46,7 @@ const User = sequelize.define("UserAccount", {
     forcePwdChange: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: true,
     },
     version: {
         type: DataTypes.INTEGER,

@@ -117,24 +117,35 @@ class DepartmentController {
     }
 
     /**
-     * Añade un link a un departamento.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
-     */
+    * Añade un link a un departamento.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
+    */
     static async addLink(req, res) {
         try {
-            const { id } = req.params;
-            const { linkId } = req.body;
+            const { id } = req.params;       
+            const { linkId } = req.body;     
+
             const department = await Department.findByPk(id);
-           
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
+            const link = await Links.findByPk(linkId);
+            if (!link) return res.status(404).json({ error: "Link no encontrado" });
+
+            await department.addLink(link);
+            const links = await department.getLinks();
+
+            LoggerController.info('Link con id ' + linkId + ' añadido correctamente al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
+            res.json({ linksSize: links.length });
+
         } catch (error) {
-            LoggerController.error('Error al añadir el link con id ' + linkId + ' al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error al añadir el link' +  linkId + ' al departamento' +  id +  'por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(400).json({ error: error.message });
         }
     }
+
 
     /**
      * Elimina un departamento de un usuario.
@@ -147,10 +158,20 @@ class DepartmentController {
         try {
             const { id } = req.params;
             const { linkId } = req.body;
+
             const department = await Department.findByPk(id);
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
+            const link = await Links.findByPk(linkId);
+            if (!link) return res.status(404).json({ error: "Link no encontrado" });
+
+            await department.removeLink(link);
+            const links = await department.getLinks();
+
+            LoggerController.info('Link con id ' + linkId + ' eliminado correctamente al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
+            res.json({ linksSize: links.length });
 
         } catch (error) {
-            LoggerController.error('Error al eliminar el link con id ' + linkId + ' al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error al eliminar el link con id ' + linkId + ' del departamento con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(400).json({ error: error.message });
         }

@@ -114,7 +114,7 @@ export default function DashboardSystem() {
     if (loading) return <Spinner />;
 
     return (
-        <Container className="mt-4 d-flex flex-column" style={{ minHeight: '70vh' }}>
+        <Container className="mt-4 d-flex flex-column"  style={{ minHeight: '70vh' }}>
             <h3 className="text-center mb-4">Estadísticas del Servidor</h3>
 
             <div className="position-absolute top-0 start-0">
@@ -129,7 +129,7 @@ export default function DashboardSystem() {
                     { label: "Threads Activos", value: threadsCount, type: "info" },
                     { label: "Uptime", value: uptimeSeconds !== null ? formatUptime(uptimeSeconds) : null, type: "primary" }
                 ].map((metric, idx) => (
-                    <Col key={idx} xs={6} md={3}>
+                    <Col key={idx} xs={6} md={6} lg={3}>
                         <Card className={`border-${metric.type} shadow-sm`}>
                             <CardBody>
                                 <CardTitle tag="h6">{metric.label}</CardTitle>
