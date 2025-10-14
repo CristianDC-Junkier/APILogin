@@ -13,6 +13,7 @@ import {
     faUserAlt,
     faGlobeEurope,
     faScroll,
+    faBriefcase
 } from '@fortawesome/free-solid-svg-icons';
 
 /**
@@ -36,6 +37,7 @@ const Home = () => {
             default: return [
                 { label: 'Proyectos', icon: faGlobeEurope, action: () => navigate('/app') },
                 { label: 'Gestión de Usuarios', icon: faUsers, action: () => navigate('/users') },
+                { label: 'Gestión de Departamentos', icon: faBriefcase, action: () => navigate('/departments') },
                 { label: 'Acceder Logs', icon: faScroll, action: () => navigate('/logs') },
                 { label: 'Perfil de Usuario', icon: faUserAlt, action: () => navigate('/profile') },
             ];
