@@ -15,6 +15,9 @@ const LoggerController = require("../controllers/LoggerController");
  *  - Eliminar departamentos de un usuario  
  */
 class UserAccountController {
+
+    //#region Métodos recuperación de usuarios
+
     /**
      * Lista todos los usuarios existentes.
      * 
@@ -77,6 +80,9 @@ class UserAccountController {
         }
     }
 
+    //#endregion
+
+    //#region Métodos añadir/modificar/eliminar/forzar contraseña de usuarios
     /**
      * Crea un nuevo usuario en la base de datos.
      * 
@@ -98,7 +104,7 @@ class UserAccountController {
 
             const user = await UserAccount.create({ username, password, usertype });
 
-            LoggerController.info(`Usuario con id ${user.id} creado correctamente por el usuario con id ${req.user.id}`);
+            LoggerController.info('Usuario con id ' + user.id + 'creado correctamente por el usuario con id ' + req.user.id);
             res.json({ id: user.id });
         } catch (error) {
             LoggerController.error('Error creando un usuario por el usuario con id ' + req.user.id);
@@ -112,7 +118,7 @@ class UserAccountController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { username, password, usertype } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. Solo un SUPERADMIN puede modificar otro SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito con el id del usuario modificado o mensaje de error. 
      */
     static async update(req, res) {
         try {
@@ -127,6 +133,7 @@ class UserAccountController {
             }
             if (user.version != version) return res.status(403).json({ error: "El usuario ha sido modificado anteriormente" });
 
+            // No se puede cambiar el tipo de usuario del SUPERADMIN por defecto (id=1)
             if (user.id !== 1 ) {
                 if (usertype) user.usertype = usertype;
             }
@@ -135,10 +142,10 @@ class UserAccountController {
 
             await user.save();
 
-            LoggerController.info(`Usuario con id ${user.id} actualizado correctamente por el usuario con id ${req.user.id}`);
+            LoggerController.info('Usuario con id ' + user.id + ' actualizado correctamente por el usuario con id ' + req.user.id);
             res.json({ id: user.id });
         } catch (error) {
-            LoggerController.error('Error modificando al usuario con id ' + user.id + '  por el usuario con id ' + req.user.id);
+            LoggerController.error('Error modificando al usuario con id ' + user.id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
@@ -165,7 +172,7 @@ class UserAccountController {
             user.password = password;
             await user.save();
 
-            LoggerController.info(`Usuario con id  ${user.id} marcado para cambio de contraseña por el usuario con id ${req.user.id}`);
+            LoggerController.info('Usuario con id ' + user.id + ' marcado para cambio de contraseña por el usuario con id ' + req.user.id);
             res.json({ id });
         } catch (error) {
             LoggerController.error('Error forzando la recuperación de contraseña del un usuario con id ' + id + ' por el usuario con id ' + req.user.id);
@@ -175,11 +182,11 @@ class UserAccountController {
     }
 
     /**
-     * Elimina un usuario existente.
+     * Elimina un usuario existente (No se puede eliminar al SUPERADMIN).
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. No se puede eliminar al SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito o error. 
      */
     static async delete(req, res) {
         try {
@@ -195,7 +202,7 @@ class UserAccountController {
 
             await user.destroy();
 
-            LoggerController.info(`Usuario con id  ${user.id} eliminado por el usuario con id ${req.user.id}`);
+            LoggerController.info('Usuario con id ' + user.id + ' eliminado por el usuario con id ' + req.user.id);
             res.json({ id });
 
         } catch (error) {
@@ -205,18 +212,190 @@ class UserAccountController {
         }
     }
 
+    //#endregion
+
+    //#region Métodos gestión de su propia cuenta
+    /**
+    * Permite al usuario autenticado modificar su propia cuenta.
+    * 
+    * @param {Object} req - Objeto de petición con {  body: { username, usertype, oldPassword, newPassword, version }, query: { version } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del usuario modificado o mensaje de error.
+    */
+    static async updateMyAccount(req, res) {
+        try {
+            const currentUser = req.user;
+            const { username, usertype, oldPassword, newPassword } = req.body;
+            const { version } = req.query;
+
+            const user = await UserAccount.findByPk(currentUser.id);
+            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+
+            const updates = {};
+
+            // --- Contraseña ---
+            if (!oldPassword || !newPassword) {
+                return res.status(400).json({ error: "Ambas contraseñas son requeridas para actualizarla" });
+            }
+            if (oldPassword === newPassword) {
+                return res.status(400).json({ error: "La contraseña nueva debe ser diferente a la actual" });
+            }
+            if (user.password !== oldPassword) {
+                return res.status(400).json({ error: "La contraseña actual no es correcta" });
+            }
+
+            updates.password = newPassword;
+            updates.forcePwdChange = false;
+
+
+            // --- Nombre de Usuario ---
+            if (!username) return res.status(400).json({ error: "El nombre de usuario es obligatorio" });
+
+            const exists = await UserAccount.findOne({
+                where: { username, id: { [Op.ne]: currentUser.id } }
+            });
+            if (exists) return res.status(400).json({ error: "El nombre de usuario ya existe" });
+
+            updates.username = username;
+
+            // --- Tipo de Usuario ---
+            if (currentUser.usertype === "SUPERADMIN") {
+                if (!usertype) return res.status(400).json({ error: "El tipo de usuario es obligatorio" });
+                if (currentUser.id !== 1) {
+                    updates.usertype = usertype;
+                }
+            } else if (currentUser.usertype === "ADMIN") {
+                if (!usertype) return res.status(400).json({ error: "El tipo de usuario es obligatorio" });
+                if (usertype !== "SUPERADMIN") {
+                    updates.usertype = usertype;
+                }
+            }
+
+            // Aplicar cambios
+            await user.update(updates);
+
+            const token = await generateToken({
+                id: user.id,
+                username: user.username,
+                usertype: user.usertype,
+                departmentId: user.departmentId,
+                remember: currentUser.remember || false
+            });
+
+            LoggerController.info('El usuario con id' + user.id + ' actualizó su perfil correctamente');
+            res.json({
+                token,
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    forcePwdChange: user.forcePwdChange,
+                    version: user.version,
+                }
+            });
+
+
+        } catch (error) {
+            LoggerController.error('Error modificando su perfil del usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    /**
+    * Permite al usuario autenticado eliminar su propia cuenta.
+    * 
+    * @param {Object} req - Objeto de petición con { query: { version } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del usuario eliminado o mensaje de error.
+    */
+    static async deleteMyAccount(req, res) {
+        try {
+            const { id } = req.user.id;
+            const { version } = req.query;
+
+            const user = await UserAccount.findByPk(id);
+            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+
+            if (user.usertype === "SUPERADMIN") {
+                return res.status(403).json({ error: "Un SUPERADMIN no puede eliminarse" });
+            }
+
+            await user.destroy();
+
+            LoggerController.info('El usuario con id ' + req.user.id + ' se elimino a si mismo correctamente');
+            res.json({ id });
+        } catch (error) {
+            LoggerController.error('Error eliminando su perfil del usuario con id ' + req.user.id);
+            LoggerController.error('Error en la eliminación de usuario: ' + error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    /**
+    * Permite al usuario autenticado cambiar su contraseña tras ser marcado.
+    * 
+    * @param {Object} req - Objeto de petición con {  body: { newPassword }, query: { version } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del usuario con la contraseña cambiada o mensaje de error.
+    */
+    static async forcedPasswordChange(req, res) {
+        try {
+            const { id } = req.user.id;
+            const { newPassword } = req.body;
+            const { version } = req.query;
+
+            if (!newPassword) {
+                return res.status(400).json({ error: "Nueva contraseña requerida" });
+            }
+
+            const user = await UserAccount.findByPk(id);
+            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+
+            // Actualizar contraseña
+            user.password = newPassword;
+            user.forcePwdChange = false;
+            await user.save();
+
+            res.json({ id });
+            LoggerController.info('El usuario con id ' + id + ' cambió su contraseña correctamente');
+        } catch (error) {
+            LoggerController.error('Error actualizando la contraseña de su perfil del usuario con id ' + req.user.id);
+            LoggerController.error(`Error actualizando contraseña: ${error.message}`);
+            res.status(500).json({ error: error.message });
+        }
+    }
+    //#endregion
+
+    //#region Métodos gestión de departamentos de usuarios
     /**
      * Añade un departamento a un usuario.
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error.
+     * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
      */
     static async addDepartment(req, res) {
         try {
             const { id } = req.params;
             const { departmentId } = req.body;
+
             const user = await UserAccount.findByPk(id);
+            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+            const department = await Department.findByPk(departmentId);
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
+
+            await user.addDepartment(department);
+            const departments = await user.getDepartments();
+
+            LoggerController.info('Departamento con id ' + departmentId + ' añadido correctamente al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            res.json({ departmentsSize: departments.length });
+
 
         } catch (error) {
             LoggerController.error('Error al añadir el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
@@ -230,13 +409,23 @@ class UserAccountController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error.
+     * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
      */
     static async delDepartment(req, res) {
         try {
             const { id } = req.params;
             const { departmentId } = req.body;
+
             const user = await UserAccount.findByPk(id);
+            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+            const department = await Department.findByPk(departmentId);
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
+
+            await user.removeDepartment(department);
+            const departments = await user.getDepartments();
+
+            LoggerController.info('Departamento con id ' + departmentId + ' eliminado correctamente del usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            res.json({ departmentsSize: departments.length });
 
         } catch (error) {
             LoggerController.error('Error al eliminar el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
@@ -244,6 +433,8 @@ class UserAccountController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    //#endregion
 }
 
 module.exports = UserAccountController;

@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const UserAccountController = require("../controllers/UserAccountController");
-const { adminOnly } = require("../middlewares/Auth");
+const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
 
 /**
  * Rutas para la gestión de cuentas de usuario.
@@ -24,6 +24,10 @@ const { adminOnly } = require("../middlewares/Auth");
 
 router.get("/", adminOnly, UserAccountController.list);
 router.get("/:id", adminOnly, UserAccountController.getOne);
+
+router.put("/profile-update", isAuthenticated, UserAccountController.updateMyAccount);
+router.delete("/profile-del", isAuthenticated, UserAccountController.deleteMyAccount);
+router.patch("/profile-PWD", isAuthenticated, UserAccountController.forcedPasswordChange);
 
 router.post("/", adminOnly, UserAccountController.create);
 router.put("/:id", adminOnly, UserAccountController.update);
