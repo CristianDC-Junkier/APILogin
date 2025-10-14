@@ -20,13 +20,15 @@ class UserAccountController {
      * 
      * @param {Object} req - Objeto de petición de Express.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Array de usuarios con sus atributos: id, username y usertype.
+     * @returns {JSON} - Array de usuarios o mensaje de error.
      */
     static async list(req, res) {
         try {
-            const users = await UserAccount.findAll({ attributes: ["id", "username", "usertype"] });
+            const users = await UserAccount.findAll();
             res.json({ users });
         } catch (error) {
+            LoggerController.error('Error recogiendo los usuarios por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -34,8 +36,9 @@ class UserAccountController {
     /**
     * Recupera los datos completos de un usuario por su ID.
     * 
-    * @param {Object} req - req.params.id es el ID del usuario a consultar
-    * @param {Object} res
+    * @param {Object} req - Objeto de petición de Express con { params: { id } , query: { version } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Usuario con sus departamentos o mensaje de error.
     */
     static async getOne(req, res) {
         try {
@@ -70,7 +73,8 @@ class UserAccountController {
 
 
         } catch (error) {
-            LoggerController.error(`Error obteniendo usuario: ${error.message}`);
+            LoggerController.error('Error recogiendo el usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -81,7 +85,6 @@ class UserAccountController {
      * @param {Object} req - Objeto de petición de Express, con { body: { username, password, usertype } }.
      * @param {Object} res - Objeto de respuesta de Express.
      * @returns {JSON} - Mensaje de éxito con id del usuario creado o mensaje de error.
-     *                   Solo un SUPERADMIN puede crear otro SUPERADMIN.
      */
     static async create(req, res) {
         try {
@@ -97,12 +100,12 @@ class UserAccountController {
 
             const user = await UserAccount.create({ username, password, usertype });
 
-            LoggerController.info('Nuevo usuario ' + username + ' creado correctamente');
+            LoggerController.info(`Usuario con id ${user.id} creado correctamente por el usuario con id ${req.user.id}`);
             res.json({ id: user.id });
-
         } catch (error) {
-            LoggerController.error('Error en la creación de usuario: ' + error.message);
-            res.status(400).json({ error: error.message });
+            LoggerController.error('Error creando un usuario por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
         }
     }
 
@@ -128,16 +131,19 @@ class UserAccountController {
 
             if (user.version != version) return res.status(403).json({ error: "El usuario ha sido modificado anteriormente" });
 
+            if (user.id !== 1 ) {
+                if (usertype) user.usertype = usertype;
+            }
             if (username) user.username = username;
             if (password) user.password = password;
-            if (usertype) user.usertype = usertype;
 
             await user.save();
 
-            oggerController.info(`Usuario ${user.username} actualizado por ${req.user.username}`);
+            LoggerController.info(`Usuario con id ${user.id} actualizado correctamente por el usuario con id ${req.user.id}`);
             res.json({ id: targetUserId });
         } catch (error) {
-            LoggerController.error('Error en el modificar usuario: ' + error.message);
+            LoggerController.error('Error modificando al usuario con id ' + user.id + '  por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -163,10 +169,11 @@ class UserAccountController {
             user.password = password;
             await user.save();
 
-            LoggerController.info(`Usuario ${user.username} marcado para cambio de contraseña por ${req.user.username}`);
+            LoggerController.info(`Usuario con id  ${user.id} marcado para cambio de contraseña por el usuario con id ${req.user.id}`);
             res.json({ id });
         } catch (error) {
-            LoggerController.error('Error en forzar cambio de contraseña: ' + error.message);
+            LoggerController.error('Error forzando la recuperación de contraseña del un usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -192,11 +199,12 @@ class UserAccountController {
 
             await user.destroy();
 
-            LoggerController.info(`Usuario Worker: ${user.username} y sus Datos de usuario, eliminado por ${req.user.username}`);
+            LoggerController.info(`Usuario con id  ${user.id} eliminado por el usuario con id ${req.user.id}`);
             res.json({ id });
 
         } catch (error) {
-            LoggerController.error('Error en la eliminación de usuario: ' + error.message);
+            LoggerController.error('Error eliminando un usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -215,7 +223,8 @@ class UserAccountController {
             const user = await UserAccount.findByPk(id);
 
         } catch (error) {
-            LoggerController.error('Error al añadir departamento al usuario: ' + error.message);
+            LoggerController.error('Error al añadir el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -234,7 +243,8 @@ class UserAccountController {
             const user = await UserAccount.findByPk(id);
 
         } catch (error) {
-            LoggerController.error('Error al añadir departamento al usuario: ' + error.message);
+            LoggerController.error('Error al eliminar el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }

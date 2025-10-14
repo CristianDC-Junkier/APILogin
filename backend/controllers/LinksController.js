@@ -19,14 +19,15 @@ class LinksController {
      * 
      * @param {Object} req - Objeto de petición de Express.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Array de usuarios con sus atributos: id, name y web.
+     * @returns {JSON} - Array de links o mensaje de error.
      */
     static async list(req, res) {
         try {
-            const links = await Links.findAll({ attributes: ["id", "name", "web"] });
-            res.json(links);
+            const links = await Links.findAll();
+            res.json({ links });
         } catch (error) {
-            LoggerController.error('Error recogiendo los links por el usuario con id ' + req.params.id);
+            LoggerController.error('Error recogiendo los links por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -48,12 +49,12 @@ class LinksController {
 
             const link = await Links.create({ name, web });
 
-            LoggerController.info('Nuevo link con id' + link.id + ' creado correctamente');
+            LoggerController.info('Nuevo link con id' + link.id + ' creado correctamente por el usuario con id ' + req.user.id);
             res.json({ id: link.id });
         } catch (error) {
-            LoggerController.error('Error en la creación del link por el usuario con id ' + req.params.id);
+            LoggerController.error('Error en la creación del link por el usuario con id ' + req.user.id);
             LoggerController.error('Error - '+ error.message);
-            res.status(400).json({ error: error.message });
+            res.status(500).json({ error: error.message });
         }
     }
 
@@ -62,7 +63,7 @@ class LinksController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { name, web } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. Solo un USER no puede modificar un link.
+     * @returns {JSON} -  Mensaje de éxito con id del link modificadop o mensaje de error. 
      */
     static async update(req, res) {
         try {
@@ -77,10 +78,10 @@ class LinksController {
 
             await link.save();
 
-            LoggerController.info('Link con id ' + link.id + ' modificado correctamente');
+            LoggerController.info('Link con id ' + link.id + ' modificado correctamente por el usuario con id ' + req.user.id);
             res.json({ id: link.id });
         } catch (error) {
-            LoggerController.error('Error en la modificación del link por el usuario con id ' + req.params.id);
+            LoggerController.error('Error en la modificación del link con id ' + id +  ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
@@ -102,10 +103,10 @@ class LinksController {
 
             await link.destroy();
 
-            LoggerController.info('Link con id ' + link.id + ' modificado correctamente');
-            res.json({ id: link.id });
+            LoggerController.info('Link con id ' + link.id + ' modificado correctamente por el usuario con id ' + req.user.id);
+            res.json({ id });
         } catch (error) {
-            LoggerController.error('Error en la eliminación del link por el usuario con id ' + req.params.id);
+            LoggerController.error('Error en la eliminación del link con id ' + id +  ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
@@ -114,7 +115,7 @@ class LinksController {
    /**
     * Obtiene los links asociados a un departamento.
     * 
-    * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
+    * @param {Object} req - Objeto de petición de Express, con { body: { departmentIds } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Array de links asociados al departamento o mensaje de error.
     */
@@ -150,7 +151,7 @@ class LinksController {
             res.json({ departments: formattedDepartments });
 
         } catch (error) {
-            LoggerController.error('Error en la busqueda del links de departamentos por el usuario con id ' + req.params.id);
+            LoggerController.error('Error en la busqueda del links de departamentos por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
