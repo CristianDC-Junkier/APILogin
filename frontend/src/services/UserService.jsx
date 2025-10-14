@@ -53,13 +53,14 @@ export const createUser = async (user, token) => {
 
 /**
  * Solicitud de modificación de un usuario existente
+ * @param {int} userId - ID del usuario que se va a modificar
  * @param {Object} user - la información del usuario que se quiere modificar
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const modifyUser = async (id, user, token) => {
+export const modifyUser = async (userId, user, token) => {
     try {
-        const res = await api.put(`/user/${id}`, user, {
+        const res = await api.put(`/user/${userId}`, user, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return { success: true, data: res.data };

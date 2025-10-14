@@ -24,8 +24,24 @@ class DepartmentController {
      */
     static async list(req, res) {
         try {
-            const departments = await Department.findAll();
-            res.json({ departments });
+            const departments = await Department.findAll({
+                include: [
+                    {
+                        model: Links,
+                        as: 'links',
+                        attributes: ['id', 'name', 'web'],
+                        through: { attributes: [] }
+                    },
+                ],
+            });
+
+            const dFormatted = departments.map(department => ({
+                id: department.id,
+                name: department.name,
+                links: department.links || [],
+            }));
+
+            res.json({ departments: dFormatted });
         } catch (error) {
             LoggerController.error('Error recogiendo los departamentos por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
