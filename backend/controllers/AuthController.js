@@ -115,6 +115,7 @@ class AuthController {
     static async getProfile(req, res) {
         try {
             const userId = req.user.id;
+            const { version } = req.query;
 
             const user = await UserAccount.findByPk(userId, {
                 include: [
@@ -128,6 +129,7 @@ class AuthController {
             });
 
             if (!user) return res.status(409).json({ error: "Usuario no encontrado" });
+            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
 
             res.json({
                 user: {
@@ -136,6 +138,8 @@ class AuthController {
                     usertype: user.usertype,
                     forcePwdChange: user.forcePwdChange,
                     version: user.version,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
                 },
                 departments: user.departments,
             });

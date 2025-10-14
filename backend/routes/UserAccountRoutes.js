@@ -9,25 +9,28 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  * Rutas para la gestión de cuentas de usuario.
  *
  * Endpoints:
- * - GET    /                     → Listar todos los usuarios. (Solo administradores)
- * - GET    /:id                  → Obtener los datos completos de un usuario por ID. (Solo administradores)
- * - POST   /                     → Crear un nuevo usuario. (Solo administradores)
- * - PUT    /:id                  → Actualizar un usuario existente. (Solo administradores)
- * - DELETE /:id                  → Eliminar un usuario. (Solo administradores)
- * - PATCH  /:id/forcePwdChange   → Forzar cambio de contraseña al usuario. (Solo administradores)
- * - POST   /:id/department       → Añadir departamento a un usuario. (Solo administradores)
- * - DELETE /:id/department       → Eliminar departamento de un usuario. (Solo administradores)
+ * - PUT    /profile-update                        → Modificar la cuenta del usuario identificado. (Usuarios identificados)
+ * - DELETE /profile-delete                        → Eliminar la cuenta del usuario identificado. (Usuarios identificados)
+ * - PATCH  /profile-PWD                           → Modificar solo la contraseña del usuario identificado. (Usuarios identificados)
+ * - GET    /                                      → Listar todos los usuarios. (Solo administradores)
+ * - GET    /:id                                   → Obtener los datos completos de un usuario por ID. (Solo administradores)
+ * - POST   /                                      → Crear un nuevo usuario. (Solo administradores)
+ * - PUT    /:id                                   → Actualizar un usuario existente. (Solo administradores)
+ * - DELETE /:id                                   → Eliminar un usuario. (Solo administradores)
+ * - PATCH  /:id/forcePwdChange                    → Forzar cambio de contraseña al usuario. (Solo administradores)
+ * - POST   /:id/add-department/:departmentId      → Añadir departamento a un usuario. (Solo administradores)
+ * - DELETE /:id/add-department/:departmentId      → Eliminar departamento de un usuario. (Solo administradores)
  *
  * Middlewares:
  * - `adminOnly` → Restringe acceso a usuarios con rol de administrador o superior.
  */
 
+router.put("/profile-update", isAuthenticated, UserAccountController.updateMyAccount);
+router.delete("/profile-delete", isAuthenticated, UserAccountController.deleteMyAccount);
+router.patch("/profile-PWD", isAuthenticated, UserAccountController.forcedPasswordChange);
+
 router.get("/", adminOnly, UserAccountController.list);
 router.get("/:id", adminOnly, UserAccountController.getOne);
-
-router.put("/profile-update", isAuthenticated, UserAccountController.updateMyAccount);
-router.delete("/profile-del", isAuthenticated, UserAccountController.deleteMyAccount);
-router.patch("/profile-PWD", isAuthenticated, UserAccountController.forcedPasswordChange);
 
 router.post("/", adminOnly, UserAccountController.create);
 router.put("/:id", adminOnly, UserAccountController.update);

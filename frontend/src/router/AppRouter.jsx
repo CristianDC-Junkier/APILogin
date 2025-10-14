@@ -13,11 +13,13 @@ import LoginPage from '../pages/Login';
 import HomePage from '../pages/Home';
 
 import NotFoundPage from '../pages/NotFound';
-import AccessDenied from '../pages/AccessDenied';
+import AccessDeniedPage from '../pages/AccessDenied';
 
-import DashBoardUser from '../pages/users/DashboardUser';
-import DashboardSystem from '../pages/system/DashboardSystem';
-import ExternalWeb from '../pages/ExternalWeb';
+import DashBoardUserPage from '../pages/users/DashboardUser';
+import DashboardSystemPage from '../pages/system/DashboardSystem';
+import ExternalWebPage from '../pages/ExternalWeb';
+
+import ProfileUserPage from '../pages/users/ProfileUser';
 
 import PrivacityPage from '../pages/politics/Privacity';
 import CookiesPage from '../pages/politics/Cookies';
@@ -33,7 +35,7 @@ const AppRouter = () => {
         <Routes>
             <Route element={<MainLayout />}>
                 <Route path="/" element={<Navigate to="/login" replace />} />
-                <Route path="/accessdenied" element={<AccessDenied />} />
+                <Route path="/accessdenied" element={<AccessDeniedPage />} />
 
                 <Route path="/privacity-politic" element={<PrivacityPage />} />
                 <Route path="/cookies-politic" element={<CookiesPage />} />
@@ -42,16 +44,17 @@ const AppRouter = () => {
                 {/* Rutas publicas */}
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 {/* Rutas privadas */}
+                <Route path="/profile" element={<PrivateRoute><ProfileUserPage /> </PrivateRoute>} />
                 
                 {/* Rutas privadas por rol */}
                 <Route path="/home" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><HomePage /></RoleRoute>} />
-                <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashBoardUser /></RoleRoute>} />
-                <Route path="/logs" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashboardSystem /></RoleRoute>} />
+                <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashBoardUserPage /></RoleRoute>} />
+                <Route path="/logs" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashboardSystemPage /></RoleRoute>} />
 
                 <Route path="*" element={<NotFoundPage />} />
             </Route>
             <Route element={<ExternalLayout />}>
-                <Route path="/app" element={<PrivateRoute><ExternalWeb /></PrivateRoute>} />
+                <Route path="/app" element={<PrivateRoute><ExternalWebPage /></PrivateRoute>} />
             </Route>
 
         </Routes>
