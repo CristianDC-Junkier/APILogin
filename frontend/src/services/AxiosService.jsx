@@ -32,7 +32,7 @@ api.interceptors.response.use(
                 localStorage.removeItem("user");
 
                 // Redirigir al login
-                window.location.href = '/listin-telefonico/login';
+                window.location.href = '/visor-sig/login';
             });
         }
         return Promise.reject(error);

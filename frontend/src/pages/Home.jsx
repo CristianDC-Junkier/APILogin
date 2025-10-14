@@ -1,7 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HomeButtonComponent from '../components/user/HomeButtonComponent';
-import LogoutButton from '../components/user/LogoutComponent';
+import HomeButtonComponent from '../components/utils/HomeButtonComponent';
+import LogoutButton from '../components/utils/LogoutComponent';
 import { useAuth } from '../hooks/useAuth';
 import {
     Container,
