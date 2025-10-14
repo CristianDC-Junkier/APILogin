@@ -2,6 +2,7 @@
 import { useAuth } from '../hooks/UseAuth';
 import { useNavigate } from 'react-router-dom';
 import SpinnerComponent from '../components/utils/SpinnerComponent';
+import PWDChangeComponent from '../components/user/PWDChangeComponent';
 
 
 /**
@@ -16,7 +17,7 @@ import SpinnerComponent from '../components/utils/SpinnerComponent';
  * @param {React.ReactNode} props.children - Componentes hijos que se mostrarán si el usuario está autenticado.
  */
 const PrivateRoute = ({ children }) => {
-    const { user, loading } = useAuth();
+    const { user, loading, token } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,7 +27,13 @@ const PrivateRoute = ({ children }) => {
     }, [loading, user, navigate]);
 
     if (loading) return <SpinnerComponent />;
-    return user ? children : <SpinnerComponent />;
+    return (
+        <>
+            {/* Prompt para cambio de contraseña si es necesario */}
+            {user?.forcePwdChange && <PWDChangeComponent user={user} token={token} />}
+            {user ? children : <SpinnerComponent />}
+        </>
+    );
 };
 
 export default PrivateRoute;

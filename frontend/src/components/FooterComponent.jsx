@@ -30,21 +30,21 @@ const FooterComponent = () => {
                 <div className="text-end me-2 ">
                     <small className="fs-7 footer-links">
                         <a
-                            href="/listin-telefonico/data-compromise"
+                            href="/visor-sig/data-compromise"
                             className={`text-white text-decoration-none ${isActive("/data-compromise") ? "active-link" : ""}`}
                         >
                             Protección de Datos
                         </a>
                         <span className="mx-1">|</span>
                         <a
-                            href="/listin-telefonico/privacity-politic"
+                            href="/visor-sig/privacity-politic"
                             className={`text-white text-decoration-none ${isActive("/privacity-politic") ? "active-link" : ""}`}
                         >
                             Política de Privacidad
                         </a>
                         <span className="mx-1">|</span>
                         <a
-                            href="/listin-telefonico/cookies-politic"
+                            href="/visor-sig/cookies-politic"
                             className={`text-white text-decoration-none ${isActive("/cookies-politic") ? "active-link" : ""}`}
                         >
                             Política de Cookies
