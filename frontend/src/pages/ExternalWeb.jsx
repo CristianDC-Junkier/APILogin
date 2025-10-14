@@ -3,7 +3,7 @@ import { Container, Row, Col } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import BackButton from "../components/utils/BackButtonComponent";
-import LogoutButton from "../components/user/LogoutComponent";
+import LogoutButton from "../components/utils/LogoutComponent";
 
 /**
  * Página que muestra la aplicación externa
