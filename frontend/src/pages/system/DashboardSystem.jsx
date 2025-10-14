@@ -27,7 +27,7 @@ function formatUptime(totalSeconds) {
     return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-export default function DashboardSystem() {
+export default function DashboardSystemPage() {
     const [logs, setLogs] = useState([]);
     const [selectedLog, setSelectedLog] = useState(null);
     const [logContent, setLogContent] = useState('Selecciona un archivo para ver su contenido');

@@ -10,6 +10,7 @@ import {
 } from 'reactstrap';
 import {
     faUsers,
+    faUserAlt,
     faGlobeEurope,
     faScroll,
 } from '@fortawesome/free-solid-svg-icons';
@@ -23,14 +24,23 @@ const Home = () => {
     const [loadingLogout, setLoadingLogout] = useState(false);
 
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
 
-    //Acciones que relizan los botones presentes en la página
-    const actions = [
-        { label: 'Continuar a la aplicación', icon: faGlobeEurope, action: () => navigate('/app') },
-        { label: 'Gestión de Usuarios', icon: faUsers, action: () => navigate('/users') },
-        { label: 'Acceder Logs', icon: faScroll, action: () => navigate('/logs') },
-    ];
+    //Acciones disponibles según el tipo de usuario
+    const actions = (() => {
+        switch (user.usertype) {
+            case 'USER': return [
+                { label: 'Proyectos', icon: faGlobeEurope, action: () => navigate('/app') },
+                { label: 'Perfil de Usuario', icon: faUserAlt, action: () => navigate('/profile') },
+            ];
+            default: return [
+                { label: 'Proyectos', icon: faGlobeEurope, action: () => navigate('/app') },
+                { label: 'Gestión de Usuarios', icon: faUsers, action: () => navigate('/users') },
+                { label: 'Acceder Logs', icon: faScroll, action: () => navigate('/logs') },
+                { label: 'Perfil de Usuario', icon: faUserAlt, action: () => navigate('/profile') },
+            ];
+        }
+    })();
 
     //Función que gestiona el cierre de sesión
     const handleLogout = async () => {
@@ -47,28 +57,31 @@ const Home = () => {
         <Container
             fluid
             className="d-flex flex-column py-4"
-            style={{
-                minHeight: '70vh',
-            }}
+            style={{ minHeight: '80vh' }}
         >
-            {/*Botón de cierre de sesión*/ }
+
+            {/* Botón de cierre de sesión */}
             <Row className="align-items-center m-0 p-0">
-                <Col className="d-flex justify-content-start p-2">
+                <Col className="d-flex justify-content-start">
                     <LogoutButton onClick={handleLogout} loading={loadingLogout} />
                 </Col>
             </Row>
 
-            {/*Botones con las acciones definidas anteriormente*/ }
+            {/* Botones con las acciones definidas */}
             <div className="d-flex flex-column justify-content-center align-items-center" style={{ flexGrow: 1 }}>
-                <Row className="g-3 mb-4 w-100">
+                <Row className="g-3 mb-4 w-100 justify-content-center">
                     {actions.map(({ label, icon, action }, idx) => (
-                        <Col xs="6" md="4" key={idx} className="d-flex justify-content-center">
+                        <Col
+                            key={idx}
+                            xs={12} sm={8} md={6} lg={4} xl={3}
+                            className="d-flex justify-content-center"
+                        >
                             <HomeButtonComponent label={label} icon={icon} onClick={action} />
                         </Col>
                     ))}
                 </Row>
-            </div>
 
+            </div>
         </Container>
     );
 };
