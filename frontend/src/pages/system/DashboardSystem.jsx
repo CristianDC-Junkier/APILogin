@@ -32,9 +32,8 @@ export default function DashboardSystem() {
     const [selectedLog, setSelectedLog] = useState(null);
     const [logContent, setLogContent] = useState('Selecciona un archivo para ver su contenido');
 
-    const { user: currentUser } = useAuth();
+    const { token } = useAuth();
     const [loading, setLoading] = useState(false);
-    const token = currentUser?.token;
 
     const [cpuUsage, setCpuUsage] = useState(null);
     const [memoryUsed, setMemoryUsed] = useState(null);
@@ -136,10 +135,22 @@ export default function DashboardSystem() {
                                 <CardTitle tag="h6">{metric.label}</CardTitle>
                                 <CardText className="fs-4 fw-bold">
                                     {metric.value !== null && metric.value !== undefined
-                                        ? typeof metric.value === "number"
-                                            ? `${metric.value.toFixed(2)}%`
-                                            : metric.value
-                                        : "Cargando..."}
+                                        ? (() => {
+                                            switch (metric.label) {
+                                                case "CPU Usage (%)":
+                                                    return `${metric.value.toFixed(2)}%`;
+                                                case "Memoria Usada (MB)":
+                                                    return `${metric.value.toFixed(2)} MB`;
+                                                case "Threads Activos":
+                                                    return metric.value;
+                                                case "Uptime":
+                                                    return metric.value; // ya viene formateado con formatUptime
+                                                default:
+                                                    return metric.value;
+                                            }
+                                        })()
+                                        : "Cargando..."
+                                    }
                                 </CardText>
                             </CardBody>
                         </Card>

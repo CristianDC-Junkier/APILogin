@@ -5,7 +5,7 @@ const LoggerController = require("../controllers/LoggerController");
 /**
  * Controlador de autenticación y gestión de usuarios.
  * 
- * Proporciona métodos estáticos para:            //FALTA (HABRIA TMB QUE HACER LOS CAMBIOS EN EL OTRO PROGRAMA)
+ * Proporciona métodos estáticos para:           
  *  - Listar todos los departamentos                   
  *  - Crear un departamento 
  *  - Modificar un departamento
@@ -20,77 +20,74 @@ class DepartmentController {
      * 
      * @param {Object} req - Objeto de petición de Express.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Array de usuarios con sus atributos: id, username y usertype.
+     * @returns {JSON} - Array de departamentos o mensaje de error.
      */
     static async list(req, res) {
         try {
-            const users = await Department.findAll({ attributes: ["id", "username", "usertype"] });
-            res.json(users);
+            const departments = await Department.findAll();
+            res.json({ departments });
         } catch (error) {
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error recogiendo los departamentos por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
         }
     }
 
     /**
      * Crea un nuevo departamento en la base de datos.
      * 
-     * @param {Object} req - Objeto de petición de Express, con { body: { username, password, usertype } }.
+     * @param {Object} req - Objeto de petición de Express, con { body: { name } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del usuario creado o mensaje de error.
-     *                   Solo un SUPERADMIN puede crear otro SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito con id del departamento creado o mensaje de error.
      */
     static async create(req, res) {
         try {
-            const { username, password, usertype } = req.body;
+            const { name } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ success: false, message: "Usuario y contraseña requeridos" });
+            if (!name) {
+                return res.status(400).json({ error: "Debe indicar un nombre correcto" });
             }
 
-            if ((usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
-                return res.status(403).json({ success: false, message: "Solo un SUPERADMIN puede crear a otro SUPERADMIN" });
-            }
+            const department = await Department.create({ name });
 
-            const user = await Department.create({ username, password, usertype });
-
-            res.json({ success: true, message: "Usuario registrado correctamente", id: user.id });
-            LoggerController.info('Nuevo usuario ' + username + ' creado correctamente');
+            LoggerController.info('Nuevo departamento con id ' + department.id + ' creado correctamente por el usuario con id ' + req.user.id);
+            res.json({ id: department.id });
         } catch (error) {
-            LoggerController.error('Error en la creación de usuario: ' + error.message);
-            res.status(400).json({ success: false, error: error.message });
+            LoggerController.error('Error en la creación del departamento por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(400).json({ error: error.message });
         }
     }
 
     /**
      * Modifica un departamento existente.
      * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { username, password, usertype } }.
+     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { name } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. Solo un SUPERADMIN puede modificar otro SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
      */
     static async update(req, res) {
         try {
             const { id } = req.params;
-            const { username, password, usertype } = req.body;
+            const { name } = req.body;
 
-            const user = await Department.findByPk(id);
-            if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
-
-            if ((user.usertype === "SUPERADMIN" || usertype === "SUPERADMIN") && req.user.usertype !== "SUPERADMIN") {
-                return res.status(403).json({ success: false, message: "Solo un SUPERADMIN puede modificar a otro SUPERADMIN" });
+            if (!name) {
+                return res.status(400).json({ error: "Debe indicar un nombre correcto" });
             }
 
-            if (username) user.username = username;
-            if (password) user.password = password;
-            if (usertype) user.usertype = usertype;
+            const department = await Department.findByPk(id);
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
 
-            await user.save();
+            department.name = name;
 
-            res.json({ success: true, message: "Usuario actualizado correctamente" });
-            LoggerController.info('Usuario actualizado correctamente');
+            await department.save();
+
+            LoggerController.info('Departamento con id ' + department.id + ' actualizado correctamente por el usuario con id ' + req.user.id);
+            res.json({ id: department.id });
         } catch (error) {
-            LoggerController.error('Error en el modificar usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error en la modificación del departamento por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(400).json({ error: error.message });
         }
     }
 
@@ -99,26 +96,23 @@ class DepartmentController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. No se puede eliminar al SUPERADMIN.
+     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
      */
     static async delete(req, res) {
         try {
             const { id } = req.params;
 
-            const user = await Department.findByPk(id);
-            if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+            const department = await Department.findByPk(id);
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
 
-            if (user.usertype === 'SUPERADMIN') {
-                return res.status(403).json({ success: false, message: "No puedes eliminar al SUPERADMIN" });
-            }
+            await department.destroy();
 
-            await user.destroy();
-
-            res.json({ success: true, message: "Usuario eliminado correctamente" });
-            LoggerController.info('Usuario eliminado correctamente');
+            LoggerController.info('Departamento con id ' + department.id + ' eliminado correctamente por el usuario con id ' + req.user.id);
+            res.json({ id });
         } catch (error) {
-            LoggerController.error('Error en la eliminación de usuario: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error en la eliminación del departamento por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(400).json({ error: error.message });
         }
     }
 
@@ -127,7 +121,7 @@ class DepartmentController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error.
+     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
      */
     static async addLink(req, res) {
         try {
@@ -136,8 +130,9 @@ class DepartmentController {
             const department = await Department.findByPk(id);
            
         } catch (error) {
-            LoggerController.error('Error al añadir link al departamento: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error al añadir el link con id ' + linkId + ' al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(400).json({ error: error.message });
         }
     }
 
@@ -146,7 +141,7 @@ class DepartmentController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error.
+     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
      */
     static async delLink(req, res) {
         try {
@@ -155,8 +150,9 @@ class DepartmentController {
             const department = await Department.findByPk(id);
 
         } catch (error) {
-            LoggerController.error('Error al eliminar el link del departamento: ' + error.message);
-            res.status(500).json({ success: false, error: error.message });
+            LoggerController.error('Error al eliminar el link con id ' + linkId + ' al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(400).json({ error: error.message });
         }
     }
 }

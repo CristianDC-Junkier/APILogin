@@ -8,8 +8,8 @@ const LoggerController = require("../controllers/LoggerController");
  * Controlador de autenticación y gestión de usuarios.
  * 
  * Proporciona métodos estáticos para:      
- *  - Login de usuarios                                
- *  - Login de usuario
+ *  - Login de usuario                               
+ *  - Logout de usuario
  *  - Recoger perfil del usuario
  *  - Recoger version del usuario 
  */
@@ -49,6 +49,7 @@ class AuthController {
 
             const token = generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
 
+            LoggerController.info('Sesion iniciada por ' + user.username + 'con id ' + user.id);
             res.json({
                 token,
                 user: {
@@ -60,7 +61,6 @@ class AuthController {
                 },
                 departments: user.departments,
             });
-            LoggerController.info('Sesion iniciada por ' + user.username + 'con id ' + user.id);
         } catch (error) {
             LoggerController.error('Error en el login - ' + error.message);
             res.status(500).json({error: error.message });
@@ -74,7 +74,6 @@ class AuthController {
     * de datos para evitar que se puedan generar nuevos access tokens.
     *
     * @param {Object} req - Objeto de petición de Express.
-    *   - Debe contener la cabecera "Authorization: Bearer <token>".
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Mensaje de exito o error.
     */
@@ -100,7 +99,8 @@ class AuthController {
                 return res.json({ message: "Logout exitoso" });
             }
         } catch (error) {
-            LoggerController.error("Error en el logout: " + error.message);
+            LoggerController.error('Error en el logout por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: "Error al cerrar sesión" });
         }
     }
@@ -142,7 +142,8 @@ class AuthController {
 
 
         } catch (error) {
-            LoggerController.error(`Error obteniendo perfil: ${error.message}`);
+            LoggerController.error('Error obtiendo el perfil del usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -165,7 +166,8 @@ class AuthController {
             return res.json({ version });
 
         } catch (error) {
-            LoggerController.error("Error recuperando la versión del usuario: " + error.message);
+            LoggerController.error('Error recuperando la versión del usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
