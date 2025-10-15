@@ -154,7 +154,9 @@ export const AuthProvider = ({ children }) => {
      */
     const contextUpdate = (newUser, newToken) => {
         setUser(newUser);
-        setVersion(newUser.version == version ? (version + 1) : newUser.version); // Incrementa si no viene versión del backend
+        console.log(newUser);
+        console.log(version);
+        setVersion(newUser.version === version ? (version + 1) : newUser.version); // Incrementa si no viene versión del backend
 
         // Guardar en storage
         const storage = localStorage.getItem("user") ? localStorage : sessionStorage;

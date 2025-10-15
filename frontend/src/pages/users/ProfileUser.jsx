@@ -7,7 +7,7 @@ import { FaUser, FaEdit, FaTrash, FaCalendarAlt } from 'react-icons/fa';
 import Spinner from '../../components/utils/SpinnerComponent';
 import { useAuth } from "../../hooks/useAuth";
 
-import { getProfile, modifyProfile, deleteProfile, deleteDepartmentProfile } from "../../services/UserService";
+import { getProfile, modifyProfile, deleteProfile, addDepartmentProfile, deleteDepartmentProfile } from "../../services/UserService";
 import { getDepartmentList } from "../../services/DepartmentService";
 
 
@@ -20,39 +20,35 @@ import ModifyUserAccountComponent from '../../components/user/ModifyUserAccountC
 const ProfileUser = () => {
     const [profile, setProfile] = useState();
     const [loading, setLoading] = useState(true);
-    const [departments, setDepartments] = useState([]);
     const [availableDepartments, setAvailableDepartments] = useState([]);
     const navigate = useNavigate();
     const { token, version, logout, update } = useAuth();
 
-    const fetchData = async () => {
+    const fetchData = async (updatedVersion) => {
+
         if (!token) return;
         setLoading(true);
+
         try {
-            const response = await getProfile(token, version);
-            if (response.success) {
-                setProfile(response.data);
-            } else if (response.error === "Token inválido") {
+            const profileResp = await getProfile(token, updatedVersion || version);
+            console.log(profileResp);//FALTA
+            if (profileResp.success) {
+                setProfile(profileResp.data);
+                
+            } else if (profileResp.status !== 409) {
                 Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
-                    .then(() => { logout(); navigate('/login'); });
-            } else {
-                Swal.fire('Error', response.error || 'No se pudo cargar el perfil', 'error');
+                    .then(() => { navigate('/home'); });
             }
 
             // Traer todos los departamentos disponibles
             const deptResp = await getDepartmentList(token);
             if (deptResp.success) {
-                const departmentsAux = deptResp.data.departments || [];
-                setDepartments(departmentsAux);
                 setAvailableDepartments(
-                    departmentsAux.filter(
-                        d => !profile.departments.some(pd => pd.id === d.id)
+                    deptResp.data.departments.filter(
+                        d => !profileResp.data.departments.some(pd => pd.id === d.id)
                     )
                 );
             }
-
-            // Filtrar departamentos disponibles para añadir
-            
 
 
         } catch (err) {
@@ -180,8 +176,9 @@ const ProfileUser = () => {
                                                                 department={dep.name}
                                                                 onDelete={async () => {
                                                                     const result = await deleteDepartmentProfile(dep.id, token, version);
+
                                                                     if (result.success) {
-                                                                        Swal.fire("Éxito", "Departamento eliminado correctamente", "success");
+                                                                        update(result.data.user, token);
                                                                         fetchData();
                                                                     } else {
                                                                         Swal.fire("Error", result.error || "No se pudo eliminar", "error");
@@ -197,7 +194,16 @@ const ProfileUser = () => {
                                                         availableDepartments={availableDepartments}
                                                         token={token}
                                                         version={version}
-                                                        onAdded={fetchData}
+                                                        onAdded={async (depId) => {
+                                                            const result = await addDepartmentProfile(depId, token, version);
+
+                                                            if (result.success) {
+                                                                update(result.data.user, token);
+                                                                fetchData(result.data.user.version);
+                                                            } else {
+                                                                Swal.fire("Error", result.error || "No se pudo eliminar", "error");
+                                                            }
+                                                        }}
                                                     />
 
                                                 </>

@@ -1,6 +1,8 @@
 ﻿
 const { UserAccount, Department } = require("../models/Relations");
 const LoggerController = require("../controllers/LoggerController");
+const { Op } = require("sequelize");
+const { generateToken } = require("../utils/JWT");
 
 /**
  * Controlador de autenticación y gestión de usuarios.
@@ -275,15 +277,9 @@ class UserAccountController {
             // Aplicar cambios
             await user.update(updates);
 
-            const token = await generateToken({
-                id: user.id,
-                username: user.username,
-                usertype: user.usertype,
-                departmentId: user.departmentId,
-                remember: currentUser.remember || false
-            });
-
+            const token = await generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
             LoggerController.info('El usuario con id' + user.id + ' actualizó su perfil correctamente');
+
             res.json({
                 token,
                 user: {
@@ -391,6 +387,9 @@ class UserAccountController {
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
 
             await user.addDepartment(department);
+            await user.increment('version', { by: 1 });
+            await user.changed('updatedAt', true);
+            await user.save({ skipRefreshTokens: true });
             const departments = await user.getDepartments();
 
             LoggerController.info('Departamento con id ' + departmentId + ' añadido correctamente al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
@@ -422,6 +421,9 @@ class UserAccountController {
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
 
             await user.removeDepartment(department);
+            await user.increment('version', { by: 1 });
+            await user.changed('updatedAt', true);
+            await user.save({ skipRefreshTokens: true });
             const departments = await user.getDepartments();
 
             LoggerController.info('Departamento con id ' + departmentId + ' eliminado correctamente del usuario con id ' + id + ' por el usuario con id ' + req.user.id);
@@ -455,12 +457,20 @@ class UserAccountController {
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
 
             await user.addDepartment(department);
-            const departments = await user.getDepartments();
+            await user.increment('version', { by: 1 }); 
+            await user.changed('updatedAt', true); 
+            await user.save({ skipRefreshTokens: true }); 
 
             LoggerController.info('Departamento con id ' + departmentId + ' añadido correctamente al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
-            res.json({ departmentsSize: departments.length });
-
-
+            res.json({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    forcePwdChange: user.forcePwdChange,
+                    version: user.version,
+                }
+            });
         } catch (error) {
             LoggerController.error('Error al añadir el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
@@ -489,11 +499,20 @@ class UserAccountController {
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
 
             await user.removeDepartment(department);
-            const departments = await user.getDepartments();
+            await user.increment('version', { by: 1 }); 
+            await user.changed('updatedAt', true); 
+            await user.save({ skipRefreshTokens: true }); 
 
             LoggerController.info('Departamento con id ' + departmentId + ' eliminado correctamente del usuario con id ' + id + ' por el usuario con id ' + req.user.id);
-            res.json({ departmentsSize: departments.length });
-
+            res.json({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    forcePwdChange: user.forcePwdChange,
+                    version: user.version,
+                }
+            });
         } catch (error) {
             LoggerController.error('Error al eliminar el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);

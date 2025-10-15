@@ -15,11 +15,11 @@ let isLoggingOut = false;
 
 api.interceptors.response.use(
     response => response,
-    error => {// A VECES ME ECHA SIN SALIR EL MENSAJE
+    async error => {// A VECES ME ECHA SIN SALIR EL MENSAJE
         if ((error.response?.status === 401 || error.response?.status === 409) && !isLoggingOut) {
             isLoggingOut = true; // Se marca que ya está en proceso
 
-            Swal.fire({
+            await Swal.fire({
                 icon: 'warning',
                 title: 'Sesión expirada',
                 html: 'Por motivos de seguridad su sesión expiró.<br> Por favor, vuelve a iniciar sesión.',
@@ -30,7 +30,6 @@ api.interceptors.response.use(
                 // Solo cuando el usuario pulse "Aceptar"
                 sessionStorage.removeItem("user");
                 localStorage.removeItem("user");
-
                 // Redirigir al login
                 window.location.href = '/visor-sig/login';
             });
