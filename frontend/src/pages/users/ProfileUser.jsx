@@ -6,16 +6,24 @@ import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import { FaUser, FaEdit, FaTrash, FaCalendarAlt } from 'react-icons/fa';
 import Spinner from '../../components/utils/SpinnerComponent';
 import { useAuth } from "../../hooks/useAuth";
-import { getProfile, modifyProfile, deleteProfile } from "../../services/UserService";
+
+import { getProfile, modifyProfile, deleteProfile, deleteDepartmentProfile } from "../../services/UserService";
+import { getDepartmentList } from "../../services/DepartmentService";
+
+
 import BackButton from "../../components/utils/BackButtonComponent";
 import DepartmentBadgeComponent from "../../components/department/DepartmentBadgeComponent";
+import AddDepartmentBadgeComponent from "../../components/department/AddDepartmentBadgeComponent";
+import RemovableDepartmentBadgeComponent from "../../components/department/RemovableDepartmentBadgeComponent";
 import ModifyUserAccountComponent from '../../components/user/ModifyUserAccountComponent';
 
 const ProfileUser = () => {
     const [profile, setProfile] = useState();
     const [loading, setLoading] = useState(true);
+    const [departments, setDepartments] = useState([]);
+    const [availableDepartments, setAvailableDepartments] = useState([]);
     const navigate = useNavigate();
-    const { token, version, logout, update, user } = useAuth();
+    const { token, version, logout, update } = useAuth();
 
     const fetchData = async () => {
         if (!token) return;
@@ -30,6 +38,23 @@ const ProfileUser = () => {
             } else {
                 Swal.fire('Error', response.error || 'No se pudo cargar el perfil', 'error');
             }
+
+            // Traer todos los departamentos disponibles
+            const deptResp = await getDepartmentList(token);
+            if (deptResp.success) {
+                const departmentsAux = deptResp.data.departments || [];
+                setDepartments(departmentsAux);
+                setAvailableDepartments(
+                    departmentsAux.filter(
+                        d => !profile.departments.some(pd => pd.id === d.id)
+                    )
+                );
+            }
+
+            // Filtrar departamentos disponibles para añadir
+            
+
+
         } catch (err) {
             Swal.fire('Error', err.message || 'Error al obtener perfil', 'error');
         } finally {
@@ -101,6 +126,8 @@ const ProfileUser = () => {
         return date.toLocaleDateString() + " " + date.toLocaleTimeString();
     };
 
+
+
     return (
         <Container fluid className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
             {/* Botón Volver */}
@@ -130,27 +157,54 @@ const ProfileUser = () => {
                                     <Row className="mb-2">
                                         <Col md="5"><strong>Usuario:</strong></Col>
                                         <Col md="7">
-                                            <span style={{ fontWeight: "700", color: "#000" }}>{profile.user.username || "-"}</span>
+                                            <span style={{ marginLeft: "3px", fontWeight: "700", color: "#000" }}>{profile.user.username || "-"}</span>
                                         </Col>
                                     </Row>
 
                                     <Row className="mb-2">
                                         <Col md="5"><strong>Departamentos:</strong></Col>
-                                        <Col md="7" className="d-flex flex-wrap gap-2 mt-1 mb-1">
-                                            {profile.departments && profile.departments.length > 0
-                                                ? profile.departments.map((dep) => (
-                                                    <DepartmentBadgeComponent key={dep} department={dep} />
-                                                ))
-                                                : (
-                                                    <>
-                                                        <DepartmentBadgeComponent key="Obras" department="Obras" />
-                                                        <DepartmentBadgeComponent key="Marketing" department="Marketing" />
-                                                        <DepartmentBadgeComponent key="Ventas" department="Ventas" />
-                                                        <DepartmentBadgeComponent key="Marketing" department="Marketing" />
-                                                    </>
-                                                )}
+                                        <Col md="7" className="d-flex flex-wrap gap-1 mt-1 mb-1">
+                                            {profile.user.usertype === "USER" ? (
+                                                // Solo badges normales
+                                                profile.departments && profile.departments.length > 0
+                                                    ? profile.departments.map(dep => (
+                                                        <DepartmentBadgeComponent key={dep.id} department={dep.name} />
+                                                    ))
+                                                    : null
+                                            ) : (
+                                                <>
+                                                    {profile.departments && profile.departments.length > 0
+                                                        ? profile.departments.map(dep => (
+                                                            <RemovableDepartmentBadgeComponent
+                                                                key={dep.id}
+                                                                department={dep.name}
+                                                                onDelete={async () => {
+                                                                    const result = await deleteDepartmentProfile(dep.id, token, version);
+                                                                    if (result.success) {
+                                                                        Swal.fire("Éxito", "Departamento eliminado correctamente", "success");
+                                                                        fetchData();
+                                                                    } else {
+                                                                        Swal.fire("Error", result.error || "No se pudo eliminar", "error");
+                                                                    }
+                                                                }}
+                                                            />
+
+                                                        ))
+                                                        : null
+                                                    }
+                                                    {/* Badge para añadir departamento */}
+                                                    <AddDepartmentBadgeComponent
+                                                        availableDepartments={availableDepartments}
+                                                        token={token}
+                                                        version={version}
+                                                        onAdded={fetchData}
+                                                    />
+
+                                                </>
+                                            )}
                                         </Col>
                                     </Row>
+
 
                                     <Row className="mb-2">
                                         <Col md="5" className="d-flex align-items-center">

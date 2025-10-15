@@ -1,5 +1,4 @@
-﻿const sequelize = require('./db');
-const Login = require('../models/AuthModel');
+﻿const { sequelize, UserAccount, Department } = require("../models/Relations");
 
 const USER_TYPE = ['USER', 'ADMIN', 'SUPERADMIN'];
 const LoggerController = require("../controllers/LoggerController");
@@ -32,14 +31,44 @@ async function initDatabase() {
         await sequelize.authenticate();
         await sequelize.sync();
 
+        LoggerController.info('✅ Base de datos sincronizada correctamente');
+
+        // Comprobar si ya existen departamentos
+        const existingDepartments = await Department.count();
+        let departments = [];
+
+        if (existingDepartments === 0) {
+            // Crear departamentos de ejemplo
+            const departmentsData = [
+                { name: 'Ventanilla (SAC)' }, { name: 'Estadística' },
+                { name: 'Informática' }, { name: 'Rentas' }, { name: 'Tesorería' },
+                { name: 'Intervención' }, { name: 'Patrimonio' }, { name: 'Personal' },
+                { name: 'Contratación' }, { name: 'Archivo Municipal' }, { name: 'Secretaría' },
+                { name: 'Equipo de Gobierno' }, { name: 'Salud y Consumo' }, { name: 'Servicios Inseccion' },
+                { name: 'Servicios Sociales' }, { name: 'Turismo' }, { name: 'Policía Local' },
+                { name: 'Concejalía Matalascañas' }, { name: 'Desarrollo Local' }, { name: 'Agricultura' },
+                { name: 'Urbanismo' }, { name: 'Concejalía El Rocío' }, { name: 'Alcaldía' },
+                { name: 'Ciudad de la Cultura' }, { name: 'Otros' }, { name: 'Moviles Coporativos' },
+                { name: 'Escuelas Infatiles' }, { name: 'Part. Ciudadana y Dllo. Comunitario' },
+                { name: 'Institutos' }, { name: 'Centro Sociocultural Barrio Obrero' }
+            ];
+
+            for (const dep of departmentsData) {
+                const created = await Department.create(dep);
+                departments.push(created);
+            }
+            LoggerController.info('✅ Departamentos de ejemplo creados');
+        } else {
+            LoggerController.warn('ℹ️ Departamentos ya existentes, no se crean nuevos');
+        }
         // Comprobar si existe el superadmin
         const superAdminType = USER_TYPE[USER_TYPE.length - 1];
 
-        const existing = await Login.findOne({ where: { usertype: superAdminType } });
+        const existing = await UserAccount.findOne({ where: { usertype: superAdminType } });
 
         if (!existing) {
 
-            await Login.create({
+            await UserAccount.create({
                 username: 'admin',
                 password: 'admin',
                 usertype: superAdminType,

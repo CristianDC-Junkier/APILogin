@@ -5,6 +5,7 @@ const UserAccount = require("./AuthModel");
 const Department = require("./DepartmentModel");
 const Links = require("./LinksModel");
 const RefreshToken = require("./RefreshTokenModel");
+const UserDepartments = require("./UserDepartmentsModel");
 
 // ----------- DEFINIR RELACIONES -----------
 
@@ -21,8 +22,16 @@ RefreshToken.belongsTo(UserAccount, {
 });
 
 // Relacion UserAccount 0..* ↔ 0..* Department
-UserAccount.belongsToMany(Department, { through: "UserDepartments", foreignKey: "userId", as: "departments" });
-Department.belongsToMany(UserAccount, { through: "UserDepartments", foreignKey: "departmentId", as:"useraccounts" });
+UserAccount.belongsToMany(Department, {
+    through: UserDepartments,
+    foreignKey: "userId",
+    as: "departments"
+});
+Department.belongsToMany(UserAccount, {
+    through: UserDepartments,
+    foreignKey: "departmentId",
+    as: "useraccounts"
+});
 
 // Relacion Department 0..* ↔ 0..* Links
 Department.belongsToMany(Links, { through: "DepartmentLinks", foreignKey: "departmentId", as: "links"  });
@@ -35,7 +44,8 @@ module.exports = {
     UserAccount,
     RefreshToken,
     Department,
-    Links
+    Links,
+    UserDepartments
 };
 
 // ----------- REGISTRAR HOOKS -----------

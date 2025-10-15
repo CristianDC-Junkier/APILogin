@@ -30,17 +30,18 @@ async function verifyToken(token) {
         return jwt.verify(token, JWT_SECRET);
     } catch (err) {
         if (err.name === "TokenExpiredError") {
+            const userId = decodeToken(token).id
             // Si expiró, buscamos el refresh token en BD
             const refresh = await RefreshToken.findOne({ where: { token } });
             if (!refresh) {
-                throw new Error("Token expirado y no existe refresh token");
+                throw new Error("Token expirado y no existe refresh token para el usuario con id " + userId);
             }
 
             // Comprobar si el refresh token está caducado
             const now = new Date();
             if (refresh.expireDate && refresh.expireDate < now) {
                 await RefreshToken.destroy({ where: { id: refresh.id } });
-                throw new Error("Refresh token caducado");
+                throw new Error("Refresh token caducado para el usuario con id " + userId);
             } else {
                 token = jwt.sign(jwt.decode(token), JWT_SECRET, { expiresIn: '1h' });
                 await RefreshToken.update(

@@ -1,29 +1,42 @@
 ﻿import React from "react";
 import Swal from "sweetalert2";
+import { addDepartmentProfile } from "../../services/UserService";
 
 /**
  * Badge para añadir un departamento (solo para admins/superadmins)
- * @param {Object} props
- * @param {Function} props.onAdd Callback al pulsar añadir
  */
-const AddDepartmentBadge = ({ onAdd }) => {
+const AddDepartmentBadgeComponent = ({ availableDepartments = [], token, version, onAdded }) => {
+    const handleAddClick = async () => {
+        if (!availableDepartments.length)
+            return Swal.fire("Info", "No hay departamentos disponibles para añadir", "info");
+
+        const { value: depId } = await Swal.fire({
+            title: "Selecciona un departamento",
+            input: "select",
+            inputOptions: Object.fromEntries(availableDepartments.map(d => [d.id, d.name])),
+            inputPlaceholder: "Selecciona un departamento",
+            showCancelButton: true,
+        });
+
+        if (!depId) return;
+
+        const { success, error } = await addDepartmentProfile(depId, token, version);
+        Swal.fire(
+            success ? "Éxito" : "Error",
+            success ? "Departamento añadido correctamente" : (error || "No se pudo añadir el departamento"),
+            success ? "success" : "error"
+        );
+        if (success && onAdded) onAdded();
+    };
+
     return (
         <span
-            onClick={async () => {
-                const { value: departmentName } = await Swal.fire({
-                    title: "Añadir departamento",
-                    input: "text",
-                    inputLabel: "Nombre del departamento",
-                    inputPlaceholder: "Escribe el nombre",
-                    showCancelButton: true,
-                });
-                if (departmentName) onAdd(departmentName);
-            }}
+            onClick={handleAddClick}
             style={{
                 display: "inline-block",
                 padding: "4px 12px",
                 borderRadius: "50px",
-                backgroundColor: "#dcdcdc",
+                backgroundColor: "#e0e0e0",
                 color: "#333",
                 fontWeight: 500,
                 fontSize: "0.8rem",
@@ -36,4 +49,4 @@ const AddDepartmentBadge = ({ onAdd }) => {
     );
 };
 
-export default AddDepartmentBadge;
+export default AddDepartmentBadgeComponent;

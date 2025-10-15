@@ -475,7 +475,7 @@ class UserAccountController {
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
     */
-    static async delDepartment(req, res) {
+    static async delDepartmentProfile(req, res) {
         try {
             const { id } = req.user;
             const { departmentId } = req.params;
