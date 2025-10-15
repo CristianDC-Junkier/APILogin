@@ -15,7 +15,7 @@ let isLoggingOut = false;
 
 api.interceptors.response.use(
     response => response,
-    error => {
+    error => {// A VECES ME ECHA SIN SALIR EL MENSAJE
         if ((error.response?.status === 401 || error.response?.status === 409) && !isLoggingOut) {
             isLoggingOut = true; // Se marca que ya está en proceso
 

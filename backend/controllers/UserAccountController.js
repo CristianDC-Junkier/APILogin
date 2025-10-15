@@ -374,16 +374,16 @@ class UserAccountController {
 
     //#region Métodos gestión de departamentos de usuarios
     /**
-     * Añade un departamento a un usuario.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
-     */
+    * Añade un departamento a un usuario.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { id, departmentId } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
+    */
     static async addDepartment(req, res) {
         try {
             const { id } = req.params;
-            const { departmentId } = req.body;
+            const { departmentId } = req.params;
 
             const user = await UserAccount.findByPk(id);
             if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
@@ -405,16 +405,16 @@ class UserAccountController {
     }
 
     /**
-     * Elimina un departamento de un usuario.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { departmentId } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
-     */
+    * Elimina un departamento de un usuario.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { id, departmentId } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
+    */
     static async delDepartment(req, res) {
         try {
             const { id } = req.params;
-            const { departmentId } = req.body;
+            const { departmentId } = req.params;
 
             const user = await UserAccount.findByPk(id);
             if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
@@ -434,6 +434,72 @@ class UserAccountController {
         }
     }
 
+    /**
+    * Un admin añade un departamento a su perfil.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { departmentId }, query: { version } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
+    */
+    static async addDepartmentProfile(req, res) {
+        try {
+            const { id } = req.user;
+            const { departmentId } = req.params;
+            const { version } = req.query;
+
+            const user = await UserAccount.findByPk(id);
+            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
+            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+
+            const department = await Department.findByPk(departmentId);
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
+
+            await user.addDepartment(department);
+            const departments = await user.getDepartments();
+
+            LoggerController.info('Departamento con id ' + departmentId + ' añadido correctamente al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            res.json({ departmentsSize: departments.length });
+
+
+        } catch (error) {
+            LoggerController.error('Error al añadir el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    /**
+    * Un admin elimina un departamento de su perfil.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { departmentId }, query: { version } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
+    */
+    static async delDepartment(req, res) {
+        try {
+            const { id } = req.user;
+            const { departmentId } = req.params;
+            const { version } = req.query;
+
+            const user = await UserAccount.findByPk(id);
+            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
+            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+
+            const department = await Department.findByPk(departmentId);
+            if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
+
+            await user.removeDepartment(department);
+            const departments = await user.getDepartments();
+
+            LoggerController.info('Departamento con id ' + departmentId + ' eliminado correctamente del usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            res.json({ departmentsSize: departments.length });
+
+        } catch (error) {
+            LoggerController.error('Error al eliminar el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
     //#endregion
 }
 

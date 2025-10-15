@@ -42,7 +42,8 @@ async function initDatabase() {
             await Login.create({
                 username: 'admin',
                 password: 'admin',
-                usertype: superAdminType
+                usertype: superAdminType,
+                forcePwdChange: false,
             });
             LoggerController.info('✅ Superadmin creado correctamente');
         }
