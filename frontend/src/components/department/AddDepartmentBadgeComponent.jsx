@@ -4,11 +4,15 @@ import { addDepartmentProfile } from "../../services/UserService";
 
 /**
  * Badge para añadir un departamento (solo para admins/superadmins)
+ * @param {Object} props
+ * @param {Array} props.availableDepartments Lista de departamentos disponibles [{id, name}]
+ * @param {Function} props.onAdded Callback que recibe el resultado de la operación
  */
-const AddDepartmentBadgeComponent = ({ availableDepartments = [], token, version, onAdded }) => {
+const AddDepartmentBadgeComponent = ({ availableDepartments = [], onAdded }) => {
     const handleAddClick = async () => {
-        if (!availableDepartments.length)
+        if (!availableDepartments.length) {
             return Swal.fire("Info", "No hay departamentos disponibles para añadir", "info");
+        }
 
         const { value: depId } = await Swal.fire({
             title: "Selecciona un departamento",
@@ -19,14 +23,8 @@ const AddDepartmentBadgeComponent = ({ availableDepartments = [], token, version
         });
 
         if (!depId) return;
+        await onAdded(depId); 
 
-        const { success, error } = await addDepartmentProfile(depId, token, version);
-        Swal.fire(
-            success ? "Éxito" : "Error",
-            success ? "Departamento añadido correctamente" : (error || "No se pudo añadir el departamento"),
-            success ? "success" : "error"
-        );
-        if (success && onAdded) onAdded();
     };
 
     return (
