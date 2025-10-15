@@ -71,6 +71,7 @@ export const modifyUser = async (id, user, token) => {
  * Solicitud de eliminación de un usuario
  * @param {Object} userId - el ID del usuario que se quiere eliminar
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const deleteUser = async (userId, token, version) => {
@@ -84,11 +85,13 @@ export const deleteUser = async (userId, token, version) => {
         return { success: false, error: error.response?.data?.error };
     }
 };
+//#endregion
 
 //#region Profile Actions
 /**
  * Solicitud para obtener la información del usuario conectado
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const getProfile = async (token, version) => {
@@ -107,11 +110,12 @@ export const getProfile = async (token, version) => {
  * Solicitud de eliminación de un usuario
  * @param {Object} userId - el ID del usuario que se quiere eliminar
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const deleteProfile = async (token, version) => {
     try {
-        const res = await api.delete(`/user/profile-delete`, {
+        const res = await api.delete(`/user/profile/delete`, {
             params: { version },
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -123,14 +127,52 @@ export const deleteProfile = async (token, version) => {
 
 /**
  * Solicitud de cambio de infromación de la cuenta del perfil conectado
- * 
- * @param {String} useraccount - Nueva información de inicio de sesion para el perfil concetado
+ * @param {String} useraccount - Nueva información de inicio de sesion para el perfil conectado
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const modifyProfile = async (useraccount, token, version) => {
     try {
-        const res = await api.put(`/user/profile-update`, useraccount, {
+        const res = await api.put(`/user/profile/update`, useraccount, {
+            params: { version },
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+}
+
+/**
+* Solicitud para añadir un departamento al perfil conectado
+* @param {String} departmentId - Nuevo departamento a añadir al perfil conectado
+* @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
+* @returns {JSON} - Devuelve la información recibida de la llamada
+*/
+export const addDepartmentProfile = async (departmentId, token, version) => {
+    try {
+        const res = await api.post(`/user/profile/add-department/${departmentId}`, {}, {
+            params: { version },
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+}
+
+/**
+* Solicitud para eliminar un departamento del perfil conectado
+* @param {String} useraccount - Departamento a eliminar del perfil conectado
+* @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
+* @returns {JSON} - Devuelve la información recibida de la llamada
+*/
+export const deleteDepartmentProfile = async (departmentId, token, version) => {
+    try {
+        const res = await api.delete(`/user/profile/del-department/${departmentId}`, {
             params: { version },
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -143,14 +185,13 @@ export const modifyProfile = async (useraccount, token, version) => {
 //#endregion
 
 
-//#endregion
-
 //#region Forced Password Change Actions
 /**
  * Solicitud para marcar a un usuario para forzar un cambio de contraseña
  * @param {Object} userId - el ID del usuario que se quiere va a marcar
  * @param {Object} password - la constraseña temporal establecida por el usuario que realizó la marcación 
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @param {String} version - Version del usuario a modificar para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const markPWDCUser = async (userId, password, token, version) => {
@@ -169,11 +210,12 @@ export const markPWDCUser = async (userId, password, token, version) => {
  * Solicitud de cambio de contraseña para un usuario que ha sido marcado para cambio de contraseña
  * @param {String} newPassword - Nueva contraseña para el usuario marcado para el cambio de contraseña
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @param {String} version - Version del usuario a modificar para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const changePasswordPWD = async (newPassword, token, version) => {
     try {
-        const res = await api.patch(`user/profile-PWD`, newPassword, {
+        const res = await api.patch(`user/profile/PWD`, newPassword, {
             params: { version },
             headers: { Authorization: `Bearer ${token}` }
         });
