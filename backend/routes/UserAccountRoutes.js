@@ -30,8 +30,8 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
 router.put("/profile/update", isAuthenticated, UserAccountController.updateMyAccount);
 router.delete("/profile/delete", isAuthenticated, UserAccountController.deleteMyAccount);
 router.patch("/profile/PWD", isAuthenticated, UserAccountController.forcedPasswordChange);
-router.post("/profile/add-department/:departmentId", adminOnly, UserAccountController.addDepartment);
-router.delete("/profile/del-department/:departmentId", adminOnly, UserAccountController.delDepartment);
+router.post("/profile/add-department/:departmentId", adminOnly, UserAccountController.addDepartmentProfile);
+router.delete("/profile/del-department/:departmentId", adminOnly, UserAccountController.delDepartmentProfile);
 
 
 router.get("/", adminOnly, UserAccountController.list);

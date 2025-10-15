@@ -1,4 +1,4 @@
-﻿const { UserAccount, RefreshToken } = require("./Relations");
+﻿const { UserAccount, UserDepartments, RefreshToken } = require("./Relations");
 
 /**
  * Hook: antes de actualizar un UserAccount.
@@ -19,7 +19,23 @@ UserAccount.beforeUpdate((user, options) => {
  * - Destruir todos los refresh tokens asociados al usuario modificado
  */
 UserAccount.afterUpdate(async (user, options) => {
-    await RefreshToken.destroy({
-        where: { userId: user.id }
-    });
+    if (!options.skipRefreshTokens) {
+        await RefreshToken.destroy({ where: { userId: user.id } });
+    }
 });
+
+// Función para "tocar" usuario cuando se añade o elimina un departamento
+const touchUser = async (userDepartment) => {
+    const user = await UserAccount.findByPk(userDepartment.userId);
+    if (user) {
+        // ⚙️ Actualiza la fecha y dispara beforeUpdate pero sin destruir refresh tokens
+        await user.update(
+            { updatedAt: new Date() },
+            { skipRefreshTokens: true } 
+        );
+    }
+};
+
+// Hooks sobre UserDepartments
+UserDepartments.afterCreate(touchUser);
+UserDepartments.afterDestroy(touchUser);

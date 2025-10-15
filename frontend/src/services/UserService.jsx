@@ -184,7 +184,6 @@ export const deleteDepartmentProfile = async (departmentId, token, version) => {
 
 //#endregion
 
-
 //#region Forced Password Change Actions
 /**
  * Solicitud para marcar a un usuario para forzar un cambio de contraseña
