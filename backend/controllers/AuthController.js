@@ -118,6 +118,7 @@ class AuthController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(userId, {
+                attributes: ['id', 'username', 'usertype', 'forcePwdChange', 'version', 'createdAt', 'updatedAt'],
                 include: [
                     {
                         model: Department,

@@ -29,14 +29,39 @@ class UserAccountController {
      */
     static async list(req, res) {
         try {
-            const users = await UserAccount.findAll();
-            res.json({ users });
+            // Traer todos los usuarios con sus departamentos asociados
+            const users = await UserAccount.findAll({
+                attributes: ['id', 'username', 'usertype', 'forcePwdChange', 'version'],
+                include: [
+                    {
+                        model: Department,         
+                        as: 'departments',        
+                        attributes: ['id', 'name'] 
+                    }
+                ]
+            });
+
+            // Formatear la respuesta
+            const formattedUsers = users.map(user => ({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    forcePwdChange: user.forcePwdChange,
+                    version: user.version,
+                },
+                departments: user.departments  // ya vienen del include
+            }));
+
+            res.json({ users: formattedUsers });
+
         } catch (error) {
             LoggerController.error('Error recogiendo los usuarios por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
+
 
     /**
     * Recupera los datos completos de un usuario por su ID.
@@ -51,6 +76,7 @@ class UserAccountController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(id, {
+                attributes: ['id', 'username', 'usertype', 'forcePwdChange', 'version'],
                 include: [
                     {
                         model: Department,
@@ -378,8 +404,7 @@ class UserAccountController {
     */
     static async addDepartment(req, res) {
         try {
-            const { id } = req.params;
-            const { departmentId } = req.params;
+            const { id, departmentId } = req.params;
 
             const user = await UserAccount.findByPk(id);
             if (!user) return res.status(404).json({ error: "Usuario no encontrado" });

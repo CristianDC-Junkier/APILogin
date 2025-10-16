@@ -10,7 +10,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { getProfile, modifyProfile, deleteProfile, addDepartmentProfile, deleteDepartmentProfile } from "../../services/UserService";
 import { getDepartmentList } from "../../services/DepartmentService";
 
-
 import BackButton from "../../components/utils/BackButtonComponent";
 import DepartmentBadgeComponent from "../../components/department/DepartmentBadgeComponent";
 import AddDepartmentBadgeComponent from "../../components/department/AddDepartmentBadgeComponent";
@@ -31,14 +30,7 @@ const ProfileUser = () => {
 
         try {
             const profileResp = await getProfile(token, updatedVersion || version);
-            console.log(profileResp);//FALTA
-            if (profileResp.success) {
-                setProfile(profileResp.data);
-                
-            } else if (profileResp.status !== 409) {
-                Swal.fire('Error', 'El tiempo de acceso caducó, reinicie sesión', 'error')
-                    .then(() => { navigate('/home'); });
-            }
+            if (profileResp.success) setProfile(profileResp.data);
 
             // Traer todos los departamentos disponibles
             const deptResp = await getDepartmentList(token);
@@ -179,7 +171,7 @@ const ProfileUser = () => {
 
                                                                     if (result.success) {
                                                                         update(result.data.user, token);
-                                                                        fetchData();
+                                                                        fetchData(result.data.user.version);
                                                                     } else {
                                                                         Swal.fire("Error", result.error || "No se pudo eliminar", "error");
                                                                     }
@@ -192,8 +184,6 @@ const ProfileUser = () => {
                                                     {/* Badge para añadir departamento */}
                                                     <AddDepartmentBadgeComponent
                                                         availableDepartments={availableDepartments}
-                                                        token={token}
-                                                        version={version}
                                                         onAdded={async (depId) => {
                                                             const result = await addDepartmentProfile(depId, token, version);
 

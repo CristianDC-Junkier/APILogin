@@ -1,6 +1,5 @@
 ﻿import React from "react";
 import Swal from "sweetalert2";
-import { addDepartmentProfile } from "../../services/UserService";
 
 /**
  * Badge para añadir un departamento (solo para admins/superadmins)

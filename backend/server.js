@@ -29,8 +29,8 @@ const LinksRoutes = require('./routes/LinksRoutes');
 app.use(`${basePath}/api`, AuthRoutes);
 app.use(`${basePath}/api`, SystemRoutes);
 app.use(`${basePath}/api/user`, UserAccountRoutes);
-app.use(`${basePath}/api/department/`, DepartmentRoutes);
-app.use(`${basePath}/api/link/`, LinksRoutes);
+app.use(`${basePath}/api/department`, DepartmentRoutes);
+app.use(`${basePath}/api/link`, LinksRoutes);
 
 // --------------------------------
 //            FRONTEND
