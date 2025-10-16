@@ -24,6 +24,7 @@ export const getUsersList = async (token) => {
         const res = await api.get('/user/', {
             headers: { Authorization: `Bearer ${token}` }
         });
+        console.log(res);
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
@@ -85,6 +86,44 @@ export const deleteUser = async (userId, token, version) => {
         return { success: false, error: error.response?.data?.error };
     }
 };
+
+/**
+* Solicitud para añadir un departamento al perfil conectado
+* @param {String} departmentId - Nuevo departamento a añadir al perfil conectado
+* @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
+* @returns {JSON} - Devuelve la información recibida de la llamada
+*/
+export const addDepartment = async (userId, departmentId, token, version) => {
+    try {
+        const res = await api.post(`/user/${userId}/add-department/${departmentId}`, {}, {
+            params: { version },
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+}
+
+/**
+* Solicitud para eliminar un departamento del perfil conectado
+* @param {String} useraccount - Departamento a eliminar del perfil conectado
+* @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
+* @returns {JSON} - Devuelve la información recibida de la llamada
+*/
+export const deleteDepartment = async (userId, departmentId, token, version) => {
+    try {
+        const res = await api.delete(`/user/${userId}/del-department/${departmentId}`, {
+            params: { version },
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+}
 //#endregion
 
 //#region Profile Actions
@@ -214,7 +253,7 @@ export const markPWDCUser = async (userId, password, token, version) => {
  */
 export const changePasswordPWD = async (newPassword, token, version) => {
     try {
-        const res = await api.patch(`user/profile/PWD`, newPassword, {
+        const res = await api.patch(`/user/profile/PWD`, newPassword, {
             params: { version },
             headers: { Authorization: `Bearer ${token}` }
         });

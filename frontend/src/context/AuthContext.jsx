@@ -154,8 +154,6 @@ export const AuthProvider = ({ children }) => {
      */
     const contextUpdate = (newUser, newToken) => {
         setUser(newUser);
-        console.log(newUser);
-        console.log(version);
         setVersion(newUser.version === version ? (version + 1) : newUser.version); // Incrementa si no viene versión del backend
 
         // Guardar en storage

@@ -15,7 +15,7 @@ let isLoggingOut = false;
 
 api.interceptors.response.use(
     response => response,
-    async error => {// A VECES ME ECHA SIN SALIR EL MENSAJE
+    async error => {
         if ((error.response?.status === 401 || error.response?.status === 409) && !isLoggingOut) {
             isLoggingOut = true; // Se marca que ya está en proceso
 
@@ -33,6 +33,8 @@ api.interceptors.response.use(
                 // Redirigir al login
                 window.location.href = '/visor-sig/login';
             });
+
+            return;
         }
         return Promise.reject(error);
     }
