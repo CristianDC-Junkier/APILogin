@@ -167,8 +167,8 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                                             <AddBadgeComponent
                                                 availableObjs={links}
                                                 objType="enlace"
-                                                    onAdded={async (linkId) => {
-                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                    onAdded={async (link) => {
+                                                    await addLinkToDepartment(depItem.id, link.id, token);
                                                     await refreshData(false);
                                                 }}
                                             />
