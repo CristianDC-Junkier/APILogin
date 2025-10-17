@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 
-const ResponsiveTextComponent = ({ fullText, shortText, breakpoint = 700 }) => {
+const ResponsiveTextComponent = ({ fullText, shortText, breakpoint = 500 }) => {
     const [isSmall, setIsSmall] = useState(() => {
         if (typeof window !== "undefined") return window.innerWidth < breakpoint;
         return false; // fallback SSR

@@ -166,9 +166,9 @@ const DashBoardUser = () => {
             </Row>
 
             {/* Fila con tipo de usuario seleccionado + búsqueda */}
-            <div className="d-flex flex-column flex-md-row justify-content-between mb-2 align-items-start align-items-md-center">
+            <div className="d-flex justify-content-between mb-2 align-items-center">
                 {/* título */}
-                <div className="fw-bold fs-6 mb-2 mb-md-0">
+                <div className="fw-bold fs-6 d-flex justify-content-between mb-2 align-items-center">
                     {selectedType === "All" ? "Todos los usuarios" : selectedType === "Admin" ? "Administradores" : "Usuarios"}
                 </div>
 

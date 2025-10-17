@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from "react";
+﻿import React, { useMemo, useEffect, useState } from "react";
 import { Table, Button } from "reactstrap";
 import { createRoot } from "react-dom/client";
 import Swal from "sweetalert2";
@@ -19,6 +19,19 @@ import Pagination from "../../components/PaginationComponent";
  * @param {Function} props.refreshData - Función para recargar los datos
  */
 const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, setCurrentPage, refreshData }) => {
+
+    // Hook para detectar pantalla pequeña
+    const useIsSmallScreen = (breakpoint = 500) => {
+        const [isSmall, setIsSmall] = useState(window.innerWidth < breakpoint);
+
+        useEffect(() => {
+            const handleResize = () => setIsSmall(window.innerWidth < breakpoint);
+            window.addEventListener("resize", handleResize);
+            return () => window.removeEventListener("resize", handleResize);
+        }, [breakpoint]);
+
+        return isSmall;
+    };
 
     const filteredLinks = useMemo(
         () => links?.filter(d => d.name.toLowerCase().includes(search.toLowerCase())),
@@ -88,6 +101,8 @@ const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, se
         }
     };
 
+    const isSmallScreen = useIsSmallScreen(770);
+
     return (
         <>
             <Table striped responsive>
@@ -95,8 +110,16 @@ const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, se
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th>Dirección Web</th>
-                        <th className="text-center">Acciones</th>
+                        <th
+                            className="text-center"
+                            style={{ width: isSmallScreen ? "15%" : "55%" }}>
+                            Dirección Web
+                        </th>
+                        <th
+                            className="text-center"
+                            style={{ width: isSmallScreen ? "55%" : "15%" }}>
+                            Acciones
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
