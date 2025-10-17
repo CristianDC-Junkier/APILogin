@@ -129,7 +129,7 @@ const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, se
                             <tr key={idx}>
                                 <td> {linkItem?.id || "\u00A0"} </td>
                                 <td> {linkItem?.name || "\u00A0"} </td>
-                                <td> {linkItem?.web || "\u00A0"} </td>
+                                <td> {<a href={linkItem?.web} target="_blank"> {isSmallScreen ? "Enlace" : linkItem?.web } </a> || "\u00A0"} </td>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center flex-wrap m">
                                         <Button color="warning" size="sm" className="me-1 mb-1" onClick={() => handleModify(linkItem)}> ✏️ </Button>
