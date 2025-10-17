@@ -1,5 +1,5 @@
 ﻿
-const { UserAccount, Department } = require("../models/Relations");
+const { UserAccount, Department, Links } = require("../models/Relations");
 const LoggerController = require("../controllers/LoggerController");
 const { Op } = require("sequelize");
 const { generateToken } = require("../utils/JWT");
@@ -34,9 +34,18 @@ class UserAccountController {
                 attributes: ['id', 'username', 'usertype', 'forcePwdChange', 'version'],
                 include: [
                     {
-                        model: Department,         
-                        as: 'departments',        
-                        attributes: ['id', 'name'] 
+                        model: Department,
+                        as: 'departments',
+                        attributes: ['id', 'name'],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Links,
+                                as: 'links',
+                                attributes: ['id', 'name', 'web'],
+                                through: { attributes: [] } 
+                            }
+                        ]
                     }
                 ]
             });
@@ -50,10 +59,19 @@ class UserAccountController {
                     forcePwdChange: user.forcePwdChange,
                     version: user.version,
                 },
-                departments: user.departments  // ya vienen del include
+                departments: user.departments.map(dep => ({
+                    id: dep.id,
+                    name: dep.name,
+                    links: dep.links.map(link => ({
+                        id: link.id,
+                        name: link.name,
+                        url: link.url
+                    }))
+                }))
             }));
 
             res.json({ users: formattedUsers });
+
 
         } catch (error) {
             LoggerController.error('Error recogiendo los usuarios por el usuario con id ' + req.user.id);

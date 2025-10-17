@@ -24,7 +24,6 @@ export const getUsersList = async (token) => {
         const res = await api.get('/user/', {
             headers: { Authorization: `Bearer ${token}` }
         });
-        console.log(res);
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };

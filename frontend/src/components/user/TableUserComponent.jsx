@@ -139,24 +139,23 @@ const TableUserComponent = ({
 
     return (
         <>
-            <Table striped responsive>
+            <Table striped responsive style={{ tableLayout: "fixed" }}>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Tipo</th>
-                        <th>Departamentos</th>
-                        <th className="text-center">Acciones</th>
+                        <th style={{ width: "5%", whiteSpace: "nowrap" }}>ID</th>
+                        <th style={{ width: "8%" }}>Usuario</th>
+                        <th style={{ width: "15%" }}>Tipo</th>
+                        <th style={{ width: "40%" }}>Departamentos</th>
+                        <th style={{ width: "12%" }} className="text-center">Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {currentUsers.map((userItem, idx) => {
                         const isSuperAdminUser = userItem.user.usertype === "SUPERADMIN";
                         const canModify = ((userItem.user.usertype !== "SUPERADMIN") ||
                             (userItem.user.usertype === "SUPERADMIN" && currentUser.usertype === "SUPERADMIN"));
                         const isCurrentUser = userItem.user.id === currentUser.id;
-
-                        console.log(userItem);
 
                         return (
                             <tr key={idx}>
@@ -174,7 +173,7 @@ const TableUserComponent = ({
                                     {userItem.departments && userItem.departments.length > 0 ? (
                                         <>
                                             {/* Mostrar los primeros dos departamentos */}
-                                            {userItem.departments.slice(0, 2).map(dep => (
+                                            {userItem.departments.slice(0, 3).map(dep => (
                                                 canModify && !isCurrentUser
                                                     ? <RemovableDepartmentBadgeComponent
                                                         key={dep.id}
@@ -191,15 +190,15 @@ const TableUserComponent = ({
                                             ))}
 
                                             {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
-                                            {userItem.departments.length > 2 ? (
+                                            {userItem.departments.length > 3 ? (
                                                 <ShowMoreDepartmentBadgeComponent
                                                     currentUser={currentUser}
                                                     user={userItem.user}
                                                     canModify={canModify}
                                                     departments={departments} 
                                                     userDepartments={userItem.departments}
-                                                    onAdded={async (dep) => {
-                                                        await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                    onAdded={async (depId) => {
+                                                        await addDepartment(userItem.user.id, depId, token, userItem.user.version);
                                                         await refreshData();
                                                     }}
                                                     onDeleted={async (dep) => {
@@ -219,7 +218,6 @@ const TableUserComponent = ({
                                     ) : (
                                         // Usuario sin departamentos
                                             canModify ? (
-                                                console.log(departments),
                                             <AddDepartmentBadgeComponent
                                                 availableDepartments={departments}
                                                     onAdded={async (depId) => {
