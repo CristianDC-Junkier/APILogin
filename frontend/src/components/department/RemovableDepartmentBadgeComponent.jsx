@@ -48,6 +48,7 @@ const RemovableDepartmentBadgeComponent = ({ department, onDelete }) => {
                 whiteSpace: "nowrap",
                 cursor: "default",
                 userSelect: "none",
+
             }}
         >
             {department}
@@ -69,6 +70,7 @@ const RemovableDepartmentBadgeComponent = ({ department, onDelete }) => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        zIndex: 1000
                     }}
                 />
             )}
