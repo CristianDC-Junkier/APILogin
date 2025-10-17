@@ -196,8 +196,9 @@ const TableUserComponent = ({
                                                     currentUser={currentUser}
                                                     user={userItem.user}
                                                     canModify={canModify}
-                                                    departments={departments} 
-                                                    userDepartments={userItem.departments}
+                                                    objList={departments}
+                                                    objType="departamento"
+                                                    userObjects={userItem.departments}
                                                     onAdded={async (depId) => {
                                                         await addDepartment(userItem.user.id, depId, token, userItem.user.version);
                                                         await refreshData();

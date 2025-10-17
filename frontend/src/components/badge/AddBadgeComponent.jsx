@@ -14,16 +14,16 @@ const AddBadgeComponent = ({ objType, availableObjs = [], onAdded }) => {
             return Swal.fire("Info", `No hay ${objType}s disponibles para añadir`, "info");
         }
 
-        const { value: depId } = await Swal.fire({
+        const { value: objId } = await Swal.fire({
             title: `Selecciona un ${objType}`,
             input: "select",
-            inputOptions: Object.fromEntries(availableObjs.map(d => [d.id, d.name])),
+            inputOptions: Object.fromEntries(availableObjs.map(o => [o.id, o.name])),
             inputPlaceholder: `Selecciona un ${objType}`,
             showCancelButton: true,
         });
 
-        if (!depId) return;
-        await onAdded(depId); 
+        if (!objId) return;
+        await onAdded(objId); 
 
     };
 
