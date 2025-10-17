@@ -25,7 +25,7 @@ router.post("/", adminOnly, DepartmentController.create);
 router.put("/:id", adminOnly, DepartmentController.update);
 router.delete("/:id", adminOnly, DepartmentController.delete);
 
-router.put("/add-links/:id", adminOnly, DepartmentController.addLink);
-router.put("/del-links/:id", adminOnly, DepartmentController.delLink);
+router.put("/:id/add-links/:linkId", adminOnly, DepartmentController.addLink);
+router.put("/:id/del-links/:linkId", adminOnly, DepartmentController.delLink);
 
 module.exports = router;

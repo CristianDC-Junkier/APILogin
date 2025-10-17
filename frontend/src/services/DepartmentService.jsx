@@ -95,7 +95,7 @@ export const deleteDepartment = async (departmentId, token) => {
  */
 export const addLinkToDepartment = async (depId, linkId, token) => {
     try {
-        const res = await api.put(`/department/add-links/${depId}`, { linkId }, {
+        const res = await api.put(`/department/${depId}/add-links/${linkId}`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };
@@ -113,7 +113,7 @@ export const addLinkToDepartment = async (depId, linkId, token) => {
  */
 export const deleteLinkToDepartment = async (depId, linkId, token) => {
     try {
-        const res = await api.put(`/department/del-links/${depId}`, { linkId }, {
+        const res = await api.put(`/department/${depId}/del-links/${linkId}`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };

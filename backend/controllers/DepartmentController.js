@@ -141,8 +141,7 @@ class DepartmentController {
     */
     static async addLink(req, res) {
         try {
-            const { id } = req.params;       
-            const { linkId } = req.body;     
+            const { id, linkId } = req.params;       
 
             const department = await Department.findByPk(id);
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
@@ -172,8 +171,7 @@ class DepartmentController {
      */
     static async delLink(req, res) {
         try {
-            const { id } = req.params;
-            const { linkId } = req.body;
+            const { id, linkId } = req.params;
 
             const department = await Department.findByPk(id);
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });

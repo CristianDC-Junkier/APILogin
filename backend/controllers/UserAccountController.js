@@ -352,8 +352,7 @@ class UserAccountController {
     */
     static async deleteMyAccount(req, res) {
         try {
-            console.log(req.user);
-            const { id } = req.user.id;
+            const { id } = req.user;
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(id);
