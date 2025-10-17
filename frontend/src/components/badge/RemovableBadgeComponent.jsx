@@ -22,8 +22,8 @@ const RemovableBadgeComponent = ({ objType, objName, onDelete }) => {
     const handleDeleteClick = async (e) => {
         e.stopPropagation(); // evita que se propague el clic al badge
         const result = await Swal.fire({
-            title: `Eliminar ${objType}`,
-            text: `¿Quieres eliminar el ${objType} "${objName}"?`,
+            title: `Desasignar ${objType}`,
+            text: `¿Quieres desasignar el ${objType} "${objName}"?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",

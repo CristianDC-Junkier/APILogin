@@ -23,3 +23,12 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+/* Tabla responsiva: muestra texto alternativo en pantallas pequeñas */
+.responsive-th {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+

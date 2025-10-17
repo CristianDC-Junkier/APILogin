@@ -35,21 +35,29 @@ const ShowMoreDepartmentBadgeComponent = ({
 
     const handleShowMore = () => {
         if (currentUser.id !== user.id) {
-            console.log("Show more departments for user:", user);
-            console.log("Current user:", currentUser);
-            console.log("Can modify:", canModify);
-            console.log("User departments:", userDepartments);
-            console.log("All departments:", departments);
-            console.log("Available departments:", availableDepartments);
             Swal.fire({
-                title: 'Departamentos',
-                html: '<div id="departments-container"></div>',
+                title: `<strong>Departamentos de ${user.username}</strong>`,
+                html: `<div id="departments-container"></div>`,
                 didOpen: () => {
                     const container = document.getElementById('departments-container');
                     if (container) {
                         const root = ReactDOM.createRoot(container);
                         root.render(
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '4px',
+                                    maxHeight: '300px',
+                                    overflowY: 'auto',
+                                    minHeight: '200px',  
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: '#f9f9f9',
+                                    alignItems: 'flex-start',
+                                    boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)',
+                                }}
+                            >
                                 {canModify ? (
                                     <>
                                         {userDepartments.map(dep => (
@@ -61,21 +69,20 @@ const ShowMoreDepartmentBadgeComponent = ({
                                                     await onDeleted(dep);
                                                     userDepartments = userDepartments.filter(d => d.id !== dep.id);
                                                     availableDepartments = [...availableDepartments, dep];
-                                                    handleShowMore();       
+                                                    handleShowMore(); 
                                                 }}
                                             />
                                         ))}
                                         <AddBadgeComponent
                                             availableObjs={availableDepartments}
                                             objType="departamento"
-                                            onAdded={async (depId) => {
-                                                await onAdded(depId); // PODRIAMOS CAMBIAR EL ADDED PARA QUE DEVUELVA EL DEPARTAMENTO COMPLETO
-                                                const addedDep = departments.find(d => d.id === Number(depId));
-                                                availableDepartments = availableDepartments.filter(d => d.id !== depId);
+                                            onAdded={async (dep) => {
+                                                await onAdded(dep);
+                                                const addedDep = departments.find(d => d.id === Number(dep.id));
+                                                availableDepartments = availableDepartments.filter(d => d.id !== dep.id);
                                                 userDepartments = [...userDepartments, addedDep];
-                                                handleShowMore();       
+                                                handleShowMore(); 
                                             }}
-
                                         />
                                     </>
                                 ) : (
@@ -90,11 +97,14 @@ const ShowMoreDepartmentBadgeComponent = ({
                 showConfirmButton: true,
                 confirmButtonText: 'Cerrar',
                 width: '600px',
+                buttonsStyling: true,
             });
-        } else {
+        }
+        else {
             navigate('/profile');
         }
     };
+
 
     return (
         <span
