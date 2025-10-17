@@ -2,9 +2,9 @@
 import ReactDOM from "react-dom/client";
 import Swal from "sweetalert2";
 
-import DepartmentBadgeComponent from "./DepartmentBadgeComponent";
-import AddDepartmentBadgeComponent from "./AddDepartmentBadgeComponent";
-import RemovableDepartmentBadgeComponent from "./RemovableDepartmentBadgeComponent";
+import BadgeComponent from "./BadgeComponent";
+import AddBadgeComponent from "./AddBadgeComponent";
+import RemovableBadgeComponent from "./RemovableBadgeComponent";
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -53,9 +53,10 @@ const ShowMoreDepartmentBadgeComponent = ({
                                 {canModify ? (
                                     <>
                                         {userDepartments.map(dep => (
-                                            <RemovableDepartmentBadgeComponent
+                                            <RemovableBadgeComponent
                                                 key={dep.id}
-                                                department={dep.name}
+                                                objName={dep.name}
+                                                objType="departamento"
                                                 onDelete={async () => {
                                                     await onDeleted(dep);
                                                     userDepartments = userDepartments.filter(d => d.id !== dep.id);
@@ -64,8 +65,9 @@ const ShowMoreDepartmentBadgeComponent = ({
                                                 }}
                                             />
                                         ))}
-                                        <AddDepartmentBadgeComponent
-                                            availableDepartments={availableDepartments}
+                                        <AddBadgeComponent
+                                            availableObjs={availableDepartments}
+                                            objType="departamento"
                                             onAdded={async (depId) => {
                                                 await onAdded(depId); // PODRIAMOS CAMBIAR EL ADDED PARA QUE DEVUELVA EL DEPARTAMENTO COMPLETO
                                                 const addedDep = departments.find(d => d.id === Number(depId));
@@ -78,7 +80,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                     </>
                                 ) : (
                                     userDepartments.map(dep => (
-                                        <DepartmentBadgeComponent key={dep.id} department={dep.name} />
+                                        <BadgeComponent key={dep.id} department={dep.name} />
                                     ))
                                 )}
                             </div>
