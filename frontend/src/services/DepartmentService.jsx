@@ -85,7 +85,7 @@ export const deleteDepartment = async (departmentId, token) => {
 };
 //#endregion
 
-//#region Generic Department Action
+//#region Link Association Actions
 /**
  * Solicitud para añadir un enlace a un departamento
  * @param {String} depId - ID del departamento al que se va a añadir el enlace
@@ -95,7 +95,7 @@ export const deleteDepartment = async (departmentId, token) => {
  */
 export const addLinkToDepartment = async (depId, linkId, token) => {
     try {
-        const res = await api.put(`/department/add-links/${depId}`, linkId, {
+        const res = await api.put(`/department/add-links/${depId}`, { linkId }, {
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };
@@ -113,7 +113,7 @@ export const addLinkToDepartment = async (depId, linkId, token) => {
  */
 export const deleteLinkToDepartment = async (depId, linkId, token) => {
     try {
-        const res = await api.put(`/department/del-links/${depId}`, linkId, {
+        const res = await api.put(`/department/del-links/${depId}`, { linkId }, {
             headers: { Authorization: `Bearer ${token}` }
         });
         return { success: true, data: res.data };

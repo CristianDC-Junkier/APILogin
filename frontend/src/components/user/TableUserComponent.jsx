@@ -195,24 +195,25 @@ const TableUserComponent = ({
                                                         />
                                                 ))}
 
-                                                {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
-                                                {userItem.departments.length > 3 ? (
-                                                    <ShowMoreBadgeComponent
-                                                        currentUser={currentUser}
-                                                        user={userItem.user}
-                                                        canModify={canModify}
-                                                        departments={departments}
-                                                        userDepartments={userItem.departments}
+                                            {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
+                                            {userItem.departments.length > 3 ? (
+                                                <ShowMoreBadgeComponent
+                                                    currentUser={currentUser}
+                                                    user={userItem.user}
+                                                    canModify={canModify}
+                                                    objList={departments}
+                                                    objType="departamento"
+                                                    userObjects={userItem.departments}
                                                         onAdded={async (dep) => {
                                                             await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
-                                                            await refreshData();
-                                                        }}
-                                                        onDeleted={async (dep) => {
-                                                            await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
-                                                            await refreshData();
-                                                        }}
-                                                    />
-                                                ) : <AddBadgeComponent
+                                                        await refreshData();
+                                                    }}
+                                                    onDeleted={async (dep) => {
+                                                        await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                        await refreshData();
+                                                    }}
+                                                />
+                                            ) : <AddBadgeComponent
                                                     availableObjs={departments.filter(d => !userItem.departments.some(ud => ud.id === d.id))}
                                                     objType="departamento"
                                                     onAdded={async (dep) => {

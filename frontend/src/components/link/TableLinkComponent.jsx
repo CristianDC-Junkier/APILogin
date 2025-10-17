@@ -109,7 +109,6 @@ const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, se
                                 <td> {linkItem?.web || "\u00A0"} </td>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center flex-wrap m">
-                                        <Button color="info" size="sm" className="me-1 mb-1" onClick={() => alert()}> 🔑 </Button>
                                         <Button color="warning" size="sm" className="me-1 mb-1" onClick={() => handleModify(linkItem)}> ✏️ </Button>
                                         <Button color="danger" size="sm" className="me-1 mb-1" onClick={() => handleDelete(linkItem)}> 🗑️ </Button>
                                     </div>
