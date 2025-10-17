@@ -9,21 +9,52 @@ import Swal from "sweetalert2";
  * @param {Function} props.onAdded Callback que recibe el resultado de la operación
  */
 const AddBadgeComponent = ({ objType, availableObjs = [], onAdded }) => {
+
     const handleAddClick = async () => {
         if (!availableObjs.length) {
             return Swal.fire("Info", `No hay ${objType}s disponibles para añadir`, "info");
         }
 
-        const { value: depId } = await Swal.fire({
-            title: `Selecciona un ${objType}`,
-            input: "select",
-            inputOptions: Object.fromEntries(availableObjs.map(d => [d.id, d.name])),
-            inputPlaceholder: `Selecciona un ${objType}`,
+        const sortedOptions = [...availableObjs].sort((a, b) =>
+            objType === "departamento" ? a.name.localeCompare(b.name) : a.id - b.id
+        );
+
+        const { value: selectedId } = await Swal.fire({
+            title: `<strong>Asignar ${objType}s</strong>`,
+            html: `
+        <select id="swal-select" style="
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 0.9rem;
+        ">
+            <option value="" disabled selected>Seleccione un ${objType}</option>
+            ${sortedOptions.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
+        </select>
+    `,
             showCancelButton: true,
+            confirmButtonText: 'Agregar',
+            cancelButtonText: 'Cancelar',
+            buttonsStyling: true,
+            preConfirm: () => {
+                const select = Swal.getPopup().querySelector('#swal-select');
+                if (!select.value) {
+                    Swal.showValidationMessage(`Debes seleccionar un ${objType}`);
+                    return;
+                }
+                return select.value;
+            },
         });
 
-        if (!depId) return;
-        await onAdded(depId); 
+
+
+        if (!selectedId) return;
+
+        // Buscar el objeto completo por su id
+        const selectedObj = availableObjs.find(d => d.id.toString() === selectedId.toString());
+
+        await onAdded(selectedObj);
 
     };
 

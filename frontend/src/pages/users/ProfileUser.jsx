@@ -30,16 +30,21 @@ const ProfileUser = () => {
 
         try {
             const profileResp = await getProfile(token, updatedVersion || version);
-            if (profileResp.success) setProfile(profileResp.data);
+            if (profileResp.success) {
+                profileResp.data.departments = [...profileResp.data.departments].sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                );
+                setProfile(profileResp.data);
+            }
 
             // Traer todos los departamentos disponibles
             const deptResp = await getDepartmentList(token);
             if (deptResp.success) {
-                setAvailableDepartments(
-                    deptResp.data.departments.filter(
-                        d => !profileResp.data.departments.some(pd => pd.id === d.id)
-                    )
-                );
+                const availableDepartmentsAux = deptResp.data.departments
+                    .filter(d => !profileResp.data.departments.some(pd => pd.id === d.id))
+                    .sort((a, b) => a.name.localeCompare(b.name));
+
+                setAvailableDepartments(availableDepartmentsAux);
             }
 
 
@@ -186,8 +191,8 @@ const ProfileUser = () => {
                                                     <AddBadgeComponent
                                                         availableObjs={availableDepartments}
                                                         objType="departamento"
-                                                        onAdded={async (depId) => {
-                                                            const result = await addDepartmentProfile(depId, token, version);
+                                                        onAdded={async (dep) => {
+                                                            const result = await addDepartmentProfile(dep.id, token, version);
 
                                                             if (result.success) {
                                                                 update(result.data.user, token);

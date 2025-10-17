@@ -5,6 +5,8 @@ import Swal from "sweetalert2";
 import { modifyUser, deleteUser, markPWDCUser, addDepartment, deleteDepartment } from "../../services/UserService";
 
 import CaptchaSlider from '../utils/CaptchaSliderComponent';
+import ResponsiveTextComponent from "../utils/ResponsiveTextComponent";
+
 import PaginationComponent from "../PaginationComponent";
 import AddModifyUserCommponent from "./AddModifyUserComponent";
 import PWDAskComponent from "./PWDAskComponent";
@@ -139,14 +141,16 @@ const TableUserComponent = ({
 
     return (
         <>
-            <Table striped responsive style={{ tableLayout: "fixed" }}>
+            <Table striped responsive>
                 <thead>
                     <tr>
-                        <th style={{ width: "5%", whiteSpace: "nowrap" }}>ID</th>
-                        <th style={{ width: "8%" }}>Usuario</th>
-                        <th style={{ width: "15%" }}>Tipo</th>
-                        <th style={{ width: "40%" }}>Departamentos</th>
-                        <th style={{ width: "12%" }} className="text-center">Acciones</th>
+                        <th style={{whiteSpace: "nowrap" }}>ID</th>
+                        <th>Usuario</th>
+                        <th>Tipo</th>
+                        <th>Departamentos</th>
+                        <th className="text-center">
+                            <ResponsiveTextComponent fullText="Acciones" shortText="Acs" />
+                        </th>
                     </tr>
                 </thead>
 
@@ -171,67 +175,67 @@ const TableUserComponent = ({
                                 <td>
                                     <div className="d-flex flex-wrap m" style={{ gap: "0.1rem" }}>
 
-                                    {userItem.departments && userItem.departments.length > 0 ? (
-                                        <>
-                                            {/* Mostrar los primeros dos departamentos */}
-                                            {userItem.departments.slice(0, 3).map(dep => (
-                                                canModify && !isCurrentUser
-                                                    ? <RemovableBadgeComponent
-                                                        key={dep.id}
-                                                        objName={dep.name}
-                                                        objType="departamento"
-                                                        onDelete={async () => {
+                                        {userItem.departments && userItem.departments.length > 0 ? (
+                                            <>
+                                                {/* Mostrar los primeros dos departamentos */}
+                                                {userItem.departments.slice(0, 3).map(dep => (
+                                                    canModify && !isCurrentUser
+                                                        ? <RemovableBadgeComponent
+                                                            key={dep.id}
+                                                            objName={dep.name}
+                                                            objType="departamento"
+                                                            onDelete={async () => {
+                                                                await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                                await refreshData();
+                                                            }}
+                                                        />
+                                                        : <BadgeComponent
+                                                            key={dep.id}
+                                                            objName={dep.name}
+                                                        />
+                                                ))}
+
+                                                {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
+                                                {userItem.departments.length > 3 ? (
+                                                    <ShowMoreBadgeComponent
+                                                        currentUser={currentUser}
+                                                        user={userItem.user}
+                                                        canModify={canModify}
+                                                        departments={departments}
+                                                        userDepartments={userItem.departments}
+                                                        onAdded={async (dep) => {
+                                                            await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                            await refreshData();
+                                                        }}
+                                                        onDeleted={async (dep) => {
                                                             await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
                                                             await refreshData();
                                                         }}
                                                     />
-                                                    : <BadgeComponent
-                                                        key={dep.id}
-                                                        objName={dep.name}
-                                                    />
-                                            ))}
-
-                                            {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
-                                            {userItem.departments.length > 3 ? (
-                                                <ShowMoreBadgeComponent
-                                                    currentUser={currentUser}
-                                                    user={userItem.user}
-                                                    canModify={canModify}
-                                                    departments={departments} 
-                                                    userDepartments={userItem.departments}
-                                                    onAdded={async (depId) => {
-                                                        await addDepartment(userItem.user.id, depId, token, userItem.user.version);
-                                                        await refreshData();
-                                                    }}
-                                                    onDeleted={async (dep) => {
-                                                        await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                ) : <AddBadgeComponent
+                                                    availableObjs={departments.filter(d => !userItem.departments.some(ud => ud.id === d.id))}
+                                                    objType="departamento"
+                                                    onAdded={async (dep) => {
+                                                        await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
                                                         await refreshData();
                                                     }}
                                                 />
-                                            ) : <AddBadgeComponent
-                                                    availableObjs={epartments.filter(d => !userItem.departments.some(ud => ud.id === d.id))}
+                                                }
+                                            </>
+                                        ) : (
+                                            // Usuario sin departamentos
+                                            canModify ? (
+                                                <AddBadgeComponent
+                                                    availableObjs={departments}
                                                     objType="departamento"
                                                     onAdded={async (depId) => {
                                                         await addDepartment(userItem.user.id, depId, token, userItem.user.version);
                                                         await refreshData();
                                                     }}
                                                 />
-                                        }
-                                        </>
-                                    ) : (
-                                        // Usuario sin departamentos
-                                            canModify ? (
-                                            <AddBadgeComponent
-                                                availableObjs={departments}
-                                                objType="departamento"
-                                                onAdded={async (depId) => {
-                                                    await addDepartment(userItem.user.id, depId, token, userItem.user.version);
-                                                    await refreshData();
-                                                }}
-                                            />
-                                        ) : null
-                                    )}
-
+                                            ) : null
+                                        )}
+                                    </div>
                                 </td>
 
                                 <td className="text-center">
