@@ -21,7 +21,7 @@ const DepartmentList = () => {
     const { user: currentUser, token } = useAuth();
 
     const [currentView, setCurrentView] = useState("departments"); // "departments" | "links"
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [allDeprts, setallDeprts] = useState([]);
     const [allLinks, setallLinks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -84,11 +84,15 @@ const DepartmentList = () => {
         if (!init) setLoading(false);
     };
 
-    useEffect(() => {
+    const fetchData = async () => {
         setLoading(true);
-        fetchDeps(true);
-        fetchLinks(true);
+        await fetchDeps(true);
+        await fetchLinks(true);
         setLoading(false);
+    }
+
+    useEffect(() => {
+        fetchData();
     }, []);
 
     //Función que gestiona la creación de un usuario
