@@ -1,9 +1,9 @@
 ﻿import React from "react";
 
 /**
- * Muestra una insignia con el nombre del departamento del usuario.
+ * Muestra una insignia con el nombre de un objeto.
  * @param {Object} props
- * @param {string} props.department Nombre del departamento.
+ * @param {string} props.objName Nombre del objeto.
  */
 function stringToColor(str) {
     let hash = 0;
@@ -18,8 +18,8 @@ function stringToColor(str) {
     return color;
 }
 
-const DepartmentBadgeComponent = ({ department }) => {
-    const bgColor = stringToColor(department);
+const BadgeComponent = ({ objName }) => {
+    const bgColor = stringToColor(objName);
     return (
         <span
             style={{
@@ -33,9 +33,9 @@ const DepartmentBadgeComponent = ({ department }) => {
                 whiteSpace: "nowrap",
             }}
         >
-            {department}
+            {objName}
         </span>
     );
 };
 
-export default DepartmentBadgeComponent;
+export default BadgeComponent;

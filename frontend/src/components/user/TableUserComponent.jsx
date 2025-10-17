@@ -9,10 +9,10 @@ import PaginationComponent from "../PaginationComponent";
 import AddModifyUserCommponent from "./AddModifyUserComponent";
 import PWDAskComponent from "./PWDAskComponent";
 
-import DepartmentBadgeComponent from "../department/DepartmentBadgeComponent";
-import AddDepartmentBadgeComponent from "../department/AddDepartmentBadgeComponent";
-import RemovableDepartmentBadgeComponent from "../department/RemovableDepartmentBadgeComponent";
-import ShowMoreDepartmentBadgeComponent from "../department/ShowMoreDepartmentBadgeComponent";
+import BadgeComponent from "../badge/BadgeComponent";
+import AddBadgeComponent from "../badge/AddBadgeComponent";
+import RemovableBadgeComponent from "../badge/RemovableBadgeComponent";
+import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
 
 const TableUserComponent = ({
     users,
@@ -175,23 +175,24 @@ const TableUserComponent = ({
                                             {/* Mostrar los primeros dos departamentos */}
                                             {userItem.departments.slice(0, 3).map(dep => (
                                                 canModify && !isCurrentUser
-                                                    ? <RemovableDepartmentBadgeComponent
+                                                    ? <RemovableBadgeComponent
                                                         key={dep.id}
-                                                        department={dep.name}
+                                                        objName={dep.name}
+                                                        objType="departamento"
                                                         onDelete={async () => {
                                                             await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
                                                             await refreshData();
                                                         }}
                                                     />
-                                                    : <DepartmentBadgeComponent
+                                                    : <BadgeComponent
                                                         key={dep.id}
-                                                        department={dep.name}
+                                                        objName={dep.name}
                                                     />
                                             ))}
 
                                             {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
                                             {userItem.departments.length > 3 ? (
-                                                <ShowMoreDepartmentBadgeComponent
+                                                <ShowMoreBadgeComponent
                                                     currentUser={currentUser}
                                                     user={userItem.user}
                                                     canModify={canModify}
@@ -206,22 +207,25 @@ const TableUserComponent = ({
                                                         await refreshData();
                                                     }}
                                                 />
-                                            ) : <AddDepartmentBadgeComponent
-                                                availableDepartments={departments}
-                                                onAdded={async (depId) => {
-                                                    await addDepartment(userItem.user.id, depId, token, userItem.user.version);
-                                                    await refreshData();
-                                                }}
-                                            />
+                                            ) : <AddBadgeComponent
+                                                    availableObjs={departments}
+                                                    objType="departamento"
+                                                    onAdded={async (depId) => {
+                                                        await addDepartment(userItem.user.id, depId, token, userItem.user.version);
+                                                        await refreshData();
+                                                    }}
+                                                />
                                         }
                                         </>
                                     ) : (
                                         // Usuario sin departamentos
                                             canModify ? (
-                                            <AddDepartmentBadgeComponent
-                                                availableDepartments={departments}
-                                                    onAdded={async (depId) => {
+                                            <AddBadgeComponent
+                                                availableObjs={departments}
+                                                objType="departamento"
+                                                onAdded={async (depId) => {
                                                     await addDepartment(userItem.user.id, depId, token, userItem.user.version);
+                                                    await refreshData();
                                                 }}
                                             />
                                         ) : null

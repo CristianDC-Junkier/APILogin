@@ -15,15 +15,15 @@ function stringToColor(str) {
     return color;
 }
 
-const RemovableDepartmentBadgeComponent = ({ department, onDelete }) => {
-    const bgColor = stringToColor(department);
+const RemovableBadgeComponent = ({ objType, objName, onDelete }) => {
+    const bgColor = stringToColor(objName);
     const [hover, setHover] = useState(false);
 
     const handleDeleteClick = async (e) => {
         e.stopPropagation(); // evita que se propague el clic al badge
         const result = await Swal.fire({
-            title: "Eliminar departamento",
-            text: `¿Quieres eliminar el departamento "${department}"?`,
+            title: `Eliminar ${objType}`,
+            text: `¿Quieres eliminar el ${objType} "${objName}"?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
@@ -50,7 +50,7 @@ const RemovableDepartmentBadgeComponent = ({ department, onDelete }) => {
                 userSelect: "none",
             }}
         >
-            {department}
+            {objName}
             {hover && (
                 <FaTrash
                     onClick={handleDeleteClick}
@@ -76,4 +76,4 @@ const RemovableDepartmentBadgeComponent = ({ department, onDelete }) => {
     );
 };
 
-export default RemovableDepartmentBadgeComponent;
+export default RemovableBadgeComponent;

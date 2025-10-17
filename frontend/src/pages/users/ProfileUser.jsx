@@ -11,9 +11,9 @@ import { getProfile, modifyProfile, deleteProfile, addDepartmentProfile, deleteD
 import { getDepartmentList } from "../../services/DepartmentService";
 
 import BackButton from "../../components/utils/BackButtonComponent";
-import DepartmentBadgeComponent from "../../components/department/DepartmentBadgeComponent";
-import AddDepartmentBadgeComponent from "../../components/department/AddDepartmentBadgeComponent";
-import RemovableDepartmentBadgeComponent from "../../components/department/RemovableDepartmentBadgeComponent";
+import BadgeComponent from "../../components/badge/BadgeComponent";
+import AddBadgeComponent from "../../components/badge/AddBadgeComponent";
+import RemovableBadgeComponent from "../../components/badge/RemovableBadgeComponent";
 import ModifyUserAccountComponent from '../../components/user/ModifyUserAccountComponent';
 
 const ProfileUser = () => {
@@ -156,16 +156,17 @@ const ProfileUser = () => {
                                                 // Solo badges normales
                                                 profile.departments && profile.departments.length > 0
                                                     ? profile.departments.map(dep => (
-                                                        <DepartmentBadgeComponent key={dep.id} department={dep.name} />
+                                                        <BadgeComponent key={dep.id} objName={dep.name} />
                                                     ))
                                                     : null
                                             ) : (
                                                 <>
                                                     {profile.departments && profile.departments.length > 0
                                                         ? profile.departments.map(dep => (
-                                                            <RemovableDepartmentBadgeComponent
+                                                            <RemovableBadgeComponent
                                                                 key={dep.id}
-                                                                department={dep.name}
+                                                                objName={dep.name}
+                                                                objType="departamento"
                                                                 onDelete={async () => {
                                                                     const result = await deleteDepartmentProfile(dep.id, token, version);
 
@@ -182,8 +183,9 @@ const ProfileUser = () => {
                                                         : null
                                                     }
                                                     {/* Badge para añadir departamento */}
-                                                    <AddDepartmentBadgeComponent
-                                                        availableDepartments={availableDepartments}
+                                                    <AddBadgeComponent
+                                                        availableObjs={availableDepartments}
+                                                        objType="departamento"
                                                         onAdded={async (depId) => {
                                                             const result = await addDepartmentProfile(depId, token, version);
 

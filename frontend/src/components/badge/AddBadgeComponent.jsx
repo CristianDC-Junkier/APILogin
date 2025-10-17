@@ -2,22 +2,23 @@
 import Swal from "sweetalert2";
 
 /**
- * Badge para añadir un departamento (solo para admins/superadmins)
+ * Badge para añadir un objeto (solo para admins/superadmins)
  * @param {Object} props
- * @param {Array} props.availableDepartments Lista de departamentos disponibles [{id, name}]
+ * @param {String} props.objType Cadena de texto para aplicar en los menús
+ * @param {Array} props.availableObjs Lista de objetos disponibles // departamento -> [{id, name}] - enlace -> [{id, name, web}]
  * @param {Function} props.onAdded Callback que recibe el resultado de la operación
  */
-const AddDepartmentBadgeComponent = ({ availableDepartments = [], onAdded }) => {
+const AddBadgeComponent = ({ objType, availableObjs = [], onAdded }) => {
     const handleAddClick = async () => {
-        if (!availableDepartments.length) {
-            return Swal.fire("Info", "No hay departamentos disponibles para añadir", "info");
+        if (!availableObjs.length) {
+            return Swal.fire("Info", `No hay ${objType}s disponibles para añadir`, "info");
         }
 
         const { value: depId } = await Swal.fire({
-            title: "Selecciona un departamento",
+            title: `Selecciona un ${objType}`,
             input: "select",
-            inputOptions: Object.fromEntries(availableDepartments.map(d => [d.id, d.name])),
-            inputPlaceholder: "Selecciona un departamento",
+            inputOptions: Object.fromEntries(availableObjs.map(d => [d.id, d.name])),
+            inputPlaceholder: `Selecciona un ${objType}`,
             showCancelButton: true,
         });
 
@@ -46,4 +47,4 @@ const AddDepartmentBadgeComponent = ({ availableDepartments = [], onAdded }) => 
     );
 };
 
-export default AddDepartmentBadgeComponent;
+export default AddBadgeComponent;
