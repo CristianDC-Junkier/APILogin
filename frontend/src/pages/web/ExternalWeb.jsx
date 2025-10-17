@@ -1,17 +1,15 @@
 ﻿import React, { useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import BackButton from "../components/utils/BackButtonComponent";
-import LogoutButton from "../components/utils/LogoutComponent";
+import { useAuth } from "../../hooks/useAuth";
+import BackButton from "../../components/utils/BackButtonComponent";
+import LogoutButton from "../../components/utils/LogoutComponent";
 
 /**
  * Página que muestra la aplicación externa
  */
 
-const URL = import.meta.env.VITE_URL;
-
-const ExternalWeb = () => {
+const ExternalWebPage = (URL) => {
     const [loadingLogout, setLoadingLogout] = useState(false);
     const navigate = useNavigate();
     const { logout, user } = useAuth();
@@ -69,4 +67,4 @@ const ExternalWeb = () => {
     );
 };
 
-export default ExternalWeb;
+export default ExternalWebPage;
