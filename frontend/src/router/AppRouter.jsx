@@ -46,9 +46,9 @@ const AppRouter = () => {
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 {/* Rutas privadas */}
                 <Route path="/profile" element={<PrivateRoute><ProfileUserPage /> </PrivateRoute>} />
-                
+                <Route path="/home" element={<PrivateRoute> <HomePage /> </PrivateRoute>} />
+
                 {/* Rutas privadas por rol */}
-                <Route path="/home" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><HomePage /></RoleRoute>} />
                 <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashBoardUserPage /></RoleRoute>} />
                 <Route path="/logs" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashboardSystemPage /></RoleRoute>} />
                 <Route path="/departments" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashboardDepartmentPage /></RoleRoute>} />

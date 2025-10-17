@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from "react";
+﻿import React, { useMemo, useState, useEffect } from "react";
 import { Table, Button } from "reactstrap";
 import { createRoot } from "react-dom/client";
 import Swal from "sweetalert2";
@@ -27,6 +27,19 @@ const TableUserComponent = ({
     refreshData,
     token
 }) => {
+
+    // Hook para detectar pantalla pequeña
+    const useIsSmallScreen = (breakpoint = 500) => {
+        const [isSmall, setIsSmall] = useState(window.innerWidth < breakpoint);
+
+        useEffect(() => {
+            const handleResize = () => setIsSmall(window.innerWidth < breakpoint);
+            window.addEventListener("resize", handleResize);
+            return () => window.removeEventListener("resize", handleResize);
+        }, [breakpoint]);
+
+        return isSmall;
+    };
 
     const filteredUsers = useMemo(() => {
         return users.filter(u => {
@@ -139,21 +152,28 @@ const TableUserComponent = ({
         SUPERADMIN: "Super Administrador"
     };
 
+    const isSmallScreen = useIsSmallScreen(770);
+
     return (
         <>
-            <Table striped responsive>
+            <Table striped responsive >
                 <thead>
                     <tr>
                         <th style={{whiteSpace: "nowrap" }}>ID</th>
                         <th>Usuario</th>
                         <th>Tipo</th>
-                        <th>Departamentos</th>
-                        <th className="text-center">
-                            <ResponsiveTextComponent fullText="Acciones" shortText="Acs" />
+                        <th
+                            className="text-center"
+                            style={{ width: isSmallScreen ? "15%" : "55%" }}
+                        >Departamentos</th>
+                        <th
+                            className="text-center"
+                            style={{ width: isSmallScreen ? "55%" : "15%" }}
+                        >
+                            <ResponsiveTextComponent fullText="Acciones" shortText="Accs" breakpoint={525} />
                         </th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {currentUsers.map((userItem, idx) => {
                         const isSuperAdminUser = userItem.user.usertype === "SUPERADMIN";
@@ -174,13 +194,41 @@ const TableUserComponent = ({
                                 </td>
                                 <td>
                                     <div className="d-flex flex-wrap m" style={{ gap: "0.1rem" }}>
-
-                                        {userItem.departments && userItem.departments.length > 0 ? (
+                                        {isSmallScreen ? (
+                                            // Pantalla pequeña: solo mostrar botón "Mostrar más" o "+ Añadir"
+                                            userItem.departments && userItem.departments.length > 0 ? (
+                                                <ShowMoreBadgeComponent
+                                                    currentUser={currentUser}
+                                                    user={userItem.user}
+                                                    canModify={canModify}
+                                                    objList={departments}
+                                                    objType="departamento"
+                                                    userObjects={userItem.departments}
+                                                    onAdded={async (dep) => {
+                                                        await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                        await refreshData();
+                                                    }}
+                                                    onDeleted={async (dep) => {
+                                                        await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                        await refreshData();
+                                                    }}
+                                                />
+                                            ) : canModify ? (
+                                                <AddBadgeComponent
+                                                    availableObjs={departments}
+                                                    objType="departamento"
+                                                    onAdded={async (dep) => {
+                                                        await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                        await refreshData();
+                                                    }}
+                                                />
+                                            ) : null
+                                        ) : (
+                                            // Pantalla normal: mostrar badges + "Mostrar más" o "+ Añadir"
                                             <>
-                                                {/* Mostrar los primeros dos departamentos */}
-                                                {userItem.departments.slice(0, 3).map(dep => (
-                                                    canModify && !isCurrentUser
-                                                        ? <RemovableBadgeComponent
+                                                {userItem.departments && userItem.departments.length > 0 && userItem.departments.slice(0, 3).map(dep =>
+                                                    canModify && !isCurrentUser ? (
+                                                        <RemovableBadgeComponent
                                                             key={dep.id}
                                                             objName={dep.name}
                                                             objType="departamento"
@@ -189,52 +237,39 @@ const TableUserComponent = ({
                                                                 await refreshData();
                                                             }}
                                                         />
-                                                        : <BadgeComponent
-                                                            key={dep.id}
-                                                            objName={dep.name}
-                                                        />
-                                                ))}
+                                                    ) : (
+                                                        <BadgeComponent key={dep.id} objName={dep.name} />
+                                                    )
+                                                )}
 
-                                            {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
-                                            {userItem.departments.length > 3 ? (
-                                                <ShowMoreBadgeComponent
-                                                    currentUser={currentUser}
-                                                    user={userItem.user}
-                                                    canModify={canModify}
-                                                    objList={departments}
-                                                    objType="departamento"
-                                                    userObjects={userItem.departments}
+                                                {userItem.departments.length > 3 ? (
+                                                    <ShowMoreBadgeComponent
+                                                        currentUser={currentUser}
+                                                        user={userItem.user}
+                                                        canModify={canModify}
+                                                        objList={departments}
+                                                        objType="departamento"
+                                                        userObjects={userItem.departments}
                                                         onAdded={async (dep) => {
                                                             await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
-                                                        await refreshData();
-                                                    }}
-                                                    onDeleted={async (dep) => {
-                                                        await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
-                                                        await refreshData();
-                                                    }}
-                                                />
-                                            ) : <AddBadgeComponent
-                                                    availableObjs={departments.filter(d => !userItem.departments.some(ud => ud.id === d.id))}
-                                                    objType="departamento"
-                                                    onAdded={async (dep) => {
-                                                        await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
-                                                        await refreshData();
-                                                    }}
-                                                />
-                                                }
+                                                            await refreshData();
+                                                        }}
+                                                        onDeleted={async (dep) => {
+                                                            await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                            await refreshData();
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <AddBadgeComponent
+                                                        availableObjs={departments.filter(d => !userItem.departments.some(ud => ud.id === d.id))}
+                                                        objType="departamento"
+                                                        onAdded={async (dep) => {
+                                                            await addDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                            await refreshData();
+                                                        }}
+                                                    />
+                                                )}
                                             </>
-                                        ) : (
-                                            // Usuario sin departamentos
-                                            canModify ? (
-                                                <AddBadgeComponent
-                                                    availableObjs={departments}
-                                                    objType="departamento"
-                                                    onAdded={async (depId) => {
-                                                        await addDepartment(userItem.user.id, depId, token, userItem.user.version);
-                                                        await refreshData();
-                                                    }}
-                                                />
-                                            ) : null
                                         )}
                                     </div>
                                 </td>

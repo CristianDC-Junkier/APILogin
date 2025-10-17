@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from "react";
+﻿import React, { useMemo, useState, useEffect } from "react";
 import { Table, Button } from "reactstrap";
 import { createRoot } from "react-dom/client";
 import Swal from "sweetalert2";
@@ -25,6 +25,20 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent"
  * @param {Function} props.refreshData - Función para recargar los datos
  */
 const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPage, currentPage, setCurrentPage, refreshData, currentUser }) => {
+
+    // Hook para detectar pantalla pequeña
+    const useIsSmallScreen = (breakpoint = 500) => {
+        const [isSmall, setIsSmall] = useState(window.innerWidth < breakpoint);
+
+        useEffect(() => {
+            const handleResize = () => setIsSmall(window.innerWidth < breakpoint);
+            window.addEventListener("resize", handleResize);
+            return () => window.removeEventListener("resize", handleResize);
+        }, [breakpoint]);
+
+        return isSmall;
+    };
+
     const filteredDepartments = useMemo(
         () => departments.filter(d => d.name.toLowerCase().includes(search.toLowerCase())),
         [departments, search]
@@ -93,6 +107,8 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
         }
     };
 
+    const isSmallScreen = useIsSmallScreen(770);
+
     return (
         <>
             <Table striped responsive>
@@ -100,8 +116,16 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th>Enlaces</th>
-                        <th className="text-center">Acciones</th>
+                        <th
+                            className="text-center"
+                            style={{ width: isSmallScreen ? "15%" : "55%" }}>
+                            Departamentos
+                        </th>
+                        <th
+                            className="text-center"
+                            style={{ width: isSmallScreen ? "55%" : "15%" }}>
+                            Acciones
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -153,8 +177,8 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                                             ) : <AddBadgeComponent
                                                 availableObjs={links}
                                                 objType="enlace"
-                                                    onAdded={async (linkId) => {
-                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                onAdded={async (linkId) => {
+                                                    await addLinkToDepartment(depItem.id, linkId, token);
                                                     await refreshData(false);
                                                 }}
                                             />
@@ -166,8 +190,8 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                                             <AddBadgeComponent
                                                 availableObjs={links}
                                                 objType="enlace"
-                                                    onAdded={async (linkId) => {
-                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                onAdded={async (linkId) => {
+                                                    await addLinkToDepartment(depItem.id, linkId, token);
                                                     await refreshData(false);
                                                 }}
                                             />
