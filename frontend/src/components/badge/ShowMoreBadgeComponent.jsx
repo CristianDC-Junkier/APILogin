@@ -36,9 +36,9 @@ const ShowMoreDepartmentBadgeComponent = ({
     );
 
     const handleShowMore = () => {
-        if (currentUser.id !== user.id) {
+        if (currentUser.id !== user.id || objType === "enlace") {
             Swal.fire({
-                title: `<strong>Departamentos de ${user.username}</strong>`,
+                title: objType === "departamento" ? `<strong>Departamentos de ${user.username}</strong>` : `<strong>Enlaces de ${user.name}</strong>`,
                 html: `<div id="departments-container"></div>`,
                 didOpen: () => {
                     const container = document.getElementById('departments-container');

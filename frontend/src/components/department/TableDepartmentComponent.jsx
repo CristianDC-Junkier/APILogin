@@ -137,12 +137,13 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                                             {depItem.links.length > 3 ? (
                                                 <ShowMoreBadgeComponent
                                                     currentUser={currentUser}
+                                                    user={depItem}
                                                     canModify={canModify}
                                                     objList={links}
                                                     objType="enlace"
                                                     userObjects={depItem.links}
-                                                    onAdded={async (linkId) => {
-                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                    onAdded={async (link) => {
+                                                        await addLinkToDepartment(depItem.id, link.id, token);
                                                         await refreshData(false);
                                                     }}
                                                     onDeleted={async (link) => {
@@ -153,8 +154,8 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                                             ) : <AddBadgeComponent
                                                 availableObjs={links}
                                                 objType="enlace"
-                                                    onAdded={async (linkId) => {
-                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                    onAdded={async (link) => {
+                                                    await addLinkToDepartment(depItem.id, link.id, token);
                                                     await refreshData(false);
                                                 }}
                                             />
