@@ -352,6 +352,7 @@ class UserAccountController {
     */
     static async deleteMyAccount(req, res) {
         try {
+            console.log(req.user);
             const { id } = req.user.id;
             const { version } = req.query;
 
