@@ -168,76 +168,78 @@ const TableUserComponent = ({
                                 <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
                                     {tipoLabels[userItem?.user.usertype] || "\u00A0"}
                                 </td>
-                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>
+                                <td>
+                                    <div className="d-flex flex-wrap m" style={{ gap: "0.1rem" }}>
+                                        {userItem.departments && userItem.departments.length > 0 ? (
+                                            <>
+                                                {/* Mostrar los primeros dos departamentos */}
+                                                {userItem.departments.slice(0, 3).map(dep => (
+                                                    canModify && !isCurrentUser
+                                                        ? <RemovableDepartmentBadgeComponent
+                                                            key={dep.id}
+                                                            department={dep.name}
+                                                            onDelete={async () => {
+                                                                await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
+                                                                await refreshData();
+                                                            }}
+                                                        />
+                                                        : <DepartmentBadgeComponent
+                                                            key={dep.id}
+                                                            department={dep.name}
+                                                        />
+                                                ))}
 
-                                    {userItem.departments && userItem.departments.length > 0 ? (
-                                        <>
-                                            {/* Mostrar los primeros dos departamentos */}
-                                            {userItem.departments.slice(0, 3).map(dep => (
-                                                canModify && !isCurrentUser
-                                                    ? <RemovableDepartmentBadgeComponent
-                                                        key={dep.id}
-                                                        department={dep.name}
-                                                        onDelete={async () => {
+                                                {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
+                                                {userItem.departments.length > 3 ? (
+                                                    <ShowMoreDepartmentBadgeComponent
+                                                        currentUser={currentUser}
+                                                        user={userItem.user}
+                                                        canModify={canModify}
+                                                        departments={departments}
+                                                        userDepartments={userItem.departments}
+                                                        onAdded={async (depId) => {
+                                                            await addDepartment(userItem.user.id, depId, token, userItem.user.version);
+                                                            await refreshData();
+                                                        }}
+                                                        onDeleted={async (dep) => {
                                                             await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
                                                             await refreshData();
                                                         }}
                                                     />
-                                                    : <DepartmentBadgeComponent
-                                                        key={dep.id}
-                                                        department={dep.name}
-                                                    />
-                                            ))}
-
-                                            {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
-                                            {userItem.departments.length > 3 ? (
-                                                <ShowMoreDepartmentBadgeComponent
-                                                    currentUser={currentUser}
-                                                    user={userItem.user}
-                                                    canModify={canModify}
-                                                    departments={departments} 
-                                                    userDepartments={userItem.departments}
+                                                ) : <AddDepartmentBadgeComponent
+                                                    availableDepartments={departments.filter(
+                                                        d => !userItem.departments.some(ud => ud.id === d.id))
+                                                    }
                                                     onAdded={async (depId) => {
                                                         await addDepartment(userItem.user.id, depId, token, userItem.user.version);
                                                         await refreshData();
                                                     }}
-                                                    onDeleted={async (dep) => {
-                                                        await deleteDepartment(userItem.user.id, dep.id, token, userItem.user.version);
-                                                        await refreshData();
+                                                />
+                                                }
+                                            </>
+                                        ) : (
+                                            // Usuario sin departamentos
+                                            canModify ? (
+                                                <AddDepartmentBadgeComponent
+                                                    availableDepartments={departments}
+                                                    onAdded={async (depId) => {
+                                                        await addDepartment(userItem.user.id, depId, token, userItem.user.version);
                                                     }}
                                                 />
-                                            ) : <AddDepartmentBadgeComponent
-                                                availableDepartments={departments}
-                                                onAdded={async (depId) => {
-                                                    await addDepartment(userItem.user.id, depId, token, userItem.user.version);
-                                                    await refreshData();
-                                                }}
-                                            />
-                                        }
-                                        </>
-                                    ) : (
-                                        // Usuario sin departamentos
-                                            canModify ? (
-                                            <AddDepartmentBadgeComponent
-                                                availableDepartments={departments}
-                                                    onAdded={async (depId) => {
-                                                    await addDepartment(userItem.user.id, depId, token, userItem.user.version);
-                                                }}
-                                            />
-                                        ) : null
-                                    )}
-
+                                            ) : null
+                                        )}
+                                    </div>
                                 </td>
 
                                 <td className="text-center">
-                                    <div className="d-flex justify-content-center flex-wrap m">
+                                    <div className="d-flex justify-content-center flex-wrap m " style={{ gap: "0.25rem" }}>
                                         {!isCurrentUser && (
                                             <>
                                                 {(canModify && !isSuperAdminUser) && (
                                                     <Button
                                                         color="info"
                                                         size="sm"
-                                                        style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                        style={{ padding: "0.2rem 0.4rem", fontSize: "0.8rem" }}
                                                         onClick={() => handlePWDC(userItem.user)}
                                                     >
                                                         🔑
@@ -247,7 +249,7 @@ const TableUserComponent = ({
                                                     <Button
                                                         color="warning"
                                                         size="sm"
-                                                        style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                        style={{ padding: "0.2rem 0.4rem", fontSize: "0.8rem" }}
                                                         onClick={() => handleModify(userItem.user)}
                                                     >
                                                         ✏️
@@ -257,7 +259,7 @@ const TableUserComponent = ({
                                                     <Button
                                                         color="danger"
                                                         size="sm"
-                                                        style={{ padding: "0.2rem 0.4rem", margin: "0 0.25rem", fontSize: "0.8rem" }}
+                                                        style={{ padding: "0.2rem 0.4rem", fontSize: "0.8rem" }}
                                                         onClick={() => handleDelete(userItem.user)}
                                                     >
                                                         🗑️
