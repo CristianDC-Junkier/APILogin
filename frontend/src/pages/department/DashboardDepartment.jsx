@@ -195,11 +195,13 @@ const DepartmentList = () => {
                 <TableDepartmentComponent
                     token={token}
                     departments={allDeprts ?? []}
+                    links={allLinks ?? []}
                     search={search}
                     rowsPerPage={rowsPerPage}
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
                     refreshData={fetchDeps}
+                    currentUser={currentUser}
                 />
             )}
             {/* Tabla de enlaces */}

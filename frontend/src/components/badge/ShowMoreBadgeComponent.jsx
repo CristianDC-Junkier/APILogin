@@ -12,8 +12,9 @@ import { useNavigate } from 'react-router-dom';
 * @param {Object} currentUser usuario actual
 * @param {Object} user usuario al que se le muestran los departamentos
 * @param {boolean} canModify Indica si el usuario puede modificar
-* @param {Array} departments Lista completa de departamentos [{id, name}]
-* @param {Array} userDepartments Lista de departamentos del usuario [{id, name}]
+* @param {String} objType Cadena para aplicar en los menús
+* @param {Array} objList Lista completa de objetos // departamento -> [{id, name}] || enlace -> [{id, name, web}]
+* @param {Array} userObjects Lista de objetos del usuario // departamento -> [{id, name}] || enlace -> [{id, name, web}]
 * @param {Function} onAdded Callback cuando se agrega un departamento
 * @param {Function} onDeleted Callback cuando se elimina un departamento
 */
@@ -21,26 +22,27 @@ const ShowMoreDepartmentBadgeComponent = ({
     currentUser,
     user,
     canModify,
-    departments = [],
-    userDepartments = [],
+    objType,
+    objList = [],
+    userObjects = [],
     onAdded,
     onDeleted,
 }) => {
     const navigate = useNavigate();
 
 
-    let availableDepartments = departments.filter(
-        d => !userDepartments.some(ud => ud.id === d.id)
+    let availableObjects = objList.filter(
+        o => !userObjects.some(uo => uo.id === o.id)
     );
 
     const handleShowMore = () => {
-        if (currentUser.id !== user.id) {
-            console.log("Show more departments for user:", user);
-            console.log("Current user:", currentUser);
-            console.log("Can modify:", canModify);
-            console.log("User departments:", userDepartments);
-            console.log("All departments:", departments);
-            console.log("Available departments:", availableDepartments);
+        if (currentUser.id !== user?.id) {
+            //console.log("Show more departments for user:", user);
+           // console.log("Current user:", currentUser);
+            //console.log("Can modify:", canModify);
+           // console.log("User departments:", userObjects);
+           // console.log("All departments:", objList);
+           // console.log("Available departments:", availableObjects);
             Swal.fire({
                 title: 'Departamentos',
                 html: '<div id="departments-container"></div>',
@@ -52,35 +54,35 @@ const ShowMoreDepartmentBadgeComponent = ({
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                                 {canModify ? (
                                     <>
-                                        {userDepartments.map(dep => (
+                                        {userObjects.map(obj => (
                                             <RemovableBadgeComponent
-                                                key={dep.id}
-                                                objName={dep.name}
-                                                objType="departamento"
+                                                key={obj.id}
+                                                objName={obj.name}
+                                                objType={objType}
                                                 onDelete={async () => {
-                                                    await onDeleted(dep);
-                                                    userDepartments = userDepartments.filter(d => d.id !== dep.id);
-                                                    availableDepartments = [...availableDepartments, dep];
+                                                    await onDeleted(obj);
+                                                    userObjects = userObjects.filter(o => o.id !== obj.id);
+                                                    availableObjects = [...availableObjects, obj];
                                                     handleShowMore();       
                                                 }}
                                             />
                                         ))}
                                         <AddBadgeComponent
-                                            availableObjs={availableDepartments}
-                                            objType="departamento"
-                                            onAdded={async (depId) => {
-                                                await onAdded(depId); // PODRIAMOS CAMBIAR EL ADDED PARA QUE DEVUELVA EL DEPARTAMENTO COMPLETO
-                                                const addedDep = departments.find(d => d.id === Number(depId));
-                                                availableDepartments = availableDepartments.filter(d => d.id !== depId);
-                                                userDepartments = [...userDepartments, addedDep];
+                                            availableObjs={availableObjects}
+                                            objType={objType}
+                                            onAdded={async (objId) => {
+                                                await onAdded(objId); // PODRIAMOS CAMBIAR EL ADDED PARA QUE DEVUELVA EL DEPARTAMENTO COMPLETO
+                                                const addedObj = objList.find(o => o.id === Number(objId));
+                                                availableObjects = availableObjects.filter(d => d.id !== objId);
+                                                userObjects = [...userObjects, addedObj];
                                                 handleShowMore();       
                                             }}
 
                                         />
                                     </>
                                 ) : (
-                                    userDepartments.map(dep => (
-                                        <BadgeComponent key={dep.id} objName={dep.name} />
+                                    userObjects.map(obj => (
+                                        <BadgeComponent key={obj.id} objName={obj.name} />
                                     ))
                                 )}
                             </div>

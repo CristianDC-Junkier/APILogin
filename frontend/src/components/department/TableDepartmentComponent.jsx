@@ -2,12 +2,17 @@
 import { Table, Button } from "reactstrap";
 import { createRoot } from "react-dom/client";
 import Swal from "sweetalert2";
+
+import { modifyDepartment, deleteDepartment, addLinkToDepartment, deleteLinkToDepartment } from "../../services/DepartmentService";
+
+import Pagination from "../../components/PaginationComponent";
 import CaptchaSlider from '../utils/CaptchaSliderComponent';
 import AddDeleteLinkToDepartmentComponent from "./AddDeleteLinkToDepartmentComponent";
 import AddModifyDepartmentComponent from "./AddModifyDepartmentComponent";
-import { modifyDepartment, deleteDepartment, addLinkToDepartment } from "../../services/DepartmentService";
-import Pagination from "../../components/PaginationComponent";
-
+import BadgeComponent from "../badge/BadgeComponent";
+import AddBadgeComponent from "../badge/AddBadgeComponent";
+import RemovableBadgeComponent from "../badge/RemovableBadgeComponent";
+import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent"
 
 /**
  * Componente para mostrar la tabla de departamentos
@@ -19,8 +24,7 @@ import Pagination from "../../components/PaginationComponent";
  * @param {Function} props.setCurrentPage - Función para cambiar la página
  * @param {Function} props.refreshData - Función para recargar los datos
  */
-const TableDepartmentComponent = ({ token, departments, search, rowsPerPage, currentPage, setCurrentPage, refreshData }) => {
-    console.log(departments[0]);
+const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPage, currentPage, setCurrentPage, refreshData, currentUser }) => {
     const filteredDepartments = useMemo(
         () => departments.filter(d => d.name.toLowerCase().includes(search.toLowerCase())),
         [departments, search]
@@ -89,22 +93,6 @@ const TableDepartmentComponent = ({ token, departments, search, rowsPerPage, cur
         }
     };
 
-    const handleAddLink = async (depItem) => {
-        await AddDeleteLinkToDepartmentComponent({
-            token,
-            action: "add",
-            onConfirm: async (formValues) => {
-                const result = await addLinkToDepartment(depItem.id, formValues, token);
-                if (result.success) {
-                    Swal.fire("Éxito", "Enlace adjuntado correctamente", "success");
-                    await refreshData(false);
-                } else {
-                    Swal.fire("Error", result.error || "No se pudo adjuntar el enlace", "error");
-                }
-            }
-        });
-    };
-
     return (
         <>
             <Table striped responsive>
@@ -118,15 +106,77 @@ const TableDepartmentComponent = ({ token, departments, search, rowsPerPage, cur
                 </thead>
                 <tbody>
                     {currentDepartments.map((depItem, idx) => {
+                        const canModify = (currentUser.usertype === "SUPERADMIN" || currentUser.usertype === "ADMIN");
 
                         return (
                             <tr key={idx}>
                                 <td> {depItem?.id || "\u00A0"} </td>
                                 <td> {depItem?.name || "\u00A0"} </td>
-                                <td> {depItem?.links[0]?.name || "Sin Asignar"} </td>
+                                <td>
+                                    {depItem.links && depItem.links.length > 0 ? (
+                                        <>
+                                            {/* Mostrar los primeros dos departamentos */}
+                                            {depItem.links.slice(0, 3).map(link => (
+                                                canModify
+                                                    ? <RemovableBadgeComponent
+                                                        key={link.id}
+                                                        objName={link.name}
+                                                        objType="enlace"
+                                                        onDelete={async () => {
+                                                            await deleteLinkToDepartment(depItem.id, link.id, token);
+                                                            await refreshData(false);
+                                                        }}
+                                                    />
+                                                    : <BadgeComponent
+                                                        key={link.id}
+                                                        objName={link.name}
+                                                    />
+                                            ))}
+
+                                            {/* Si hay más de 2 departamentos, mostramos el botón "Mostrar más" */}
+                                            {depItem.links.length > 3 ? (
+                                                <ShowMoreBadgeComponent
+                                                    currentUser={currentUser}
+                                                    canModify={canModify}
+                                                    objList={links}
+                                                    objType="enlace"
+                                                    userObjects={depItem.links}
+                                                    onAdded={async (linkId) => {
+                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                        await refreshData(false);
+                                                    }}
+                                                    onDeleted={async (link) => {
+                                                        await deleteLinkToDepartment(depItem.id, link.id, token);
+                                                        await refreshData(false);
+                                                    }}
+                                                />
+                                            ) : <AddBadgeComponent
+                                                availableObjs={links}
+                                                objType="enlace"
+                                                    onAdded={async (linkId) => {
+                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                    await refreshData(false);
+                                                }}
+                                            />
+                                            }
+                                        </>
+                                    ) : (
+                                        // Usuario sin departamentos
+                                        canModify ? (
+                                            <AddBadgeComponent
+                                                availableObjs={links}
+                                                objType="enlace"
+                                                    onAdded={async (linkId) => {
+                                                        await addLinkToDepartment(depItem.id, linkId, token);
+                                                    await refreshData(false);
+                                                }}
+                                            />
+                                        ) : null
+                                    )}
+
+                                </td>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center flex-wrap m">
-                                        <Button color="info" size="sm" className="me-1 mb-1" onClick={() => handleAddLink(depItem)}> +🔗 </Button>
                                         <Button color="warning" size="sm" className="me-1 mb-1" onClick={() => handleModify(depItem)}> ✏️ </Button>
                                         <Button color="danger" size="sm" className="me-1 mb-1" onClick={() => handleDelete(depItem)}> 🗑️ </Button>
                                     </div>
