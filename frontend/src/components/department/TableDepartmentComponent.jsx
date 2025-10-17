@@ -137,10 +137,40 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                                 <td> {depItem?.id || "\u00A0"} </td>
                                 <td> {depItem?.name || "\u00A0"} </td>
                                 <td>
-                                    {depItem.links && depItem.links.length > 0 ? (
+                                    {isSmallScreen ? (
+                                        // Pantalla pequeña: solo mostrar botón "Mostrar más" o "+ Añadir"
+                                        depItem.links && depItem.links.length > 0 ? (
+                                            <ShowMoreBadgeComponent
+                                                currentUser={currentUser}
+                                                user={depItem}
+                                                canModify={canModify}
+                                                objList={links}
+                                                objType="enlace"
+                                                userObjects={depItem.links}
+                                                onAdded={async (link) => {
+                                                    await addLinkToDepartment(depItem.id, link.id, token);
+                                                    await refreshData(false);
+                                                }}
+                                                onDeleted={async (link) => {
+                                                    await deleteLinkToDepartment(depItem.id, link.id, token);
+                                                    await refreshData(false);
+                                                }}
+                                            />
+                                        ) : canModify ? (
+                                                <AddBadgeComponent
+                                                    availableObjs={links}
+                                                    objType="enlace"
+                                                    onAdded={async (link) => {
+                                                        await addLinkToDepartment(depItem.id, link.id, token);
+                                                        await refreshData(false);
+                                                    }}
+                                                />
+                                        ) : null
+                                    ) : (
+                                        // Pantalla normal: mostrar badges + "Mostrar más" o "+ Añadir"
                                         <>
                                             {/* Mostrar los primeros dos departamentos */}
-                                            {depItem.links.slice(0, 3).map(link => (
+                                            {depItem.links && depItem.links.length > 0 && depItem.links.slice(0, 3).map(link => (
                                                 canModify
                                                     ? <RemovableBadgeComponent
                                                         key={link.id}
@@ -178,26 +208,15 @@ const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPa
                                             ) : <AddBadgeComponent
                                                 availableObjs={links}
                                                 objType="enlace"
-                                                    onAdded={async (link) => {
+                                                onAdded={async (link) => {
                                                     await addLinkToDepartment(depItem.id, link.id, token);
                                                     await refreshData(false);
                                                 }}
                                             />
                                             }
                                         </>
-                                    ) : (
-                                        // Usuario sin departamentos
-                                        canModify ? (
-                                            <AddBadgeComponent
-                                                availableObjs={links}
-                                                objType="enlace"
-                                                    onAdded={async (link) => {
-                                                    await addLinkToDepartment(depItem.id, link.id, token);
-                                                    await refreshData(false);
-                                                }}
-                                            />
-                                        ) : null
                                     )}
+                                    
 
                                 </td>
                                 <td className="text-center">
