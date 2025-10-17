@@ -80,7 +80,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                     </>
                                 ) : (
                                     userDepartments.map(dep => (
-                                        <BadgeComponent key={dep.id} department={dep.name} />
+                                        <BadgeComponent key={dep.id} objName={dep.name} />
                                     ))
                                 )}
                             </div>
