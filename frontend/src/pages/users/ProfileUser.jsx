@@ -16,6 +16,10 @@ import AddBadgeComponent from "../../components/badge/AddBadgeComponent";
 import RemovableBadgeComponent from "../../components/badge/RemovableBadgeComponent";
 import ModifyUserAccountComponent from '../../components/user/ModifyUserAccountComponent';
 
+/**
+ * Página del perfil de usuario
+ */
+
 const ProfileUser = () => {
     const [profile, setProfile] = useState();
     const [loading, setLoading] = useState(true);
@@ -62,7 +66,7 @@ const ProfileUser = () => {
 
     if (loading) return <Spinner />;
 
-    // Modify profile
+    // Modificar Perfil
     const handleModify = async () => {
         try {
             await ModifyUserAccountComponent({
@@ -84,7 +88,7 @@ const ProfileUser = () => {
         }
     };
 
-    // Eliminar el Usuario 
+    // Eliminar el Perfil 
     const handleDelete = async () => {
         try {
             const swal = await Swal.fire({

@@ -32,7 +32,7 @@ const DashBoardUser = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
 
-    // Función encargada de obtener la información para la tabla
+    // Ajusta el número de filas según altura de ventana
     useEffect(() => {
         const updateRows = () => {
             const vh = window.innerHeight;
@@ -47,7 +47,7 @@ const DashBoardUser = () => {
     }, []);
 
 
-
+    // Funciones encargadas de obtener la información para la tabla
     const fetchUsers = async () => {
         if (!token) return;
         setLoading(true);

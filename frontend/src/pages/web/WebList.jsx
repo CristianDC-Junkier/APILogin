@@ -8,6 +8,10 @@ import { getLinksByProfileList } from "../../services/DepartmentService";
 import BackButtonComponent from "../../components/utils/BackButtonComponent";
 import "../../styles/web/WebListPage.css";
 
+/**
+ * Página encargada de mostrar los enlaces disponibles a cada usuario
+ */
+
 const WebListPage = () => {
     const { user, token } = useAuth();
     const [departments, setDepartments] = useState([]);

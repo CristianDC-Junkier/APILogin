@@ -16,6 +16,19 @@ import AddBadgeComponent from "../badge/AddBadgeComponent";
 import RemovableBadgeComponent from "../badge/RemovableBadgeComponent";
 import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
 
+/**
+ * Componente encargado de mostrar la tabla de usuarios
+ * @param {Array} users - Lista con todos los usuarios
+ * @param {Array} departments - Lista con todo los departamentos
+ * @param {Int} rowsPerPage - Número de filas de la tabla por página
+ * @param {Int} currentPage - Número de la página actual
+ * @param {Function} setCurrentPage - Función que actualiza la página actual
+ * @param {Object} currentUser - Información del usuario conectado
+ * @param {Function} refreshData - Función encargada de actualizar la información de la tabla
+ * @param {String} token - Token asociado al usuario conectado
+ * @returns
+ */
+
 const TableUserComponent = ({
     users,
     departments,
@@ -41,6 +54,7 @@ const TableUserComponent = ({
         return isSmall;
     };
 
+    //Filtro de Usuarios
     const filteredUsers = useMemo(() => {
         return users.filter(u => {
             const matchesName = u.user.username.toLowerCase().includes(search.toLowerCase());
@@ -51,6 +65,7 @@ const TableUserComponent = ({
     const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
     const currentUsers = filteredUsers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
+    //Función encargada de enseñar un captcha
     const showCaptcha = () => new Promise((resolve, reject) => {
         const container = document.createElement('div');
         const reactRoot = createRoot(container);
@@ -79,6 +94,7 @@ const TableUserComponent = ({
         })
     });
 
+    //Función para modificar un usuario
     const handleModify = async (userItem) => {
         await AddModifyUserCommponent({
             token,
@@ -97,6 +113,7 @@ const TableUserComponent = ({
         });
     };
 
+    // Función para eliminar un usuario
     const handleDelete = async (userItem) => {
         await showCaptcha();
         const result = await deleteUser(userItem.id, token, userItem.version);
@@ -118,7 +135,7 @@ const TableUserComponent = ({
         }
     };
 
-
+    // Función encargada de marcar un usuario para cambio de contraseña
     const handlePWDC = async (userItem) => {
         try {
             const password = await PWDAskComponent({ userItem });
@@ -278,6 +295,7 @@ const TableUserComponent = ({
                                     <div className="d-flex justify-content-center flex-wrap m " style={{ gap: "0.25rem" }}>
                                         {!isCurrentUser && (
                                             <>
+                                                {/* Botón Marcar para cambio de contraseña */}
                                                 {(canModify && !isSuperAdminUser) && (
                                                     <Button
                                                         color="info"
@@ -288,6 +306,7 @@ const TableUserComponent = ({
                                                         🔑
                                                     </Button>
                                                 )}
+                                                {/* Botón Modificar Usuario */}
                                                 {(canModify && !isSuperAdminUser) && (
                                                     <Button
                                                         color="warning"
@@ -298,6 +317,7 @@ const TableUserComponent = ({
                                                         ✏️
                                                     </Button>
                                                 )}
+                                                {/* Botón Eliminar Usuario */}
                                                 {!isSuperAdminUser && (
                                                     <Button
                                                         color="danger"
@@ -326,7 +346,7 @@ const TableUserComponent = ({
                     }
                 </tbody>
             </Table>
-
+            {/* Botones para navegar entre páginas */}
             {totalPages > 1 && (
                 <div className="mt-auto" style={{ minHeight: '40px' }}>
                     <PaginationComponent currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

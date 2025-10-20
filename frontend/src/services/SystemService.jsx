@@ -33,7 +33,7 @@ export const getLogs = async (token) => {
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const getLog = async (log,token) => {
+export const getLog = async (log, token) => {
     try {
         const res = await api.get(`/logs/${encodeURIComponent(log)}`, {
             headers: { Authorization: `Bearer ${token}` }

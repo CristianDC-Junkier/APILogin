@@ -35,7 +35,7 @@ export const getDepartmentList = async (token) => {
 //#region Generic Department Action
 /**
  * Solicitud de creación de un nuevo departamento
- * @param {Object} user - la información del departamento que se quiere crear
+ * @param {Object} department - la información del departamento que se quiere crear
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
@@ -52,7 +52,8 @@ export const createDepartment = async (department, token) => {
 
 /**
  * Solicitud de modificación de un departamento existente
- * @param {Object} user - la información del departamento que se quiere modificar
+ * @param {String} id - ID del departamento que se quiere modificar
+ * @param {Object} department - la información del departamento que se quiere modificar
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
@@ -69,7 +70,7 @@ export const modifyDepartment = async (id, department, token) => {
 
 /**
  * Solicitud de eliminación de un departamento
- * @param {Object} userId - el ID del departamento que se quiere eliminar
+ * @param {Object} departmentId - ID del departamento que se quiere eliminar
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
@@ -105,8 +106,8 @@ export const addLinkToDepartment = async (depId, linkId, token) => {
 };
 
 /**
- * Solicitud para eliminar un enlace a un departamento
- * @param {String} depId - ID del departamento al que se va a eliminar el enlace
+ * Solicitud para eliminar un enlace de un departamento
+ * @param {String} depId - ID del departamento del que se va a eliminar el enlace
  * @param {String} linkId - ID del enlace
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
