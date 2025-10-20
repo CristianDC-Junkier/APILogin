@@ -9,11 +9,12 @@ const { encrypt, decrypt } = require("../utils/Crypto");
  * - id             → Identificador único autoincremental.
  * - username       → Nombre de usuario único y obligatorio.
  * - password       → Contraseña cifrada automáticamente al guardar (encriptada). 
- *                    - Al asignar (set): se cifra usando utilidades de crypto.
- *                    - Al obtener (get): se descifra para su uso interno.
+ *                      - Al asignar (set): se cifra usando utilidades de crypto.
+ *                      - Al obtener (get): se descifra para su uso interno.
  * - usertype       → Rol del usuario. Valores posibles: 'USER' (por defecto), 'ADMIN', 'SUPERADMIN'.
+ * - forcePwdChange → Booleano que designa si el usuario ha sido marcado para un cambio de contraseña.
  * - version        → Contador de modificaciones del usuario, entero entre 0 y 100000.
- *                    Se incrementa automáticamente con cada cambio en este modelo.
+ *                      - Se incrementa automáticamente con cada cambio en este modelo.
  */
 const User = sequelize.define("UserAccount", {
     id: {

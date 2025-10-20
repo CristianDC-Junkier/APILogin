@@ -3,7 +3,7 @@ const sequelize = require("../config/db");
 const { encrypt, decrypt } = require("../utils/Crypto");
 
 /**
- * Modelo Sequelize para departamentos de la empresa.
+ * Modelo Sequelize para los departamentos.
  * Todos los campos tipo STRING se guardan cifrados para proteger datos sensibles.
  * 
  * Campos:

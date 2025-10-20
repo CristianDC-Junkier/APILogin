@@ -15,8 +15,8 @@ const { adminOnly, isAuthenticated } = require("../middlewares/Auth");
  * - DELETE /:id             → Eliminar un link por ID (Solo administradores).
  * 
  * Middleware:
- * - `adminOnly` → Restringe el acceso a usuarios con roles de administrador.
- * - `isAuthenticated` → Restringe el acceso a usuarios autenticados.
+ * - `adminOnly`        → Restringe el acceso a usuarios con roles de administrador.
+ * - `isAuthenticated`  → Restringe el acceso a usuarios autenticados.
  */
 
 router.get("/", adminOnly, LinksController.list);
