@@ -3,11 +3,9 @@
  * Componente que permite crear o modificar un link mediante un modal de SweetAlert2.
  * 
  * @param {Object} props
- * @param {string} props.token - Token de autenticación del usuario actual.
- * @param {Object} [props.userItem] - Usuario a modificar (si action === "modify").
- * @param {Object} props.currentUser - Usuario que está realizando la acción.
+ * @param {Object} [props.linkItem] - Enlace a modificar (si action === "modify").
  * @param {string} props.action - "create" o "modify".
- * @param {Function} props.onConfirm - Callback que se ejecuta al confirmar los datos, recibe { userAccount, userData, userAccountId? }.
+ * @param {Function} props.onConfirm - Callback que se ejecuta al confirmar los datos, recibe { formValues }.
  */
 const AddModifyLinkComponent = async ({ linkItem, action, onConfirm }) => {
 

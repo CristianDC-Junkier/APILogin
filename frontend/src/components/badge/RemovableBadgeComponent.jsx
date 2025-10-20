@@ -2,6 +2,15 @@
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
 
+/**
+ * Badge con la función de eliminar
+ * @param {String} objType - Determina el tipo de objeto en los menús // "departamento" o "enlace"
+ * @param {String} objName - Nombre del objeto
+ * @param {Function} onDelete - Función encargada de gestionar la eliminación
+ * @returns
+ */
+
+// Función encargada de determinar el color de fonde del badge
 function stringToColor(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {

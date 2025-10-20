@@ -14,7 +14,7 @@ import TableDepartmentComponent from "../../components/department/TableDepartmen
 import TableLinkComponent from "../../components/link/TableLinkComponent";
 
 /**
- * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
+ * Página encargada de mostrar la tabla de departamentos y de enlaces y las acciones asociadas a la gestión de los mismos
  */
 
 const DepartmentList = () => {
@@ -45,7 +45,7 @@ const DepartmentList = () => {
         return () => window.removeEventListener("resize", updateRows);
     }, []);
 
-    //Función encargada de obtener la información para la tabla
+    //Funciones encargadas de obtener la información para la tabla
     const fetchDeps = async (init) => {
         if (!token) return;
         if (!init) setLoading(true);
@@ -95,7 +95,7 @@ const DepartmentList = () => {
         fetchData();
     }, []);
 
-    //Función que gestiona la creación de un usuario
+    //Función que gestiona la creación de un departamento
     const handleCreateDepartment = async () => {
         await AddModifyDepartmentComponent({
             action: "create",
@@ -111,6 +111,7 @@ const DepartmentList = () => {
         });
     };
 
+    //Función que gestiona la creación de un enlace
     const handleCreateLink = async () => {
         await AddModifyLinkComponent({
             action: "create",
@@ -146,9 +147,8 @@ const DepartmentList = () => {
                 </Button>
             </div>
 
-            {/* Tarjetas para cambiar de vista solo para ADMIN/SUPERADMIN */}
+            {/* Tarjetas para cambiar de vista */}
             <Row className="mb-3 mt-4 justify-content-center g-3">
-                {currentUser?.usertype !== "DEPARTMENT" && (
                     <Col xs={6} sm={6} md={4} l={3} xl={3}>
                         <Card
                             className={`shadow-lg mb-2 border-2 ${currentView === "departments" ? "border-primary" : ""}`}
@@ -161,7 +161,6 @@ const DepartmentList = () => {
                             </CardBody>
                         </Card>
                     </Col>
-                )}
                 <Col xs={6} sm={6} md={4} l={3} xl={3}>
                     <Card
                         className={`shadow-lg mb-2 border-2 ${currentView === "links" ? "border-primary" : ""}`}
@@ -177,7 +176,7 @@ const DepartmentList = () => {
             </Row>
 
             <div className="d-flex justify-content-between mb-2 align-items-center">
-                {/* título */}
+                {/* Título */}
                 <div className="fw-bold fs-6 d-flex justify-content-between mb-2 align-items-center">
                     {currentView === "links" ? "Enlaces" : "Departamentos"}
                 </div>
