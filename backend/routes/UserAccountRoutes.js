@@ -14,18 +14,21 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  * - PATCH  /profile/PWD                           → Modificar solo la contraseña del usuario identificado. (Usuarios identificados)
  * - POST   /profile/add-department/:departmentId  → Añadir departamento a un usuario. (Solo administradores)
  * - DELETE /profile/del-department/:departmentId  → Eliminar departamento de un usuario. (Solo administradores)
+ * 
  * - GET    /                                      → Listar todos los usuarios. (Solo administradores)
  * - GET    /:id                                   → Obtener los datos completos de un usuario por ID. (Solo administradores)
+ * 
  * - POST   /                                      → Crear un nuevo usuario. (Solo administradores)
  * - PUT    /:id                                   → Actualizar un usuario existente. (Solo administradores)
  * - DELETE /:id                                   → Eliminar un usuario. (Solo administradores)
  * - PATCH  /:id/forcePwdChange                    → Forzar cambio de contraseña al usuario. (Solo administradores)
+ * 
  * - POST   /:id/add-department/:departmentId      → Añadir departamento a un usuario. (Solo administradores)
  * - DELETE /:id/del-department/:departmentId      → Eliminar departamento de un usuario. (Solo administradores)
  *
  * Middlewares:
- * - `adminOnly` → Restringe acceso a usuarios con rol de administrador o superior.
- * - `isAuthenticated` → Restringe el acceso a usuarios autenticados.
+ * - `adminOnly`        → Restringe acceso a usuarios con rol de administrador o superior.
+ * - `isAuthenticated`  → Restringe el acceso a usuarios autenticados.
  */
 
 router.put("/profile/update", isAuthenticated, UserAccountController.updateMyAccount);
@@ -33,7 +36,6 @@ router.delete("/profile/delete", isAuthenticated, UserAccountController.deleteMy
 router.patch("/profile/PWD", isAuthenticated, UserAccountController.forcedPasswordChange);
 router.post("/profile/add-department/:departmentId", adminOnly, UserAccountController.addDepartmentProfile);
 router.delete("/profile/del-department/:departmentId", adminOnly, UserAccountController.delDepartmentProfile);
-
 
 router.get("/", adminOnly, UserAccountController.list);
 router.get("/:id", adminOnly, UserAccountController.getOne);
