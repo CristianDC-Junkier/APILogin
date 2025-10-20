@@ -8,13 +8,13 @@ export default () => {
         server: {
             port: 61939,
             proxy: {
-                '/visor-sig/api': {
+                '/IDEE-Almonte/api': {
                     target: 'http://localhost:5000',  
                     changeOrigin: true,
                     secure: false,
                 },
             },
         },
-        base: '/visor-sig',
+        base: '/IDEE-Almonte',
     });
 };

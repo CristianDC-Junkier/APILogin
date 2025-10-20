@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
  */
 
 const api = axios.create({
-    baseURL: '/visor-sig/api',
+    baseURL: '/IDEE-Almonte/api',
     withCredentials: false,
 });
 
@@ -31,7 +31,7 @@ api.interceptors.response.use(
                 sessionStorage.removeItem("user");
                 localStorage.removeItem("user");
                 // Redirigir al login
-                window.location.href = '/visor-sig/login';
+                window.location.href = '/IDEE-Almonte/login';
             });
 
             return;

@@ -1,6 +1,5 @@
 ﻿import React from "react";
 import { Container, Row, Col } from "reactstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 import BackButton from '../../components/utils/BackButtonComponent';
 
 const Privacity = () => {

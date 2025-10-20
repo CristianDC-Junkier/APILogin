@@ -1,5 +1,5 @@
 ﻿
-const { Department, Links } = require("../models/Relations");
+const { UserAccount,Department, Links } = require("../models/Relations");
 const LoggerController = require("../controllers/LoggerController");
 
 /**
@@ -141,7 +141,7 @@ class DepartmentController {
     */
     static async addLink(req, res) {
         try {
-            const { id, linkId } = req.params;       
+            const { id, linkId } = req.params;
 
             const department = await Department.findByPk(id);
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
@@ -155,7 +155,7 @@ class DepartmentController {
             res.json({ linksSize: links.length });
 
         } catch (error) {
-            LoggerController.error('Error al añadir el link' +  linkId + ' al departamento' +  id +  'por el usuario con id ' + req.user.id);
+            LoggerController.error('Error al añadir el link' + linkId + ' al departamento' + id + 'por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(400).json({ error: error.message });
         }
@@ -188,6 +188,56 @@ class DepartmentController {
             LoggerController.error('Error al eliminar el link con id ' + linkId + ' del departamento con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(400).json({ error: error.message });
+        }
+    }
+
+    /**
+    * Añade un link a un departamento.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
+    */
+    static async getLinks(req, res) {
+
+        const { id } = req.user;
+        const { version } = req.query;
+
+        try {
+            const user = await UserAccount.findByPk(id);
+            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
+            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+
+            const departments = await Department.findAll({
+                include: [
+                    {
+                        model: Links,
+                        as: 'links',
+                        attributes: ['id', 'name', 'web'],
+                        through: { attributes: [] }
+                    },
+                    {
+                        model: UserAccount,
+                        as: 'useraccounts',
+                        where: { id: user.id },
+                        attributes: [],
+                        through: { attributes: [] }
+                    }
+                ],
+
+            });
+
+            const dFormatted = departments.map(department => ({
+                id: department.id,
+                name: department.name,
+                links: department.links || [],
+            }));
+
+            res.json({ departments: dFormatted });
+        } catch (error) {
+            LoggerController.error('Error recogiendo los departamentos desde el perfil por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
         }
     }
 }
