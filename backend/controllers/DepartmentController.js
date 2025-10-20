@@ -3,7 +3,7 @@ const { UserAccount,Department, Links } = require("../models/Relations");
 const LoggerController = require("../controllers/LoggerController");
 
 /**
- * Controlador de autenticación y gestión de usuarios.
+ * Controlador de departamentos.
  * 
  * Proporciona métodos estáticos para:           
  *  - Listar todos los departamentos                   
@@ -11,17 +11,19 @@ const LoggerController = require("../controllers/LoggerController");
  *  - Modificar un departamento
  *  - Eliminar un departamento
  *  - Añadir links a un departamento                   
- *  - Eliminar links de un departamento                
+ *  - Eliminar links de un departamento    
+ *  - Recoger links de los departamentos de un usuario            
  */
 class DepartmentController {
 
+    //#region Metodos CRUD para gestionar departamentos
     /**
-     * Lista todos los departamentos existentes.
-     * 
-     * @param {Object} req - Objeto de petición de Express.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Array de departamentos o mensaje de error.
-     */
+    * Lista todos los departamentos existentes.
+    * 
+    * @param {Object} req - Objeto de petición de Express.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Array de departamentos o mensaje de error.
+    */
     static async list(req, res) {
         try {
             const departments = await Department.findAll({
@@ -50,12 +52,12 @@ class DepartmentController {
     }
 
     /**
-     * Crea un nuevo departamento en la base de datos.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { body: { name } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del departamento creado o mensaje de error.
-     */
+    * Crea un nuevo departamento en la base de datos.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { body: { name } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del departamento creado o mensaje de error.
+    */
     static async create(req, res) {
         try {
             const { name } = req.body;
@@ -76,12 +78,12 @@ class DepartmentController {
     }
 
     /**
-     * Modifica un departamento existente.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { name } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
-     */
+    * Modifica un departamento existente.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { name } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
+    */
     static async update(req, res) {
         try {
             const { id } = req.params;
@@ -108,12 +110,12 @@ class DepartmentController {
     }
 
     /**
-     * Elimina un departamento existente.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
-     */
+    * Elimina un departamento existente.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
+    */
     static async delete(req, res) {
         try {
             const { id } = req.params;
@@ -131,13 +133,15 @@ class DepartmentController {
             res.status(400).json({ error: error.message });
         }
     }
+    //#endregion
 
+    //#region Métodos para gestionar links de departamentos
     /**
     * Añade un link a un departamento.
     * 
-    * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
+    * @param {Object} req - Objeto de petición de Express, con { params: { id, linkId } }.
     * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
+    * @returns {JSON} - Mensaje de éxito con el tamaño de la lista de links del departamento o mensaje de error. 
     */
     static async addLink(req, res) {
         try {
@@ -161,14 +165,13 @@ class DepartmentController {
         }
     }
 
-
     /**
-     * Elimina un departamento de un usuario.
-     * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
-     * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
-     */
+    * Elimina un departamento de un usuario.
+    * 
+    * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Mensaje de éxito con el tamaño de la lista de links del departamento o mensaje de error. 
+    */
     static async delLink(req, res) {
         try {
             const { id, linkId } = req.params;
@@ -192,11 +195,11 @@ class DepartmentController {
     }
 
     /**
-    * Añade un link a un departamento.
+    * Devuelve los links de los departamentos asociados a un usuario.
     * 
-    * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { linkId } }.
+    * @param {Object} req - Objeto de petición de Express, con { user: { id }, query: { version } }.
     * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Mensaje de éxito con id del departamento o mensaje de error. 
+    * @returns {JSON} - Mensaje de éxito con el nombre del departamento y sus links o mensaje de error.
     */
     static async getLinks(req, res) {
 
@@ -240,6 +243,8 @@ class DepartmentController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    //#endregion
 }
 
 module.exports = DepartmentController;

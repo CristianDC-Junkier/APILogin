@@ -10,10 +10,10 @@ const LoggerController = require("./LoggerController");
  *  - Crear un link
  *  - Modificar un link
  *  - Eliminar un link
- *  - Obtener todos los links por lista de departamentos               
  */
 class LinksController {
 
+    //#region Métodos CRUD para gestión de links
     /**
      * Lista todos los link existentes.
      * 
@@ -53,7 +53,7 @@ class LinksController {
             res.json({ id: link.id });
         } catch (error) {
             LoggerController.error('Error en la creación del link por el usuario con id ' + req.user.id);
-            LoggerController.error('Error - '+ error.message);
+            LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
@@ -81,7 +81,7 @@ class LinksController {
             LoggerController.info('Link con id ' + link.id + ' modificado correctamente por el usuario con id ' + req.user.id);
             res.json({ id: link.id });
         } catch (error) {
-            LoggerController.error('Error en la modificación del link con id ' + id +  ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error en la modificación del link con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
@@ -106,56 +106,13 @@ class LinksController {
             LoggerController.info('Link con id ' + link.id + ' modificado correctamente por el usuario con id ' + req.user.id);
             res.json({ id });
         } catch (error) {
-            LoggerController.error('Error en la eliminación del link con id ' + id +  ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error en la eliminación del link con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             res.status(500).json({ error: error.message });
         }
     }
 
-   /**
-    * Obtiene los links asociados a un departamento.
-    * 
-    * @param {Object} req - Objeto de petición de Express, con { body: { departmentIds } }.
-    * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Array de links asociados al departamento o mensaje de error.
-    */
-    static async getLinksByDepartment(req, res) {
-        try {
-            const { departmentId } = req.body; // recibir array de IDs de departamentos
-
-            // Validación básica
-            if (!Array.isArray(departmentId) || departmentId.length === 0) {
-                return res.status(400).json({ error: "Se requiere un array de IDs de departamentos" });
-            }
-
-            // Buscar departamentos con sus links asociados
-            const departmentsAll = await Department.findAll({
-                where: { id: departmentId },
-                include: [
-                    {
-                        model: Links,
-                        as: 'links',          
-                        attributes: ['id', 'name', 'url'],
-                        through: { attributes: [] } 
-                    }
-                ],
-                attributes: ['id', 'name']
-            });
-
-            const formattedDepartments = departments.map(dep => ({
-                id: dep.id,
-                name: dep.name,
-                links: dep.links
-            }));
-
-            res.json({ departments: formattedDepartments });
-
-        } catch (error) {
-            LoggerController.error('Error en la busqueda del links de departamentos por el usuario con id ' + req.user.id);
-            LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
-        }
-    }
+    //#endregion
 
 }
 

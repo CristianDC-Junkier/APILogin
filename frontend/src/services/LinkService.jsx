@@ -30,23 +30,6 @@ export const getAllLinks = async (token) => {
 }
 
 /**
- * Solicitud para obtener la lista de todos los enlaces existentes asociados a un departamento
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
- * @param {int} depId - ID del departamento del que se quieren obtener los enlaces
- * @returns {JSON} - Devuelve la información recibida de la llamada
- */
-export const getLinksByDepartment = async (depId, token) => {
-    try {
-        const res = await api.get(`/link/department/${depId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        return { success: true, data: res.data };
-    } catch (error) {
-        return { success: false, error: error.response?.data?.error };
-    }
-}
-
-/**
  * Solicitud de creación de un nuevo enalce
  * @param {Object} link - la información del enlace que se quiere crear
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
