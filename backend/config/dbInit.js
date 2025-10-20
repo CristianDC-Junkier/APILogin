@@ -3,7 +3,6 @@
 const USER_TYPE = ['USER', 'ADMIN', 'SUPERADMIN'];
 const LoggerController = require("../controllers/LoggerController");
 
-
 /**
  * Inicialización de la base de datos y creación de usuarios por defecto.
  *

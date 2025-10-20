@@ -6,6 +6,22 @@ dotenv.config();
 const MODE = process.env.NODE_ENV || 'development';
 let sequelize;
 
+/**
+ * Configuración y conexión a la base de datos con Sequelize.
+ *
+ * Esta configuración realiza lo siguiente:
+ *  1. Crea una instancia de Sequelize según el modo:
+ *     - Production: se conecta a MariaDB usando credenciales de entorno.
+ *     - Development: usa SQLite local en la carpeta 'database' del proyecto.
+ *  2. Desactiva los logs de SQL para ambos modos.
+ *
+ * Variables internas importantes:
+ *  - MODE: define si la app está en 'production' o 'development'.
+ *  - sequelize: instancia de Sequelize exportada para usar en otros módulos.
+ *
+ * Exporta:
+ *  - sequelize: instancia lista para definir modelos y realizar consultas.
+ */
 if (MODE === 'production') {
     sequelize = new Sequelize(
         process.env.DB_NAME,

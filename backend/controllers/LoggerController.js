@@ -9,6 +9,7 @@ const path = require('path');
  *  - info(message): Registrar un mensaje de información.
  *  - warn(message): Registrar un mensaje de advertencia.
  *  - error(message): Registrar un mensaje de error.
+ * -  errorCritical(message): Registrar un mensaje de error crítico en la inicialización (síncrono).
  * 
  */
 class LoggerController {
@@ -91,6 +92,7 @@ class LoggerController {
 
     /**
      * Elimina los archivos de log más antiguos si se supera MAX_LOGS.
+     * 
      * @private
      */
     static _cleanupOldLogs() {
@@ -142,7 +144,7 @@ class LoggerController {
 
 
     /**
-     * Registra un mensaje de error crítico.
+     * Registra un mensaje de error crítico, solo es llamado en fallos de inicialización.
      * 
      * @param {string} message - Mensaje a registrar
      */

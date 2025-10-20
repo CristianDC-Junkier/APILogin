@@ -1,5 +1,4 @@
-﻿
-const { UserAccount, Department, RefreshToken } = require("../models/Relations");
+﻿const { UserAccount, Department, RefreshToken } = require("../models/Relations");
 
 const { generateToken } = require("../utils/JWT");
 const LoggerController = require("../controllers/LoggerController");
@@ -73,14 +72,14 @@ class AuthController {
     * automáticamente. El refresh token asociado al usuario se borra de la base
     * de datos para evitar que se puedan generar nuevos access tokens.
     *
-    * @param {Object} req - Objeto de petición de Express.
+    * @param {Object} req - Objeto de petición de Express, con { header: { token }, user: { id, username } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Mensaje de exito o error.
     */
     static async logout(req, res) {
         try {
-            const userId = req.user.id;
-            const userName = req.user.username;
+            const { id: userId, username: userName } = req.user;
+            const token = req.headers["authorization"].split(" ")[1];
 
             // Buscar todos los refresh tokens del usuario
             const userTokens = await RefreshToken.findAll({ where: { userId } });
@@ -108,13 +107,13 @@ class AuthController {
     /**
     * Recoge el perfil del usuario.
     * 
-    * @param {Object} req - Objeto de petición de Express.
+    * @param {Object} req - Objeto de petición de Express, con { user: { id }, query: { version } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Perfil del usuario con sus departamentos, o mensaje de error.
     */
     static async getProfile(req, res) {
         try {
-            const userId = req.user.id;
+            const { id: userId } = req.user;
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(userId, {
@@ -156,7 +155,7 @@ class AuthController {
     /**
     * Recoge la versión del usuario.
     * 
-    * @param {Object} req - Objeto de petición de Express.
+    * @param {Object} req - Objeto de petición de Express, con { user: { id } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Versión del usuario o mensaje de error.
     */

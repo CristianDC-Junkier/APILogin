@@ -13,7 +13,6 @@ const { adminOnly, isAuthenticated } = require("../middlewares/Auth");
  * - POST   /                → Crear un nuevo link (Solo administradores).
  * - PUT    /:id             → Actualizar datos de un link por ID (Solo administradores).
  * - DELETE /:id             → Eliminar un link por ID (Solo administradores).
- * - GET    /department/:id  → Obtener Links por departamento (Solo Usuarios identificados).
  * 
  * Middleware:
  * - `adminOnly` → Restringe el acceso a usuarios con roles de administrador.
@@ -24,7 +23,5 @@ router.get("/", adminOnly, LinksController.list);
 router.post("/", adminOnly, LinksController.create);
 router.put("/:id", adminOnly, LinksController.update);
 router.delete("/:id", adminOnly, LinksController.delete);
-
-router.get("/department/:id", isAuthenticated, LinksController.getLinksByDepartment);
 
 module.exports = router;
