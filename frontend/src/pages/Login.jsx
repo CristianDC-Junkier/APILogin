@@ -71,7 +71,7 @@ const Login = () => {
 
         try {
             // Mostrar captcha obligatorio
-            //await showCaptcha();                                      DURANTE DESARROLLO
+            await showCaptcha();
 
             // Hacer login
             const response = await login({ username, password, remember });
@@ -79,7 +79,7 @@ const Login = () => {
             if (response.success) {
                 const user = response.data.user;
                 if (user.usertype === 'USER') {
-                    navigate('/app');
+                    navigate('/list');
                 } else {
                     navigate('/home');
                 }

@@ -27,7 +27,7 @@ const PublicRoute = ({ children }) => {
                     navigate('/home');
                 }
                 else if (user.usertype === 'USER') {
-                    navigate('/app');
+                    navigate('/list');
                 } else {
                     navigate('/login');
                 }
