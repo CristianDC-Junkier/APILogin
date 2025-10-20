@@ -20,7 +20,7 @@ export const login = async (credentials) => {
 
 /**
  * Solicitud de cierre de sesión del usuario actualmente conectado
- * @returns {JSNO} - Contiene un booleano con true en caso de exito y false en caso de error
+ * @returns {JSON} - Contiene un booleano con true en caso de exito y false en caso de error
  */
 export const logout = async (token) => {
     try {

@@ -9,9 +9,9 @@ import Pagination from "../../components/PaginationComponent";
 
 
 /**
- * Componente para mostrar la tabla de departamentos
+ * Componente para mostrar la tabla de enlaces
  * @param {Object} props
- * @param {Array} props.links - Lista de departamentos
+ * @param {Array} props.links - Lista de enlaces
  * @param {String} props.search - Filtro de búsqueda por nombre
  * @param {Number} props.rowsPerPage - Número de filas por página
  * @param {Number} props.currentPage - Página actual

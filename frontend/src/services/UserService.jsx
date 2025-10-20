@@ -88,8 +88,9 @@ export const deleteUser = async (userId, token, version) => {
 };
 
 /**
-* Solicitud para añadir un departamento al perfil conectado
-* @param {String} departmentId - Nuevo departamento a añadir al perfil conectado
+* Solicitud para añadir un departamento a un usuario
+* @param {String} userId - ID del usuario al que se va a añadir el departamento
+* @param {String} departmentId - ID del departamento a añadir al usuario
 * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
 * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
 * @returns {JSON} - Devuelve la información recibida de la llamada
@@ -107,8 +108,9 @@ export const addDepartment = async (userId, departmentId, token, version) => {
 }
 
 /**
-* Solicitud para eliminar un departamento del perfil conectado
-* @param {String} useraccount - Departamento a eliminar del perfil conectado
+* Solicitud para eliminar un departamento a un usuario
+* @param {String} userId - ID del usuario al que se va a eliminar el departamento
+* @param {String} departmentId - Departamento a eliminar del usuario
 * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
 * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
 * @returns {JSON} - Devuelve la información recibida de la llamada
@@ -146,8 +148,7 @@ export const getProfile = async (token, version) => {
 };
 
 /**
- * Solicitud de eliminación de un usuario
- * @param {Object} userId - el ID del usuario que se quiere eliminar
+ * Solicitud de eliminación del perfil conectado
  * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
@@ -185,7 +186,7 @@ export const modifyProfile = async (useraccount, token, version) => {
 
 /**
 * Solicitud para añadir un departamento al perfil conectado
-* @param {String} departmentId - Nuevo departamento a añadir al perfil conectado
+* @param {String} departmentId - ID del departamento a añadir al perfil conectado
 * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
 * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
 * @returns {JSON} - Devuelve la información recibida de la llamada
@@ -204,7 +205,7 @@ export const addDepartmentProfile = async (departmentId, token, version) => {
 
 /**
 * Solicitud para eliminar un departamento del perfil conectado
-* @param {String} useraccount - Departamento a eliminar del perfil conectado
+* @param {String} departmentId - ID del departamento a eliminar del perfil conectado
 * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
 * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
 * @returns {JSON} - Devuelve la información recibida de la llamada

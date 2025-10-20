@@ -98,6 +98,7 @@ const Login = () => {
                     <CardBody className="p-0">
                         <h3 className="text-center mb-4 fw-bold mt-4">Login</h3>
                         <Form onSubmit={handleSubmit} className="px-4">
+                            {/* Campo de entrada del nombre de usuario */ }
                             <FormGroup className="mb-2">
                                 <Label className="fw-semibold">Usuario</Label>
                                 <Input
@@ -109,7 +110,7 @@ const Login = () => {
                                     className="border-0 border-bottom border-dark rounded-0 bg-white px-3 py-2"
                                 />
                             </FormGroup>
-
+                            {/* Campo de entrada de la contraseña */}
                             <FormGroup className="mb-4">
                                 <Label className="fw-semibold">Contraseña</Label>
                                 <Input
@@ -124,6 +125,7 @@ const Login = () => {
 
                             <Row className="align-items-center mb-4 px-1">
                                 <Col xs="7" className="d-flex align-items-center">
+                                    {/* Chack para activar el recorda usuario */}
                                     <FormGroup check className="mb-0">
                                         <Input
                                             type="checkbox"
@@ -137,7 +139,7 @@ const Login = () => {
                                     </FormGroup>
                                 </Col>
                             </Row>
-
+                            {/* Botón para hacer el login */}
                             <Button color="dark" type="submit" className="w-100 fw-bold mb-3 py-2">
                                 Entrar
                             </Button>

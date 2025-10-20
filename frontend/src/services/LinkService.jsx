@@ -31,8 +31,8 @@ export const getAllLinks = async (token) => {
 
 /**
  * Solicitud para obtener la lista de todos los enlaces existentes asociados a un departamento
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @param {int} depId - ID del departamento del que se quieren obtener los enlaces
+ * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const getLinksByDepartment = async (depId, token) => {
