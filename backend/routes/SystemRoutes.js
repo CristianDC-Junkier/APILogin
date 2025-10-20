@@ -11,6 +11,7 @@ const { adminOnly } = require("../middlewares/Auth");
  * Endpoints:
  * - GET /logs                 → Listar todos los logs disponibles (Solo administradores).
  * - GET /logs/:log            → Obtener el contenido de un archivo de log específico.
+ * 
  * - GET /logs/:log/download   → Descargar un archivo de log.
  * - GET /system               → Obtener métricas del sistema (CPU, memoria, etc.).
  *

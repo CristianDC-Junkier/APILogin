@@ -2,6 +2,16 @@
 const sequelize = require("../config/db");
 const { encrypt, decrypt } = require("../utils/crypto");
 
+/**
+ * Modelo Sequelize para generar token.
+ * Todos los campos tipo STRING se guardan cifrados para proteger datos sensibles.
+ * 
+ * Campos:
+ * - id         → Identificador único autoincremental.
+ * - token      → Cadena que representa el token (encriptado).
+ * - expireDate → Fecha de caducidad para el token.
+ * - userId     → ID del usuario al que está asociado.
+ */
 const RefreshToken = sequelize.define("RefreshToken", {
     id: {
         type: DataTypes.INTEGER,
