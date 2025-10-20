@@ -5,7 +5,7 @@ const path = require("path");
 const dotenv = require('dotenv');
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
-const basePath = '/visor-sig';
+const basePath = '/IDEE-Almonte';
 
 // --------------------------------
 //  DATABASE (Solo en Desarrollo)

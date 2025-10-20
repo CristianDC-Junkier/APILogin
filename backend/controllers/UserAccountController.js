@@ -275,7 +275,7 @@ class UserAccountController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(currentUser.id);
-            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
             if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
 
             const updates = {};
@@ -356,7 +356,7 @@ class UserAccountController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
 
             if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
 
@@ -393,7 +393,7 @@ class UserAccountController {
             }
 
             const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
 
             if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
 

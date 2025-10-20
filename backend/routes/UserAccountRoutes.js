@@ -25,6 +25,7 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  *
  * Middlewares:
  * - `adminOnly` → Restringe acceso a usuarios con rol de administrador o superior.
+ * - `isAuthenticated` → Restringe el acceso a usuarios autenticados.
  */
 
 router.put("/profile/update", isAuthenticated, UserAccountController.updateMyAccount);

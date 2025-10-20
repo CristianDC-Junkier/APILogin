@@ -45,6 +45,7 @@ const AppRouter = () => {
 
                 {/* Rutas publicas */}
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+
                 {/* Rutas privadas */}
                 <Route path="/profile" element={<PrivateRoute><ProfileUserPage /> </PrivateRoute>} />
                 <Route path="/home" element={<PrivateRoute> <HomePage /> </PrivateRoute>} />

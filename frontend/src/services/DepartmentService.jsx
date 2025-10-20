@@ -122,5 +122,23 @@ export const deleteLinkToDepartment = async (depId, linkId, token) => {
     }
 };
 
+/**
+ * Solicitud para obtener la lista de todos los departamentos del usuario que realiza la petición
+ * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
+ * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
+ * @returns {JSON} - Devuelve la información recibida de la llamada
+ */
+export const getLinksByProfileList = async (token, version) => {
+    try {
+        const res = await api.get('/department/profile', {
+            params: { version },
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+};
+
 //#endregion
 

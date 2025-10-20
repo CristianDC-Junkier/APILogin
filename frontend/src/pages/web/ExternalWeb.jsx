@@ -1,29 +1,23 @@
-﻿import React, { useState } from "react";
+﻿import React from "react";
 import { Container, Row, Col } from "reactstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import BackButton from "../../components/utils/BackButtonComponent";
-import LogoutButton from "../../components/utils/LogoutComponent";
+import BackButtonComponent from "../../components/utils/BackButtonComponent";
 
-/**
- * Página que muestra la aplicación externa
- */
+const ExternalWebPage = () => {
+    const { user } = useAuth();
+    const location = useLocation();
 
-const ExternalWebPage = (URL) => {
-    const [loadingLogout, setLoadingLogout] = useState(false);
-    const navigate = useNavigate();
-    const { logout, user } = useAuth();
+    // URL oculta que llega desde WebListPage
+    let url = location.state?.url;
 
-    //Función que gestiona el cierre de sesión
-    const handleLogout = async () => {
-        setLoadingLogout(true);
-        try {
-            await logout();
-            navigate("/");
-        } finally {
-            setLoadingLogout(false);
+    try {
+        if (url) {
+            new URL(url);
         }
-    };
+    } catch {
+        url = null;
+    }
 
     if (!user) return null;
 
@@ -34,33 +28,39 @@ const ExternalWebPage = (URL) => {
             style={{ width: "100%", height: "100%" }}
         >
             {/* Botonera arriba */}
-            <Row className="align-items-center m-0 p-0">
-                {user.usertype !== "USER" && (
-                    <Col className="d-flex justify-content-start p-0">
-                        <BackButton back="/home" />
-
-                    </Col>
-                )}
-                {user.usertype === "USER" && (
-                    <Col className="d-flex justify-content-start p-2">
-                        <LogoutButton onClick={handleLogout} loading={loadingLogout} />
-                    </Col>
-                )}
+            <Row className="align-items-center m-0 p-0 mb-1">
+                <Col className="d-flex justify-content-start p-0">
+                    <BackButtonComponent back="/list" />
+                </Col>
             </Row>
 
-            {/* Iframe que ocupa todo el espacio sobrante */}
+            {/* Iframe que ocupa todo el espacio */}
             <Row className="flex-grow-1 m-0 p-0">
                 <Col className="p-0">
-                    <iframe
-                        title="Web View"
-                        src={URL}
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                            border: "none",
-                            display: "block",
-                        }}
-                    />
+                    {url ? (
+                        <iframe
+                            title="Web View"
+                            src={url}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                border: "none",
+                                display: "block",
+                            }}
+                        />
+                    ) : (
+                        <div
+                            className="d-flex justify-content-center align-items-center"
+                            style={{
+                                height: "100%",
+                                fontSize: "1.5rem",
+                                color: "#6c757d",
+                                textAlign: "center",
+                            }}
+                        >
+                            No se ha recibido ninguna URL válida para mostrar.
+                        </div>
+                    )}
                 </Col>
             </Row>
         </Container>
