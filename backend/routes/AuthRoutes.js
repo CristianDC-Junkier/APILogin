@@ -11,6 +11,7 @@ const { isAuthenticated } = require("../middlewares/Auth");
  * Endpoints:
  * - POST   /login               → Iniciar sesión y obtener token JWT.
  * - GET    /logout              → Desconectar Usuario (Usuarios Autentificados).
+ * 
  * - GET    /profile             → Recoger datos del usuario (Usuarios Autentificados).
  * - GET    /version             → Recoger datos de la version del usuario (Usuarios Autentificados).
  * 
