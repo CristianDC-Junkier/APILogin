@@ -1,5 +1,9 @@
 ﻿import React from 'react';
 
+/**
+ * Componente que muestra un Spinner para mostrar cuando la página está cargando algo
+ */
+
 const SpinnerComponent = () => {
     return (
         <div

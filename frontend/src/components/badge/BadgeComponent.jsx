@@ -5,6 +5,8 @@
  * @param {Object} props
  * @param {string} props.objName Nombre del objeto.
  */
+
+// Función encargada de determinar el color de fonde del badge
 function stringToColor(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {

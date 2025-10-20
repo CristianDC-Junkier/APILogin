@@ -18,7 +18,6 @@ import {
 
 /**
  * Página que muestra las acciones disponibles al usuario
- * Solo disponible para administradores o superadministradores
  */
 
 const Home = () => {

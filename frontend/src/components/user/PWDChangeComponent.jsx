@@ -4,6 +4,13 @@ import { changePasswordPWD } from "../../services/UserService";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Componente encargado de mostrar y gestionar el marcar a un usuario para cambio de contraseña
+ * @param {Object} user - Usuario que va a ser marcado
+ * @param {String} token - Token del usuario conectado
+ * @returns
+ */
+
 const PWDChangeComponent = ({ user, token }) => {
     const { update, logout } = useAuth();
     const navigate = useNavigate();

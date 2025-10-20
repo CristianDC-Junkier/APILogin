@@ -7,7 +7,6 @@ import { modifyDepartment, deleteDepartment, addLinkToDepartment, deleteLinkToDe
 
 import Pagination from "../../components/PaginationComponent";
 import CaptchaSlider from '../utils/CaptchaSliderComponent';
-import AddDeleteLinkToDepartmentComponent from "./AddDeleteLinkToDepartmentComponent";
 import AddModifyDepartmentComponent from "./AddModifyDepartmentComponent";
 import BadgeComponent from "../badge/BadgeComponent";
 import AddBadgeComponent from "../badge/AddBadgeComponent";
@@ -18,11 +17,13 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent"
  * Componente para mostrar la tabla de departamentos
  * @param {Object} props
  * @param {Array} props.departments - Lista de departamentos
+ * @param {Array} props.links - Lista de enlaces
  * @param {String} props.search - Filtro de búsqueda por nombre
  * @param {Number} props.rowsPerPage - Número de filas por página
  * @param {Number} props.currentPage - Página actual
  * @param {Function} props.setCurrentPage - Función para cambiar la página
  * @param {Function} props.refreshData - Función para recargar los datos
+ * @param {Object} props.currentUser - Objeto con la información del usuario conectado
  */
 const TableDepartmentComponent = ({ token, departments, links, search, rowsPerPage, currentPage, setCurrentPage, refreshData, currentUser }) => {
 
