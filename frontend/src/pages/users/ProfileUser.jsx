@@ -42,13 +42,15 @@ const ProfileUser = () => {
             }
 
             // Traer todos los departamentos disponibles
-            const deptResp = await getDepartmentList(token);
-            if (deptResp.success) {
-                const availableDepartmentsAux = deptResp.data.departments
-                    .filter(d => !profileResp.data.departments.some(pd => pd.id === d.id))
-                    .sort((a, b) => a.name.localeCompare(b.name));
+            if (profileResp.data.user.usertype !== "USER") {
+                const deptResp = await getDepartmentList(token);
+                if (deptResp.success) {
+                    const availableDepartmentsAux = deptResp.data.departments
+                        .filter(d => !profileResp.data.departments.some(pd => pd.id === d.id))
+                        .sort((a, b) => a.name.localeCompare(b.name));
 
-                setAvailableDepartments(availableDepartmentsAux);
+                    setAvailableDepartments(availableDepartmentsAux);
+                }
             }
 
 
@@ -236,9 +238,10 @@ const ProfileUser = () => {
                                     <Button color="primary" className="rounded-pill px-3 d-flex align-items-center" onClick={handleModify}>
                                         <FaEdit className="me-1 mb-1" /> Modificar
                                     </Button>
-                                    <Button color="danger" className="rounded-pill px-3 d-flex align-items-center" disabled={profile.user.id === 1} onClick={handleDelete}>
+                                    {profile.user.usertype !== "USER" && <Button color="danger" className="rounded-pill px-3 d-flex align-items-center" disabled={profile.user.id === 1} onClick={handleDelete}>
                                         <FaTrash className="me-1 mb-1" /> Eliminar
                                     </Button>
+                                    }
                                 </div>
                             </CardBody>
                         </Card>
