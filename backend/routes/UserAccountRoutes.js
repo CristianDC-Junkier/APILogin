@@ -15,7 +15,6 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  * - POST   /profile/add-department/:departmentId  → Añadir departamento a un usuario. (Solo administradores)
  * - DELETE /profile/del-department/:departmentId  → Eliminar departamento de un usuario. (Solo administradores)
  * - GET    /                                      → Listar todos los usuarios. (Solo administradores)
- * - GET    /:id                                   → Obtener los datos completos de un usuario por ID. (Solo administradores)
  * - POST   /                                      → Crear un nuevo usuario. (Solo administradores)
  * - PUT    /:id                                   → Actualizar un usuario existente. (Solo administradores)
  * - DELETE /:id                                   → Eliminar un usuario. (Solo administradores)
@@ -34,9 +33,7 @@ router.patch("/profile/PWD", isAuthenticated, UserAccountController.forcedPasswo
 router.post("/profile/add-department/:departmentId", adminOnly, UserAccountController.addDepartmentProfile);
 router.delete("/profile/del-department/:departmentId", adminOnly, UserAccountController.delDepartmentProfile);
 
-
 router.get("/", adminOnly, UserAccountController.list);
-router.get("/:id", adminOnly, UserAccountController.getOne);
 
 router.post("/", adminOnly, UserAccountController.create);
 router.put("/:id", adminOnly, UserAccountController.update);

@@ -1,20 +1,27 @@
-﻿
-const { UserAccount, Department, Links } = require("../models/Relations");
-const LoggerController = require("../controllers/LoggerController");
+﻿const { UserAccount, Department, Links } = require("../models/Relations");
+
 const { Op } = require("sequelize");
+
+const LoggerController = require("../controllers/LoggerController");
+
 const { generateToken } = require("../utils/JWT");
 
 /**
  * Controlador de autenticación y gestión de usuarios.
  * 
  * Proporciona métodos estáticos para:      
- *  - Login de usuarios                     
  *  - Listar todos los usuarios             
  *  - Crear un usuario
  *  - Modificar un usuario
+ *  - Modificar la contraseña de un usuario
  *  - Eliminar un usuario
+ *  - Modificar su propia cuenta
+ *  - Eliminar su propia cuenta
+ *  - Cambiar su propia contraseña forzada
  *  - Añadir departamentos a un usuario     
  *  - Eliminar departamentos de un usuario  
+ *  - Añadir departamentos a su propio perfil
+ *  - Eliminar departamentos de su propio perfil
  */
 class UserAccountController {
 
@@ -79,56 +86,9 @@ class UserAccountController {
             res.status(500).json({ error: error.message });
         }
     }
-
-
-    /**
-    * Recupera los datos completos de un usuario por su ID.
-    * 
-    * @param {Object} req - Objeto de petición de Express con { params: { id } , query: { version } }.
-    * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Usuario con sus departamentos o mensaje de error.
-    */
-    static async getOne(req, res) {
-        try {
-            const { id } = req.params;
-            const { version } = req.query;
-
-            const user = await UserAccount.findByPk(id, {
-                attributes: ['id', 'username', 'usertype', 'forcePwdChange', 'version'],
-                include: [
-                    {
-                        model: Department,
-                        as: 'departments', 
-                        attributes: ['id', 'name'],
-                        through: { attributes: [] } 
-                    },
-                ],
-            });
-
-            if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
-
-            if (user.version != version) return res.status(403).json({ error: "El usuario ha sido modificado anteriormente" });
-            
-            res.json({
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    usertype: user.usertype,
-                    forcePwdChange: user.forcePwdChange,
-                    version: user.version,
-                },            
-                departments: user.departments,
-            });
-        } catch (error) {
-            LoggerController.error('Error recogiendo el usuario con id ' + id + ' por el usuario con id ' + req.user.id);
-            LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
-        }
-    }
-
     //#endregion
 
-    //#region Métodos añadir/modificar/eliminar/forzar contraseña de usuarios
+    //#region Métodos CRUD + Contraseña de gestión de usuarios
     /**
      * Crea un nuevo usuario en la base de datos.
      * 
@@ -160,9 +120,10 @@ class UserAccountController {
     }
 
     /**
-     * Modifica un usuario existente.
+     * Modifica un usuario existente, no se puede modificar al SUPERADMIN por otro usuario que no sea SUPERADMIN, 
+     * ni el tipo del usuario superadmin por defecto (id=1).
      * 
-     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { username, password, usertype } }.
+     * @param {Object} req - Objeto de petición de Express, con { params: { id }, body: { username, password, usertype, version } }.
      * @param {Object} res - Objeto de respuesta de Express.
      * @returns {JSON} - Mensaje de éxito con el id del usuario modificado o mensaje de error. 
      */
@@ -200,8 +161,9 @@ class UserAccountController {
     /**
    * Marca un usuario para que deba cambiar la contraseña en su próximo login.
     * 
-   * @param {Object} req - Objeto de petición con { params: { id }, body: { password, version } }.
-   * @param {Object} res 
+   * @param {Object} req - Objeto de petición con { params: { id }, body: { password }, query: { version } }.
+   * @param {Object} res - Objeto de respuesta de Express.
+   * @returns {JSON} - Mensaje de éxito con el id del usuario con contraseña modificada o mensaje de error. 
    */
     static async forcePasswordChange(req, res) {
         try {
@@ -232,7 +194,7 @@ class UserAccountController {
      * 
      * @param {Object} req - Objeto de petición de Express, con { params: { id } }.
      * @param {Object} res - Objeto de respuesta de Express.
-     * @returns {JSON} - Mensaje de éxito o error. 
+     * @returns {JSON} - Mensaje de éxito con el id del usuario eliminado o mensaje de error.  
      */
     static async delete(req, res) {
         try {
@@ -264,9 +226,9 @@ class UserAccountController {
     /**
     * Permite al usuario autenticado modificar su propia cuenta.
     * 
-    * @param {Object} req - Objeto de petición con {  body: { username, usertype, oldPassword, newPassword, version }, query: { version } }.
+    * @param {Object} req - Objeto de petición con { user: { user }, body: { username, usertype, oldPassword, newPassword }, query: { version } }.
     * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Mensaje de éxito con id del usuario modificado o mensaje de error.
+    * @returns {JSON} - Mensaje de éxito con un nuevo token de inicio de sesión o mensaje de error.
     */
     static async updateMyAccount(req, res) {
         try {
@@ -346,7 +308,7 @@ class UserAccountController {
     /**
     * Permite al usuario autenticado eliminar su propia cuenta.
     * 
-    * @param {Object} req - Objeto de petición con { query: { version } }.
+    * @param {Object} req - Objeto de petición con { user: { id }, query: { version } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Mensaje de éxito con id del usuario eliminado o mensaje de error.
     */
@@ -378,7 +340,7 @@ class UserAccountController {
     /**
     * Permite al usuario autenticado cambiar su contraseña tras ser marcado.
     * 
-    * @param {Object} req - Objeto de petición con {  body: { newPassword }, query: { version } }.
+    * @param {Object} req - Objeto de petición con { user: { id }, body: { newPassword }, query: { version } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Mensaje de éxito con id del usuario con la contraseña cambiada o mensaje de error.
     */
@@ -482,9 +444,9 @@ class UserAccountController {
     /**
     * Un admin añade un departamento a su perfil.
     * 
-    * @param {Object} req - Objeto de petición de Express, con { params: { departmentId }, query: { version } }.
+    * @param {Object} req - Objeto de petición de Express, con { user: { id }, params: { departmentId }, query: { version } }.
     * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
+    * @returns {JSON} - Mensaje de éxito con un nuevo token de inicio de sesión o mensaje de error.
     */
     static async addDepartmentProfile(req, res) {
         try {
@@ -524,9 +486,9 @@ class UserAccountController {
     /**
     * Un admin elimina un departamento de su perfil.
     * 
-    * @param {Object} req - Objeto de petición de Express, con { params: { departmentId }, query: { version } }.
+    * @param {Object} req - Objeto de petición de Express, con { user: { id }, params: { departmentId }, query: { version } }.
     * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Mensaje de éxito con numero de departamentos o mensaje de error.
+    * @returns {JSON} - Mensaje de éxito con un nuevo token de inicio de sesión o mensaje de error.
     */
     static async delDepartmentProfile(req, res) {
         try {
