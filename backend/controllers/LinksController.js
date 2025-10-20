@@ -1,5 +1,5 @@
-﻿
-const { Department, Links } = require("../models/Relations");
+﻿const { Links } = require("../models/Relations");
+
 const LoggerController = require("./LoggerController");
 
 /**

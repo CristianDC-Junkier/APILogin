@@ -1,5 +1,5 @@
-﻿const fs = require('fs');
-const path = require('path');
+﻿const fs = require("fs");
+const path = require("path");
 
 /**
  * Controlador para la gestión de logs de la aplicación.

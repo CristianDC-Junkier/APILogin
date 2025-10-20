@@ -1,6 +1,8 @@
-﻿const { Sequelize } = require('sequelize');
-const path = require('path');
-const dotenv = require('dotenv');
+﻿
+const path = require("path");
+const dotenv = require("dotenv");
+const { Sequelize } = require("sequelize");
+
 dotenv.config();
 
 const MODE = process.env.NODE_ENV || 'development';

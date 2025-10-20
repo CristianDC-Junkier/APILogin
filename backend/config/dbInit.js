@@ -1,7 +1,8 @@
 ﻿const { sequelize, UserAccount, Department } = require("../models/Relations");
 
-const USER_TYPE = ['USER', 'ADMIN', 'SUPERADMIN'];
 const LoggerController = require("../controllers/LoggerController");
+
+const USER_TYPE = ['USER', 'ADMIN', 'SUPERADMIN'];
 
 /**
  * Inicialización de la base de datos y creación de usuarios por defecto.
