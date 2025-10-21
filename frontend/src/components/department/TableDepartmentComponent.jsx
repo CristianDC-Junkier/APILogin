@@ -14,6 +14,21 @@ import AddBadgeComponent from "../badge/AddBadgeComponent";
 import RemovableBadgeComponent from "../badge/RemovableBadgeComponent";
 import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
 
+/**
+ * Componente que muestra la tabla de departamentos del sistema.
+ * 
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.token - Token JWT del usuario autenticado.
+ * @param {string} props.search - Filtro de búsqueda por nombre de departamento.
+ * @param {number} props.rowsPerPage - Número de filas mostradas por página.
+ * @param {number} props.currentPage - Página actual de la tabla.
+ * @param {function} props.setCurrentPage - Función para cambiar la página actual.
+ * @param {Object} props.currentUser - Información del usuario autenticado.
+ * @param {function} props.onStatsDepartsUpdate - Callback para actualizar estadísticas de departamentos.
+ * @param {function} props.onStatsLinksUpdate - Callback para actualizar estadísticas de enlaces.
+ * @returns {JSX.Element} Tabla interactiva de departamentos.
+ */
 const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate }) => {
     const [departments, setDepartments] = useState([]);
     const [links, setLinks] = useState([]);
@@ -147,10 +162,10 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
             <Table striped responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th style={{ width: isSmallScreen ? "15%" : "55%" }}>Enlaces</th>
-                        <th style={{ width: isSmallScreen ? "55%" : "15%" }}>Acciones</th>
+                        <th style={{ width:"5%"}}> ID</th>
+                        <th style={{ width:"15%"}}> Nombre</th>
+                        <th style={{ width: isSmallScreen ? "25%" : "60%" }}>Enlaces</th>
+                        <th className="text-center" style={{ width: isSmallScreen ? "25%" : "10%" }}>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -234,8 +249,8 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                                         </>
                                     )}
                                 </td>
-                                <td>
-                                    <div className="d-flex flex-wrap gap-1">
+                                <td className="text-center"> 
+                                    <div className="d-flex justify-content-center flex-wrap gap-1">
                                         {canModify && (
                                             <>
                                                 <Button color="warning" size="sm" onClick={() => handleModify(depItem)}>✏️</Button>

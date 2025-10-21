@@ -9,6 +9,9 @@ import BackButton from "../../components/utils/BackButtonComponent";
 import TableUserComponent from "../../components/user/TableUserComponent";
 import AddModifyUserComponent from "../../components/user/AddModifyUserComponent"; 
 
+/**
+ * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
+ */
 const DashBoardUser = () => {
     const { user: currentUser, token } = useAuth();
 

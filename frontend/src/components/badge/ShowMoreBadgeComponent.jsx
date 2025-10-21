@@ -13,8 +13,8 @@ import { useNavigate } from 'react-router-dom';
 * @param {Object} user usuario al que se le muestran los departamentos
 * @param {boolean} canModify Indica si el usuario puede modificar
 * @param {String} objType Cadena para aplicar en los menús
-* @param {Array} objList Lista completa de objetos // departamento -> [{id, name}] || enlace -> [{id, name, web}]
 * @param {Array} userObjects Lista de objetos del usuario // departamento -> [{id, name}] || enlace -> [{id, name, web}]
+* @param {Array} availableObjs Lista de objetos libres // departamento -> [{id, name}] || enlace -> [{id, name, web}]
 * @param {Function} onAdded Callback cuando se agrega un departamento
 * @param {Function} onDeleted Callback cuando se elimina un departamento
 */
