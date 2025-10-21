@@ -127,10 +127,10 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
             <Table striped responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th style={{ width: isSmallScreen ? "15%" : "45%" }}>Dirección Web</th>
-                        <th style={{ width: isSmallScreen ? "45%" : "15%" }}>Acciones</th>
+                        <th style={{ width:"5%"}}>ID</th>
+                        <th style={{ width:"10%"}}>Nombre</th>
+                        <th style={{ width: isSmallScreen ? "25%" : "60%" }}>Dirección Web</th>
+                        <th className="text-center" style={{ width: isSmallScreen ? "13%" : "10%" }}>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -150,7 +150,7 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
                                     {isSmallScreen ? "Enlace" : linkItem.web}
                                 </a>
                             </td>
-                            <td>
+                            <td className="text-center">
                                 <div className="d-flex justify-content-center flex-wrap gap-1">
                                     <Button color="warning" size="sm" onClick={() => handleModify(linkItem)}>✏️</Button>
                                     <Button color="danger" size="sm" onClick={() => handleDelete(linkItem)}>🗑️</Button>

@@ -25,6 +25,21 @@ import AddBadgeComponent from "../badge/AddBadgeComponent";
 import RemovableBadgeComponent from "../badge/RemovableBadgeComponent";
 import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
 
+/**
+ * Componente encargado de mostrar la tabla de usuarios del sistema.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.token - Token JWT del usuario autenticado.
+ * @param {Object} props.currentUser - Información del usuario actualmente conectado.
+ * @param {string} props.search - Texto utilizado para filtrar usuarios por nombre o tipo.
+ * @param {number} props.currentPage - Número de la página actualmente visible.
+ * @param {function} props.setCurrentPage - Función para actualizar la página actual.
+ * @param {number} props.rowsPerPage - Número de filas que se muestran por página.
+ * @param {function} props.onStatsUpdate - Callback para actualizar las estadísticas generales de usuarios.
+ * @param {string} [props.filterType="All"] - Tipo de usuario por el cual se filtran los resultados (ej. "USER", "ADMIN", "SUPERADMIN").
+ * @returns {JSX.Element} Tabla interactiva con los usuarios del sistema.
+ */
 const TableUserComponent = ({
     token,
     currentUser,
@@ -193,11 +208,11 @@ const TableUserComponent = ({
             <Table striped responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Tipo</th>
-                        <th className="text-center" style={{ width: isSmallScreen ? "15%" : "55%" }}>Departamentos</th>
-                        <th className="text-center" style={{ width: isSmallScreen ? "55%" : "15%" }}>
+                        <th style={{ width: "5%" }}>ID</th>
+                        <th style={{ width: "15%" }}>Usuario</th>
+                        <th style={{ width: "15%" }}>Tipo</th>
+                        <th className="text-center" style={{ width: isSmallScreen ? "25%" : "60%" }}>Departamentos</th>
+                        <th className="text-center" style={{ width: isSmallScreen ? "25%" : "10%" }}>
                             <ResponsiveTextComponent fullText="Acciones" shortText="Accs" breakpoint={525} />
                         </th>
                     </tr>

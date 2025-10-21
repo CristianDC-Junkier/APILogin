@@ -12,6 +12,9 @@ import TableLinkComponent from "../../components/link/TableLinkComponent";
 import AddModifyDepartmentComponent from "../../components/department/AddModifyDepartmentComponent";
 import AddModifyLinkComponent from "../../components/link/AddModifyLinkComponent";
 
+/**
+ * Página encargada de mostrar la tabla de departamentos y de enlaces y las acciones asociadas a la gestión de los mismos
+ */
 const DepartmentList = () => {
     const { user: currentUser, token } = useAuth();
     const [currentView, setCurrentView] = useState("departments"); // "departments" | "links"
