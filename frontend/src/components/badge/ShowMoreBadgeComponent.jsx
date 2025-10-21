@@ -23,17 +23,12 @@ const ShowMoreDepartmentBadgeComponent = ({
     user,
     canModify,
     objType,
-    objList = [],
     userObjects = [],
+    availableObjs = [],
     onAdded,
     onDeleted,
 }) => {
     const navigate = useNavigate();
-
-
-    let availableObjects = objList.filter(
-        o => !userObjects.some(uo => uo.id === o.id)
-    );
 
     const handleShowMore = () => {
         if (currentUser.id !== user.id || objType === "enlace") {
@@ -70,19 +65,18 @@ const ShowMoreDepartmentBadgeComponent = ({
                                                 onDelete={async () => {
                                                     await onDeleted(obj);
                                                     userObjects = userObjects.filter(o => o.id !== obj.id);
-                                                    availableObjects = [...availableObjects, obj];
+                                                    availableObjs = [...availableObjs, obj];
                                                     handleShowMore();       
                                                 }}
                                             />
                                         ))}
                                         <AddBadgeComponent
-                                            availableObjs={availableObjects}
+                                            availableObjs={availableObjs}
                                             objType={objType}
-                                            onAdded={async (objId) => {
-                                                await onAdded(objId); 
-                                                const addedObj = objList.find(o => o.id === Number(objId));
-                                                availableObjects = availableObjects.filter(d => d.id !== objId);
-                                                userObjects = [...userObjects, addedObj];
+                                            onAdded={async (obj) => {
+                                                await onAdded(obj); 
+                                                availableObjs = availableObjs.filter(d => d.id !== obj.id);
+                                                userObjects = [...userObjects, obj];
                                                 handleShowMore();       
                                             }}
                                         />

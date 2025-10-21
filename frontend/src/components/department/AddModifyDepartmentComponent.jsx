@@ -17,7 +17,7 @@ const AddModifyDepartmentComponent = async ({ depItem, action, onConfirm }) => {
             <div style="${rowStyle}">
                <label style="${labelStyle}">Nombre del Departamento</label>
                 <div style="flex:1; display:flex; align-items:center;">
-                    <input id="swal-name" type="text" style="${inputStyle}" placeholder="Nombre" value="${depItem?.name}"/>
+                    <input id="swal-name" type="text" style="${inputStyle}" placeholder="Nombre" value="${depItem?.name ? depItem?.name : ""}"/>
                 </div>
             </div>
         `;

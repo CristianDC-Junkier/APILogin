@@ -1,47 +1,69 @@
-﻿import React, { useMemo, useEffect, useState } from "react";
+﻿import React, { useEffect, useState, useMemo } from "react";
 import { Table, Button } from "reactstrap";
 import { createRoot } from "react-dom/client";
 import Swal from "sweetalert2";
 import CaptchaSlider from '../utils/CaptchaSliderComponent';
 import AddModifyLinkComponent from "./AddModifyLinkComponent";
-import { modifyLink, deleteLink } from "../../services/LinkService";
+import { getAllLinks, modifyLink, deleteLink } from "../../services/LinkService";
 import Pagination from "../../components/PaginationComponent";
 
+const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate }) => {
+    const [links, setLinks] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-/**
- * Componente para mostrar la tabla de enlaces
- * @param {Object} props
- * @param {Array} props.links - Lista de enlaces
- * @param {String} props.search - Filtro de búsqueda por nombre
- * @param {Number} props.rowsPerPage - Número de filas por página
- * @param {Number} props.currentPage - Página actual
- * @param {Function} props.setCurrentPage - Función para cambiar la página
- * @param {Function} props.refreshData - Función para recargar los datos
- */
-const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, setCurrentPage, refreshData }) => {
-
-    // Hook para detectar pantalla pequeña
-    const useIsSmallScreen = (breakpoint = 500) => {
+    /** Detectar pantallas pequeñas */
+    const useIsSmallScreen = (breakpoint = 770) => {
         const [isSmall, setIsSmall] = useState(window.innerWidth < breakpoint);
-
         useEffect(() => {
             const handleResize = () => setIsSmall(window.innerWidth < breakpoint);
             window.addEventListener("resize", handleResize);
             return () => window.removeEventListener("resize", handleResize);
         }, [breakpoint]);
-
         return isSmall;
     };
 
+    const isSmallScreen = useIsSmallScreen();
+
+    /** Cargar links **/
+    useEffect(() => {
+        const fetchAll = async () => {
+            if (!token) return;
+            setLoading(true);
+            try {
+                const res = await getAllLinks(token);
+                if (res.success) {
+                    setLinks(res.data.links || []);
+
+                    if (onStatsUpdate) {
+                        onStatsUpdate(res.data.links.length);
+                    }
+                }
+            } catch {
+                Swal.fire("Error", "No se pudieron cargar los datos", "error");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAll();
+        const handler = () => fetchAll();
+        window.addEventListener("refresh-links", handler);
+        return () => window.removeEventListener("refresh-links", handler);
+    }, [token, onStatsUpdate]);
+
+    /** Filtrado por búsqueda **/
     const filteredLinks = useMemo(
-        () => links?.filter(d => d.name.toLowerCase().includes(search.toLowerCase())),
+        () => links.filter(l => l.name.toLowerCase().includes(search.toLowerCase())),
         [links, search]
     );
 
-    const totalPages = Math.ceil(filteredLinks?.length / rowsPerPage);
-    const currentLinks = filteredLinks?.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-
-    const showCaptcha = () => new Promise((resolve) => {
+    const totalPages = Math.ceil(filteredLinks.length / rowsPerPage);
+    const currentLinks = useMemo(
+        () => filteredLinks.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage),
+        [filteredLinks, currentPage, rowsPerPage]
+    );
+    /** Captcha antes de eliminar **/
+    const showCaptcha = () => new Promise(resolve => {
         const container = document.createElement('div');
         const reactRoot = createRoot(container);
         let completed = false;
@@ -64,23 +86,21 @@ const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, se
             cancelButtonText: 'Cancelar',
             allowOutsideClick: false,
             preConfirm: () => {
-                if (!completed) {
-                    Swal.showValidationMessage('Debes completar el captcha');
-                    return false;
-                }
+                if (!completed) Swal.showValidationMessage('Debes completar el captcha');
             }
         });
     });
 
-    const handleModify = async (linkItem) => {
+    /** Modificar enlace **/
+    const handleModify = async linkItem => {
         await AddModifyLinkComponent({
             linkItem,
             action: "modify",
-            onConfirm: async (formValues) => {
+            onConfirm: async formValues => {
                 const result = await modifyLink(linkItem.id, formValues, token);
                 if (result.success) {
                     Swal.fire("Éxito", "Enlace modificado correctamente", "success");
-                    await refreshData(false);
+                    window.dispatchEvent(new Event("refresh-links"));
                 } else {
                     Swal.fire("Error", result.error || "No se pudo modificar el enlace", "error");
                 }
@@ -88,20 +108,19 @@ const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, se
         });
     };
 
-    const handleDelete = async (linkItem) => {
-        try { await showCaptcha(linkItem.id); }
-        catch (err) { Swal.fire('Atención', err.message || 'Captcha no completado', 'warning'); return; }
-
+    /** Eliminar enlace **/
+    const handleDelete = async linkItem => {
+        await showCaptcha(); 
         const result = await deleteLink(linkItem.id, token);
         if (result.success) {
-            Swal.fire('Éxito', 'Enlace eliminado correctamente', 'success');
-            await refreshData(false);
+            Swal.fire("Éxito", "Enlace eliminado correctamente", "success");
+            window.dispatchEvent(new Event("refresh-links"));
         } else {
-            Swal.fire('Error', result.error || 'No se pudo eliminar el enlace', 'error');
+            Swal.fire("Error", result.error || "No se pudo eliminar el enlace", "error");
         }
     };
 
-    const isSmallScreen = useIsSmallScreen(770);
+    if (loading) return <div><p colSpan={4}>Cargando...</p></div>;
 
     return (
         <>
@@ -110,54 +129,42 @@ const TableLinkComponent = ({ token, links, search, rowsPerPage, currentPage, se
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th
-                            className="text-center"
-                            style={{ width: isSmallScreen ? "15%" : "55%" }}>
-                            Dirección Web
-                        </th>
-                        <th
-                            className="text-center"
-                            style={{ width: isSmallScreen ? "55%" : "15%" }}>
-                            Acciones
-                        </th>
+                        <th style={{ width: isSmallScreen ? "15%" : "45%" }}>Dirección Web</th>
+                        <th style={{ width: isSmallScreen ? "45%" : "15%" }}>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentLinks?.map((linkItem, idx) => {
+                    {currentLinks.map((linkItem, idx) => (
+                        <tr key={idx}>
+                            <td>{linkItem.id}</td>
+                            <td style={{
+                                maxWidth: isSmallScreen ? "180px" : "auto",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                            }}>
+                                {linkItem.name}
+                            </td>
+                            <td>
+                                <a href={linkItem.web} target="_blank" rel="noopener noreferrer">
+                                    {isSmallScreen ? "Enlace" : linkItem.web}
+                                </a>
+                            </td>
+                            <td>
+                                <div className="d-flex justify-content-center flex-wrap gap-1">
+                                    <Button color="warning" size="sm" onClick={() => handleModify(linkItem)}>✏️</Button>
+                                    <Button color="danger" size="sm" onClick={() => handleDelete(linkItem)}>🗑️</Button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
 
-                        return (
-                            <tr key={idx}>
-                                <td> {linkItem?.id || "\u00A0"} </td>
-                                <td> {linkItem?.name || "\u00A0"} </td>
-                                <td> {<a href={linkItem?.web} target="_blank"> {isSmallScreen ? "Enlace" : linkItem?.web } </a> || "\u00A0"} </td>
-                                <td className="text-center">
-                                    <div className="d-flex justify-content-center flex-wrap m">
-                                        <Button color="warning" size="sm" className="me-1 mb-1" onClick={() => handleModify(linkItem)}> ✏️ </Button>
-                                        <Button color="danger" size="sm" className="me-1 mb-1" onClick={() => handleDelete(linkItem)}> 🗑️ </Button>
-                                    </div>
-                                </td>
-                            </tr>
-                        );
-                    })}
-
-                    {/* Filas vacías */}
-                    {rowsPerPage - currentLinks?.length > 0 &&
-                        [...Array(rowsPerPage - currentLinks?.length)].map((_, idx) => (
-                            <tr key={`empty-${idx}`} style={{ height: '50px' }}>
-                                <td colSpan={4}></td>
-                            </tr>
-                        ))
-                    }
+                    {[...Array(rowsPerPage - currentLinks.length)].map((_, i) => (
+                        <tr key={"empty-" + i} style={{ height: "50px" }}><td colSpan={4}></td></tr>
+                    ))}
                 </tbody>
             </Table>
-
-            <div className="mt-auto" style={{ minHeight: '40px' }}>
-                {totalPages > 1 ? (
-                    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-                ) : (
-                    <div style={{ height: '40px' }}></div>
-                )}
-            </div>
+            {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
         </>
     );
 };
