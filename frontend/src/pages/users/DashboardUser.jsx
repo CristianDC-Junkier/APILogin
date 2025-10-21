@@ -1,36 +1,24 @@
 ﻿import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardTitle, CardText, Button, Input } from "reactstrap";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
-import { getUsersList, createUser } from "../../services/UserService";
-import { getDepartmentList } from "../../services/DepartmentService";
+import { createUser } from "../../services/UserService";
 import { useAuth } from "../../hooks/useAuth";
 
 import BackButton from "../../components/utils/BackButtonComponent";
-import Spinner from '../../components/utils/SpinnerComponent';
 import TableUserComponent from "../../components/user/TableUserComponent";
-import AddModifyUserCommponent from "../../components/user/AddModifyUserComponent";
-
-/**
- * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
- */
+import AddModifyUserComponent from "../../components/user/AddModifyUserComponent"; 
 
 const DashBoardUser = () => {
-    const { user: currentUser, token, logout } = useAuth();
-    const navigate = useNavigate();
+    const { user: currentUser, token } = useAuth();
 
-    const [loading, setLoading] = useState(true);
-
-    const [users, setUsers] = useState([]);
-    const [departments, setDepartments] = useState([]);
-    const [usersShow, setUsersShow] = useState([]);
     const [selectedType, setSelectedType] = useState("All");
-
     const [selectedUser, setSelectedUser] = useState("");
-
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
+
+    // Estado de estadísticas
+    const [stats, setStats] = useState({ total: 0, admin: 0, user: 0 });
 
     // Ajusta el número de filas según altura de ventana
     useEffect(() => {
@@ -40,76 +28,23 @@ const DashBoardUser = () => {
             const rowHeight = 50;
             const footerHeight = 150;
             setRowsPerPage(Math.max(3, Math.floor((vh - headerHeight - footerHeight) / rowHeight)));
+            setCurrentPage(1);
         };
         updateRows();
         window.addEventListener("resize", updateRows);
         return () => window.removeEventListener("resize", updateRows);
     }, []);
 
-
-    // Funciones encargadas de obtener la información para la tabla
-    const fetchUsers = async () => {
-        if (!token) return;
-        setLoading(true);
-        try {
-            const responseUserList = await getUsersList(token);
-            if (responseUserList.success) {
-                setUsers(responseUserList.data.users ?? []);
-            }
-        } catch {
-            Swal.fire("Error", "No se pudo obtener la lista de usuarios", 'error');
-        }
-        setLoading(false);
-    };
-
-    const fetchDepartments = async () => {
-        if (!token) return;
-        setLoading(true);
-        try {
-            const responseDepartmentList = await getDepartmentList(token);
-            if (responseDepartmentList.success) {
-                setDepartments(responseDepartmentList.data.departments ?? []);
-            }
-        } catch {
-            Swal.fire("Error", "No se pudo obtener la lista de departamentos", 'error');
-        }
-        setLoading(false);
-    };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { fetchUsers(); fetchDepartments(); }, [token, currentUser, logout, navigate]);
-
-
-    useEffect(() => {
-        let filtered = [...users];
-        if (selectedType === "Admin") {
-            filtered = filtered.filter(u => u.user.usertype === "ADMIN" || u.user.usertype === "SUPERADMIN");
-        } else if (selectedType === "User") {
-            filtered = filtered.filter(u => u.user.usertype === "USER");
-        }
-        setUsersShow(filtered);
-        setCurrentPage(1);
-    }, [selectedType, users]);
-
-    // Estadísticas
-    const stats = {
-        total: users.length,
-        admin: users.filter(u => u.user.usertype === "ADMIN" || u.user.usertype === "SUPERADMIN").length,
-        user: users.filter(u => u.user.usertype === "USER").length,
-    };
-
-
-    //Función que gestiona la creación de un usuario
+    // Crear usuario (solo refresca la tabla)
     const handleCreate = async () => {
-        await AddModifyUserCommponent({
+        await AddModifyUserComponent({
             currentUser,
             action: "create",
             onConfirm: async (formValues) => {
                 const result = await createUser(formValues, token);
                 if (result.success) {
                     Swal.fire("Éxito", "Usuario creado correctamente", "success");
-                    const response = await getUsersList(token);
-                    if (response.success) fetchUsers();
+                    window.dispatchEvent(new Event("refresh-users"));
                 } else {
                     Swal.fire("Error", result.error || "No se pudo crear el usuario", "error");
                 }
@@ -117,10 +52,7 @@ const DashBoardUser = () => {
         });
     };
 
-    if (loading) return <Spinner />;
-
     return (
-
         <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
             {/* Botón Volver arriba a la izquierda */}
             <div className="position-absolute top-0 start-0">
@@ -161,18 +93,15 @@ const DashBoardUser = () => {
                             </CardBody>
                         </Card>
                     </Col>
-
                 ))}
             </Row>
 
             {/* Fila con tipo de usuario seleccionado + búsqueda */}
             <div className="d-flex justify-content-between mb-2 align-items-center">
-                {/* título */}
-                <div className="fw-bold fs-6 d-flex justify-content-between mb-2 align-items-center">
+                <div className="fw-bold fs-6">
                     {selectedType === "All" ? "Todos los usuarios" : selectedType === "Admin" ? "Administradores" : "Usuarios"}
                 </div>
 
-                {/* contenedor de inputs */}
                 <div className="d-flex gap-2">
                     <Input
                         type="text"
@@ -186,16 +115,14 @@ const DashBoardUser = () => {
 
             {/* Tabla de usuarios */}
             <TableUserComponent
-                users={usersShow}
-                departments={departments}
-                currentUser={currentUser}
                 token={token}
+                currentUser={currentUser}
                 search={selectedUser}
-                setSearch={setSelectedUser}
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 rowsPerPage={rowsPerPage}
-                refreshData={fetchUsers}
+                filterType={selectedType}
+                onStatsUpdate={setStats}
             />
         </Container>
     );
