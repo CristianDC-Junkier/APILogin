@@ -30,7 +30,6 @@ const DepartmentList = () => {
     // Ajuste dinámico de filas según ventana
     useEffect(() => {
         const updateRows = () => {
-            console.log("Updating rows per page based on window height");
             const vh = window.innerHeight;
             const headerHeight = 220;
             const rowHeight = 50;

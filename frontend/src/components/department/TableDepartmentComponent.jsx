@@ -6,9 +6,14 @@ import { createRoot } from "react-dom/client";
 import { getDepartmentList, modifyDepartment, deleteDepartment, addLinkToDepartment, deleteLinkToDepartment } from "../../services/DepartmentService";
 import { getAllLinks } from "../../services/LinkService";
 
-import Pagination from "../../components/PaginationComponent";
-import CaptchaSlider from '../utils/CaptchaSliderComponent';
+import PaginationComponent from "../../components/PaginationComponent";
+import CaptchaSliderComponent from '../utils/CaptchaSliderComponent';
+import SpinnerComponent from "../utils/SpinnerComponent";
+
 import AddModifyDepartmentComponent from "./AddModifyDepartmentComponent";
+
+import DepartmentNameToolTipComponent from "../tooltip/DepartmentNameToolTipComponent";
+
 import BadgeComponent from "../badge/BadgeComponent";
 import AddBadgeComponent from "../badge/AddBadgeComponent";
 import RemovableBadgeComponent from "../badge/RemovableBadgeComponent";
@@ -35,17 +40,18 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
     const [loading, setLoading] = useState(true);
 
     /** Detectar pantallas pequeñas */
-    const useIsSmallScreen = (breakpoint = 770) => {
-        const [isSmall, setIsSmall] = useState(window.innerWidth < breakpoint);
+    const useIsSmallScreen = (breakpoint) => {
+        const [isSmall, setIsSmall] = useState(window.innerWidth <= breakpoint);
         useEffect(() => {
-            const handleResize = () => setIsSmall(window.innerWidth < breakpoint);
+            const handleResize = () => setIsSmall(window.innerWidth <= breakpoint);
             window.addEventListener("resize", handleResize);
             return () => window.removeEventListener("resize", handleResize);
         }, [breakpoint]);
         return isSmall;
     };
 
-    const isSmallScreen = useIsSmallScreen();
+    const isSmallScreen_v0 = useIsSmallScreen(991);
+    const isSmallScreen_v1 = useIsSmallScreen(767);
 
     /** Cargar departamentos **/
     useEffect(() => {
@@ -102,7 +108,7 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
         let completed = false;
 
         reactRoot.render(
-            <CaptchaSlider onSuccess={() => {
+            <CaptchaSliderComponent onSuccess={() => {
                 completed = true;
                 Swal.close();
                 resolve(true);
@@ -155,17 +161,17 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
         }
     };
 
-    if (loading) return <div><p colSpan={4}>Cargando...</p></div>;
+    if (loading) return <SpinnerComponent />;
 
     return (
         <>
             <Table striped responsive>
                 <thead>
                     <tr>
-                        <th style={{ width:"5%"}}> ID</th>
-                        <th style={{ width:"15%"}}> Nombre</th>
-                        <th style={{ width: isSmallScreen ? "25%" : "60%" }}>Enlaces</th>
-                        <th className="text-center" style={{ width: isSmallScreen ? "25%" : "10%" }}>Acciones</th>
+                        <th style={{ width: "5%" }}> ID</th>
+                        <th style={{ width: isSmallScreen_v1 ? "40%" : isSmallScreen_v0 ? "10%" : "10%" }}> Nombre</th>
+                        <th className="text-center" style={{ width: isSmallScreen_v1 ? "25%" : isSmallScreen_v0 ? "50%" : "60%" }}>Enlaces</th>
+                        <th className="text-center" style={{ width: isSmallScreen_v1 ? "20%" : isSmallScreen_v0 ? "15%" : "10%" }}>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -176,16 +182,13 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                         return (
                             <tr key={idx}>
                                 <td>{depItem.id}</td>
-                                <td style={{
-                                    maxWidth: isSmallScreen ? "180px" : "auto",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                }}>
-                                    {depItem.name}
-                                </td>
+                                <DepartmentNameToolTipComponent
+                                    depItem={depItem}
+                                    isSmallScreen_v0={isSmallScreen_v0}
+                                    isSmallScreen_v1={isSmallScreen_v1}
+                                />
                                 <td>
-                                    {isSmallScreen ? (
+                                    {isSmallScreen_v1 ? (
                                         depLinks?.length > 0 ? (
                                             <ShowMoreBadgeComponent
                                                 currentUser={currentUser}
@@ -249,12 +252,24 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                                         </>
                                     )}
                                 </td>
-                                <td className="text-center"> 
+                                <td className="text-center">
                                     <div className="d-flex justify-content-center flex-wrap gap-1">
                                         {canModify && (
                                             <>
-                                                <Button color="warning" size="sm" onClick={() => handleModify(depItem)}>✏️</Button>
-                                                <Button color="danger" size="sm" onClick={() => handleDelete(depItem)}>🗑️</Button>
+                                                <Button color="warning" size="sm"
+                                                    style={{
+                                                        padding: isSmallScreen_v0 ? "0.25rem 0.45rem" : "",
+                                                        fontSize: isSmallScreen_v0 ? "0.65rem" : "",
+                                                    }}
+                                                    onClick={() => handleModify(depItem)}>✏️
+                                                </Button>
+                                                <Button color="danger" size="sm"
+                                                    style={{
+                                                        padding: isSmallScreen_v0 ? "0.25rem 0.45rem" : "",
+                                                        fontSize: isSmallScreen_v0 ? "0.65rem" : "",
+                                                    }}
+                                                    onClick={() => handleDelete(depItem)}>🗑️
+                                                </Button>
                                             </>
                                         )}
                                     </div>
@@ -265,7 +280,7 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                     {[...Array(rowsPerPage - currentDepartments.length)].map((_, i) => <tr key={"empty-" + i} style={{ height: "50px" }}><td colSpan={4}></td></tr>)}
                 </tbody>
             </Table>
-            {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
+            {totalPages > 1 && <PaginationComponent currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
         </>
     );
 };

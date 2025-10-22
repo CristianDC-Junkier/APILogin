@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState, useMemo } from "react";
-import { Table, Button  } from "reactstrap";
+import { Table, Button } from "reactstrap";
 import { createRoot } from "react-dom/client";
 import Swal from "sweetalert2";
 import {
@@ -12,13 +12,14 @@ import {
 } from "../../services/UserService";
 import { getDepartmentList } from "../../services/DepartmentService";
 
-import CaptchaSlider from "../utils/CaptchaSliderComponent";
-import ResponsiveTextComponent from "../utils/ResponsiveTextComponent";
+import CaptchaSliderComponent from "../utils/CaptchaSliderComponent";
+import SpinnerComponent from "../utils/SpinnerComponent";
 import PaginationComponent from "../PaginationComponent";
 
 import AddModifyUserComponent from "./AddModifyUserComponent";
 import PWDAskComponent from "./PWDAskComponent";
-import UserTypeTooltipComponent from "./UserTypeTooltipComponent";
+import UserTypeToolTipComponent from "../tooltip/UserTypeToolTipComponent";
+import UserNameToolTipComponent from "../tooltip/UserNameToolTipComponent";
 
 import BadgeComponent from "../badge/BadgeComponent";
 import AddBadgeComponent from "../badge/AddBadgeComponent";
@@ -56,17 +57,20 @@ const TableUserComponent = ({
     const [loading, setLoading] = useState(true);
 
     /** Detectar pantallas pequeñas */
-    const useIsSmallScreen = (breakpoint = 770) => {
-        const [isSmall, setIsSmall] = useState(window.innerWidth < breakpoint);
+    const useIsSmallScreen = (breakpoint) => {
+        const [isSmall, setIsSmall] = useState(window.innerWidth <= breakpoint);
         useEffect(() => {
-            const handleResize = () => setIsSmall(window.innerWidth < breakpoint);
+            const handleResize = () => setIsSmall(window.innerWidth <= breakpoint);
             window.addEventListener("resize", handleResize);
             return () => window.removeEventListener("resize", handleResize);
         }, [breakpoint]);
         return isSmall;
     };
+    const isSmallScreen_v_1 = useIsSmallScreen(1199);
+    const isSmallScreen_v0 = useIsSmallScreen(991);
+    const isSmallScreen_v1 = useIsSmallScreen(767);
+    const isSmallScreen_v2 = useIsSmallScreen(560);
 
-    const isSmallScreen = useIsSmallScreen();
 
     /** Cargar usuarios y departamentos **/
     useEffect(() => {
@@ -130,7 +134,7 @@ const TableUserComponent = ({
         let completed = false;
 
         reactRoot.render(
-            <CaptchaSlider onSuccess={() => {
+            <CaptchaSliderComponent onSuccess={() => {
                 completed = true;
                 Swal.close();
                 resolve(true);
@@ -199,9 +203,9 @@ const TableUserComponent = ({
             Swal.fire("Error", err.message || "No se pudo marcar contraseña temporal", "error");
         }
     };
-   
 
-    if (loading) return <div><p colSpan={5}>Cargando...</p></div>;
+
+    if (loading) return <SpinnerComponent />;
 
     return (
         <>
@@ -209,11 +213,11 @@ const TableUserComponent = ({
                 <thead>
                     <tr>
                         <th style={{ width: "5%" }}>ID</th>
-                        <th style={{ width: "15%" }}>Usuario</th>
-                        <th style={{ width: "15%" }}>Tipo</th>
-                        <th className="text-center" style={{ width: isSmallScreen ? "25%" : "60%" }}>Departamentos</th>
-                        <th className="text-center" style={{ width: isSmallScreen ? "25%" : "10%" }}>
-                            <ResponsiveTextComponent fullText="Acciones" shortText="Accs" breakpoint={525} />
+                        <th style={{ width: isSmallScreen_v2 ? "20%" : isSmallScreen_v0 ? "10%" : "15%" }}>Usuario</th>
+                        <th style={{ width: isSmallScreen_v0 ? "5%" : "10%" }}>Tipo</th>
+                        <th className="text-center" style={{ width: isSmallScreen_v2 ? "15%" : isSmallScreen_v1 ? "40%" : isSmallScreen_v0 ? "60%" : "53%" }}>Departamentos</th>
+                        <th className="text-center" style={{ width: isSmallScreen_v2 ? "35%" : isSmallScreen_v1 ? "40%" : isSmallScreen_v0 ? "20%" : "25%" }}>
+                            Acciones
                         </th>
                     </tr>
                 </thead>
@@ -231,24 +235,15 @@ const TableUserComponent = ({
                         return (
                             <tr key={idx}>
                                 <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>{user.id}</td>
-                                <td
-                                    style={{
-                                        maxWidth: isSmallScreen ? "165px" : "auto",
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                        color: isCurrentUser ? "blue" : "inherit",
-                                        fontWeight: isCurrentUser ? "bold" : "normal"
-                                    }}
-                                >
-                                    {user.username}
-                                </td>
+                                <UserNameToolTipComponent user={user} isSmallScreen_v0={isSmallScreen_v0}
+                                    isSmallScreen_v1={isSmallScreen_v1} isSmallScreen_v2={isSmallScreen_v2}
+                                    isCurrentUser={isCurrentUser} />
                                 <td>
-                                    <UserTypeTooltipComponent user={user} isSmallScreen={isSmallScreen} isCurrentUser={isCurrentUser} />
+                                    <UserTypeToolTipComponent user={user} isSmallScreen={isSmallScreen_v_1} isCurrentUser={isCurrentUser} />
                                 </td>
                                 <td>
                                     <div className="d-flex flex-wrap m" style={{ gap: "0.1rem" }}>
-                                        {isSmallScreen ? (
+                                        {isSmallScreen_v1 ? (
                                             userDeps?.length > 0 ? (
                                                 <ShowMoreBadgeComponent
                                                     currentUser={currentUser}
@@ -332,13 +327,39 @@ const TableUserComponent = ({
                                         {!isCurrentUser && (
                                             <>
                                                 {canModify && !isSuperAdminUser && (
-                                                    <Button color="info" size="sm" onClick={() => handlePWDC(user)}>🔑</Button>
+                                                    <Button
+                                                        color="info"
+                                                        size="sm"
+                                                        style={{
+                                                            padding: isSmallScreen_v0 ? "0.25rem 0.45rem" : "",
+                                                            fontSize: isSmallScreen_v0 ? "0.65rem" : "",
+                                                        }}
+                                                        onClick={() => handlePWDC(user)}
+                                                    >
+                                                        🔑
+                                                    </Button>
                                                 )}
                                                 {canModify && !isSuperAdminUser && (
-                                                    <Button color="warning" size="sm" onClick={() => handleModify(user)}>✏️</Button>
+                                                    <Button
+                                                        color="warning"
+                                                        size="sm"
+                                                        style={{
+                                                            padding: isSmallScreen_v0 ? "0.25rem 0.45rem" : "",
+                                                            fontSize: isSmallScreen_v0 ? "0.65rem" : "",
+                                                        }}
+                                                        onClick={() => handleModify(user)}>✏️
+                                                    </Button>
                                                 )}
                                                 {!isSuperAdminUser && (
-                                                    <Button color="danger" size="sm" onClick={() => handleDelete(user)}>🗑️</Button>
+                                                    <Button
+                                                        color="danger"
+                                                        size="sm"
+                                                        style={{
+                                                            padding: isSmallScreen_v0 ? "0.25rem 0.45rem" : "",
+                                                            fontSize: isSmallScreen_v0 ? "0.65rem" : "",
+                                                        }}
+                                                        onClick={() => handleDelete(user)}>🗑️
+                                                    </Button>
                                                 )}
                                             </>
                                         )}

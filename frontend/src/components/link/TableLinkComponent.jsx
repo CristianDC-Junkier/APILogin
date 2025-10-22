@@ -1,28 +1,49 @@
 ﻿import React, { useEffect, useState, useMemo } from "react";
 import { Table, Button } from "reactstrap";
-import { createRoot } from "react-dom/client";
 import Swal from "sweetalert2";
+import { createRoot } from "react-dom/client";
+
+import { getAllLinks, modifyLink, deleteLink } from "../../services/LinkService";
+
 import CaptchaSlider from '../utils/CaptchaSliderComponent';
 import AddModifyLinkComponent from "./AddModifyLinkComponent";
-import { getAllLinks, modifyLink, deleteLink } from "../../services/LinkService";
-import Pagination from "../../components/PaginationComponent";
 
+import SpinnerComponent from "../utils/SpinnerComponent";
+import LinkNameToolTipComponent from "../tooltip/LinkNameToolTipComponent";
+
+import PaginationComponent from "../PaginationComponent";
+
+/**
+ * Componente que muestra la tabla de links del sistema.
+ * 
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.token - Token JWT del usuario autenticado.
+ * @param {string} props.search - Filtro de búsqueda por nombre del link.
+ * @param {number} props.rowsPerPage - Número de filas mostradas por página.
+ * @param {number} props.currentPage - Página actual de la tabla.
+ * @param {function} props.setCurrentPage - Función para cambiar la página actual.
+ * @param {function} props.onStatsUpdate - Callback para actualizar estadísticas de links.
+ * @returns {JSX.Element} Tabla interactiva de departamentos.
+ */
 const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate }) => {
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
 
     /** Detectar pantallas pequeñas */
-    const useIsSmallScreen = (breakpoint = 770) => {
-        const [isSmall, setIsSmall] = useState(window.innerWidth < breakpoint);
+    const useIsSmallScreen = (breakpoint) => {
+        const [isSmall, setIsSmall] = useState(window.innerWidth <= breakpoint);
         useEffect(() => {
-            const handleResize = () => setIsSmall(window.innerWidth < breakpoint);
+            const handleResize = () => setIsSmall(window.innerWidth <= breakpoint);
             window.addEventListener("resize", handleResize);
             return () => window.removeEventListener("resize", handleResize);
         }, [breakpoint]);
         return isSmall;
     };
 
-    const isSmallScreen = useIsSmallScreen();
+    const isSmallScreen_v_1 = useIsSmallScreen(1199);
+    const isSmallScreen_v0 = useIsSmallScreen(991);
+    const isSmallScreen_v1 = useIsSmallScreen(767);
 
     /** Cargar links **/
     useEffect(() => {
@@ -110,7 +131,7 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
 
     /** Eliminar enlace **/
     const handleDelete = async linkItem => {
-        await showCaptcha(); 
+        await showCaptcha();
         const result = await deleteLink(linkItem.id, token);
         if (result.success) {
             Swal.fire("Éxito", "Enlace eliminado correctamente", "success");
@@ -120,40 +141,53 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
         }
     };
 
-    if (loading) return <div><p colSpan={4}>Cargando...</p></div>;
+    if (loading) return <SpinnerComponent />;
 
     return (
         <>
             <Table striped responsive>
                 <thead>
                     <tr>
-                        <th style={{ width:"5%"}}>ID</th>
-                        <th style={{ width:"10%"}}>Nombre</th>
-                        <th style={{ width: isSmallScreen ? "25%" : "60%" }}>Dirección Web</th>
-                        <th className="text-center" style={{ width: isSmallScreen ? "13%" : "10%" }}>Acciones</th>
+                        <th style={{ width: "5%" }}>ID</th>
+                        <th style={{ width: isSmallScreen_v1 ? "10%" : isSmallScreen_v0 ? "10%" : isSmallScreen_v_1 ? "15%" : "15%" }}>Nombre</th>
+                        <th className="text-center" style={{ width: isSmallScreen_v1 ? "55%" : isSmallScreen_v0 ? "65%" : isSmallScreen_v_1 ? "55%" : "70%" }}>Dirección Web</th>
+                        <th className="text-center" style={{ width: isSmallScreen_v1 ? "15%" : isSmallScreen_v0 ? "10%" : isSmallScreen_v_1 ? "10%" : "15%" }}>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {currentLinks.map((linkItem, idx) => (
                         <tr key={idx}>
                             <td>{linkItem.id}</td>
+                            <LinkNameToolTipComponent
+                                linkItem={linkItem}
+                                isSmallScreen_v0={isSmallScreen_v0}
+                                isSmallScreen_v1={isSmallScreen_v1}
+                            />
                             <td style={{
-                                maxWidth: isSmallScreen ? "180px" : "auto",
+                                maxWidth: isSmallScreen_v1 ? "100px" : isSmallScreen_v0 ? "160px" : isSmallScreen_v_1 ? "160px" : "400px",
                                 whiteSpace: "nowrap",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                             }}>
-                                {linkItem.name}
-                            </td>
-                            <td>
                                 <a href={linkItem.web} target="_blank" rel="noopener noreferrer">
-                                    {isSmallScreen ? "Enlace" : linkItem.web}
+                                    {linkItem.web}
                                 </a>
                             </td>
                             <td className="text-center">
                                 <div className="d-flex justify-content-center flex-wrap gap-1">
-                                    <Button color="warning" size="sm" onClick={() => handleModify(linkItem)}>✏️</Button>
-                                    <Button color="danger" size="sm" onClick={() => handleDelete(linkItem)}>🗑️</Button>
+                                    <Button color="warning" size="sm"
+                                        style={{
+                                            padding: isSmallScreen_v0 ? "0.25rem 0.45rem" : "",
+                                            fontSize: isSmallScreen_v0 ? "0.65rem" : "",
+                                        }}
+                                        onClick={() => handleModify(linkItem)}>✏️
+                                    </Button>
+                                    <Button color="danger" size="sm" style={{
+                                        padding: isSmallScreen_v0 ? "0.25rem 0.45rem" : "",
+                                        fontSize: isSmallScreen_v0 ? "0.65rem" : "",
+                                    }}
+                                        onClick={() => handleDelete(linkItem)}>🗑️
+                                    </Button>
                                 </div>
                             </td>
                         </tr>
@@ -164,7 +198,7 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
                     ))}
                 </tbody>
             </Table>
-            {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
+            {totalPages > 1 && <PaginationComponent currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
         </>
     );
 };

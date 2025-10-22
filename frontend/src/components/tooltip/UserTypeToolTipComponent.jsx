@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import { useState } from "react";
 import { Tooltip } from "reactstrap";
 
 /**
@@ -14,7 +14,7 @@ import { Tooltip } from "reactstrap";
  * @param {boolean} props.isCurrentUser - Indica si el usuario mostrado es el usuario actualmente autenticado.
  * @returns {JSX.Element} Elemento visual que muestra el tipo de usuario con o sin tooltip según el tamaño de la pantalla.
  */
-const UserTypeTooltipComponent = ({ user, isSmallScreen, isCurrentUser }) => {
+const UserTypeToolTipComponent = ({ user, isSmallScreen, isCurrentUser }) => {
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const tooltipId = `type-${user.id}`;
 
@@ -41,7 +41,8 @@ const UserTypeTooltipComponent = ({ user, isSmallScreen, isCurrentUser }) => {
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 color: isCurrentUser ? "blue" : "inherit",
-                fontWeight: isCurrentUser ? "bold" : "normal"
+                fontWeight: isCurrentUser ? "bold" : "normal",
+                cursor: isSmallScreen ? "help" : "default",
             }}
         >
             {displayText}
@@ -60,4 +61,4 @@ const UserTypeTooltipComponent = ({ user, isSmallScreen, isCurrentUser }) => {
 };
 
 
-export default UserTypeTooltipComponent;
+export default UserTypeToolTipComponent;
