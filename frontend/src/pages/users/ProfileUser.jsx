@@ -27,13 +27,11 @@ const ProfileUser = () => {
 
     // Desde el AuthContext
     const { version, logout, update } = useAuth();
-
     /**
      * Cargar perfil del usuario
      */
     const fetchData = async () => {
         setLoading(true);
-
         try {
             let profileResp = await getProfile(version);
 

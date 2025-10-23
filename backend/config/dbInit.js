@@ -74,6 +74,7 @@ async function initDatabase() {
                 password: 'admin',//InformaticaAlcaldia#Almonte
                 usertype: superAdminType,
                 forcePwdChange: false,
+                version: 0,
             });
             LoggerController.info('✅ Superadmin creado correctamente');
         }
