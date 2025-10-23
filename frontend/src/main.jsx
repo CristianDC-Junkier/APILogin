@@ -8,9 +8,7 @@ import './styles/Global.css';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <BrowserRouter basename='/IDEE-Almonte'>
-            <App />
-        </BrowserRouter>
-    </React.StrictMode>
+    <BrowserRouter basename='/IDEE-Almonte'>
+        <App />
+    </BrowserRouter>
 );

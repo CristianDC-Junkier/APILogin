@@ -34,21 +34,21 @@ const FooterComponent = () => {
                 <div className="text-end me-2 ">
                     <small className="fs-7 footer-links">
                         <a
-                            href="/visor-sig/data-compromise"
+                            href="/IDEE-Almonte/data-compromise"
                             className={`text-white text-decoration-none ${isActive("/data-compromise") ? "active-link" : ""}`}
                         >
                             Protección de Datos
                         </a>
                         <span className="mx-1">|</span>
                         <a
-                            href="/visor-sig/privacity-politic"
+                            href="/IDEE-Almonte/privacity-politic"
                             className={`text-white text-decoration-none ${isActive("/privacity-politic") ? "active-link" : ""}`}
                         >
                             Política de Privacidad
                         </a>
                         <span className="mx-1">|</span>
                         <a
-                            href="/visor-sig/cookies-politic"
+                            href="/IDEE-Almonte/cookies-politic"
                             className={`text-white text-decoration-none ${isActive("/cookies-politic") ? "active-link" : ""}`}
                         >
                             Política de Cookies

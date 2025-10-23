@@ -13,7 +13,7 @@ import "../../styles/web/WebListPage.css";
  */
 
 const WebListPage = () => {
-    const { user, token } = useAuth();
+    const { user } = useAuth();
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [openId, setOpenId] = useState(null);
@@ -21,8 +21,9 @@ const WebListPage = () => {
 
     useEffect(() => {
         const fetchLinks = async () => {
+            setLoading(true);
             try {
-                const response = await getLinksByProfileList(token, user.version);
+                const response = await getLinksByProfileList(user.version);
                 setDepartments(response.data.departments || []);
             } catch (err) {
                 console.error(err);
@@ -31,7 +32,7 @@ const WebListPage = () => {
             }
         };
         fetchLinks();
-    }, [token, user.version]);
+    }, [user.version]);
 
     const toggle = (id) => {
         setOpenId(openId === id ? null : id);

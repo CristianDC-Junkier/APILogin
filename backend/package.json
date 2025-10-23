@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "visor-sig",
   "version": "1.0.0",
   "main": "server.js",
@@ -20,6 +20,7 @@
     "mariadb": "^3.4.5",
     "mysql2": "^3.14.5",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "uuid": "^13.0.0"
   }
 }

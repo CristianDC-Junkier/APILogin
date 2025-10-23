@@ -13,7 +13,7 @@ import AddModifyUserComponent from "../../components/user/AddModifyUserComponent
  * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
  */
 const DashBoardUser = () => {
-    const { user: currentUser, token } = useAuth();
+    const { user: currentUser } = useAuth();
 
     const [selectedType, setSelectedType] = useState("All");
     const [selectedUser, setSelectedUser] = useState("");
@@ -44,7 +44,7 @@ const DashBoardUser = () => {
             currentUser,
             action: "create",
             onConfirm: async (formValues) => {
-                const result = await createUser(formValues, token);
+                const result = await createUser(formValues);
                 if (result.success) {
                     Swal.fire("Éxito", "Usuario creado correctamente", "success");
                     window.dispatchEvent(new Event("refresh-users"));
@@ -118,7 +118,6 @@ const DashBoardUser = () => {
 
             {/* Tabla de usuarios */}
             <TableUserComponent
-                token={token}
                 currentUser={currentUser}
                 search={selectedUser}
                 currentPage={currentPage}

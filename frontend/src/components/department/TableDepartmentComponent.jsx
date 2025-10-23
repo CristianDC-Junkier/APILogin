@@ -24,7 +24,6 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
  * 
  * @component
  * @param {Object} props - Propiedades del componente.
- * @param {string} props.token - Token JWT del usuario autenticado.
  * @param {string} props.search - Filtro de búsqueda por nombre de departamento.
  * @param {number} props.rowsPerPage - Número de filas mostradas por página.
  * @param {number} props.currentPage - Página actual de la tabla.
@@ -34,7 +33,7 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
  * @param {function} props.onStatsLinksUpdate - Callback para actualizar estadísticas de enlaces.
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
-const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate }) => {
+const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate }) => {
     const [departments, setDepartments] = useState([]);
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -56,12 +55,11 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
     /** Cargar departamentos **/
     useEffect(() => {
         const fetchAll = async () => {
-            if (!token) return;
             setLoading(true);
             try {
                 const [depRes, linkRes] = await Promise.all([
-                    getDepartmentList(token),
-                    getAllLinks(token)
+                    getDepartmentList(),
+                    getAllLinks()
                 ]);
                 if (depRes.success) {
                     setDepartments(depRes.data.departments || []);
@@ -87,7 +85,7 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
         const handler = () => fetchAll();
         window.addEventListener("refresh-departments", handler);
         return () => window.removeEventListener("refresh-departments", handler);
-    }, [token, onStatsDepartsUpdate, onStatsLinksUpdate]);
+    }, [onStatsDepartsUpdate, onStatsLinksUpdate]);
 
     /** Filtrado por búsqueda **/
     const filteredDepartments = useMemo(
@@ -136,7 +134,7 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
             depItem,
             action: "modify",
             onConfirm: async (formValues) => {
-                const result = await modifyDepartment(depItem.id, formValues, token);
+                const result = await modifyDepartment(depItem.id, formValues);
                 if (result.success) {
                     Swal.fire("Éxito", "Departamento modificado correctamente", "success");
                     window.dispatchEvent(new Event("refresh-departments"));
@@ -152,7 +150,7 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
         try { await showCaptcha(); }
         catch { return; }
 
-        const result = await deleteDepartment(depItem.id, token);
+        const result = await deleteDepartment(depItem.id);
         if (result.success) {
             Swal.fire("Éxito", "Departamento eliminado correctamente", "success");
             window.dispatchEvent(new Event("refresh-departments"));
@@ -198,11 +196,11 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                                                 userObjects={depLinks}
                                                 availableObjs={depAvailableLinks}
                                                 onAdded={async l => {
-                                                    await addLinkToDepartment(depItem.id, l.id, token);
+                                                    await addLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }}
                                                 onDeleted={async l => {
-                                                    await deleteLinkToDepartment(depItem.id, l.id, token);
+                                                    await deleteLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }}
                                             />
@@ -211,7 +209,7 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                                                 availableObjs={depAvailableLinks}
                                                 objType="enlace"
                                                 onAdded={async l => {
-                                                    await addLinkToDepartment(depItem.id, l.id, token);
+                                                    await addLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }}
                                             />
@@ -220,7 +218,7 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                                         <>
                                             {depLinks.slice(0, 3).map(l => canModify
                                                 ? <RemovableBadgeComponent key={l.id} objName={l.name} objType="enlace" onDelete={async () => {
-                                                    await deleteLinkToDepartment(depItem.id, l.id, token);
+                                                    await deleteLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }} />
                                                 : <BadgeComponent key={l.id} objName={l.name} />
@@ -234,18 +232,18 @@ const TableDepartmentComponent = ({ token, search, rowsPerPage, currentPage, set
                                                     userObjects={depLinks}
                                                     availableObjs={depAvailableLinks}
                                                     onAdded={async l => {
-                                                        await addLinkToDepartment(depItem.id, l.id, token);
+                                                        await addLinkToDepartment(depItem.id, l.id);
                                                         window.dispatchEvent(new Event("refresh-departments"));
                                                     }}
                                                     onDeleted={async l => {
-                                                        await deleteLinkToDepartment(depItem.id, l.id, token);
+                                                        await deleteLinkToDepartment(depItem.id, l.id);
                                                         window.dispatchEvent(new Event("refresh-departments"));
                                                     }}
                                                 />
                                             )}
                                             {depLinks?.length <= 3 && canModify && (
                                                 <AddBadgeComponent availableObjs={depAvailableLinks} objType="enlace" onAdded={async l => {
-                                                    await addLinkToDepartment(depItem.id, l.id, token);
+                                                    await addLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }} />
                                             )}

@@ -1,4 +1,5 @@
 ﻿const express = require("express");
+const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const LoggerController = require("./controllers/LoggerController");
 const path = require("path");
@@ -14,7 +15,12 @@ const { initDatabase } = require("./config/dbInit");
 
 const app = express();
 
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+    origin: 'http://localhost:61939/', 
+    credentials: true               
+}));
+
 app.use(express.json());
 
 // --------------------------------
@@ -26,7 +32,7 @@ const SystemRoutes = require('./routes/SystemRoutes');
 const DepartmentRoutes = require('./routes/DepartmentRoutes');
 const LinksRoutes = require('./routes/LinksRoutes');
 
-app.use(`${basePath}/api`, AuthRoutes);
+app.use(`${basePath}/api/auth`, AuthRoutes);
 app.use(`${basePath}/api`, SystemRoutes);
 app.use(`${basePath}/api/user`, UserAccountRoutes);
 app.use(`${basePath}/api/department`, DepartmentRoutes);
@@ -36,10 +42,10 @@ app.use(`${basePath}/api/link`, LinksRoutes);
 //            FRONTEND
 // --------------------------------
 
-app.use(basePath, express.static(path.join(__dirname, "./dist")));
+/*app.use(basePath, express.static(path.join(__dirname, "./dist")));
 app.use(basePath, (req, res) => {
     res.sendFile(path.join(__dirname, "./dist/index.html"));
-})
+})*/
 
 app.use('/', (req, res) => {
     res.redirect(`${basePath}/`);

@@ -17,7 +17,7 @@ import PWDChangeComponent from '../components/user/PWDChangeComponent';
  * @param {React.ReactNode} props.children - Componentes hijos que se mostrarán si el usuario está autenticado.
  */
 const PrivateRoute = ({ children }) => {
-    const { user, loading, token } = useAuth();
+    const { user, loading } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,7 +30,7 @@ const PrivateRoute = ({ children }) => {
     return (
         <>
             {/* Prompt para cambio de contraseña si es necesario */}
-            {user?.forcePwdChange && <PWDChangeComponent user={user} token={token} />}
+            {user?.forcePwdChange && <PWDChangeComponent user={user} />}
             {user ? children : <SpinnerComponent />}
         </>
     );

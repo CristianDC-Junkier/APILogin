@@ -1,211 +1,123 @@
 ﻿/* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useState, useEffect } from 'react';
-import { login, logout, getVersion } from '../services/AuthService';
-import CryptoJS from 'crypto-js';
-import Swal from "sweetalert2";
+import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { login, logout, refreshAccessToken } from '../services/AuthService';
+import { setUpdateUserState } from '../utils/AuthInterceptorHelper';
+import SpinnerComponent from '../components/utils/SpinnerComponent';
 
 export const AuthContext = createContext();
 
-const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
-
 /**
- * Proveedor de autenticación.
- *
- * Props:
- * - children: Componentes que consumen el contexto AuthContext.
- *
- * Funcionalidades:
- * - Guarda y recupera usuario en storage (session/local) cifrado con AES.
- * - Maneja expiración de sesión.
- * - Proporciona métodos login y logout para consumir en cualquier componente.
+ * Proveedor de autenticación usando cookie HttpOnly
  */
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null); // Usuario actual
-    const [token, setToken] = useState(null); // Token actual
+    const [user, setUser] = useState(null);      // Usuario actual
+    const [version, setVersion] = useState(0);   // Versión del usuario
     const [loading, setLoading] = useState(true); // Estado de carga inicial
-    const [version, setVersion] = useState(0); // Versión del usuario
 
     /**
-     * Guarda el usuario en storage cifrado con expiración.
-     * @param {Object} userData - Información del usuario.
-     * @param {boolean} rememberMe - true → localStorage, false → sessionStorage.
+     * Actualiza el usuario y su versión, función que será inyectada en el interceptor.
+     * Esta función debe ser estable.
+     * @param {Object} newUser - Objeto de usuario más reciente recibido del backend.
      */
-    const saveUserWithExpiry = (token, user, rememberMe) => {
-        const now = new Date();
-        const item = {
-            token,
-            user,
-            version: user.version || 0,
-            expiry: now.getTime() + 60 * 60 * 1000, // Expira en 1 hora
-        };
-
-        // Cifrar con AES
-        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(item), SECRET_KEY).toString();
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem("user", encrypted);
-
-    };
+    const contextUpdate = useCallback((newUser) => {
+        setUser(newUser);
+        setVersion(newUser.version || 0);
+    }, [version]); // Incluimos 'version' en dependencias para fines de logging y para que React sepa cuándo re-crear la función.
 
     /**
-     * Recupera el usuario desde storage y valida expiración.
-     * @returns {Object|null} Usuario descifrado o null si expira/no existe.
-     */
-    const getUserWithExpiry = () => {
-        const encrypted = sessionStorage.getItem("user") || localStorage.getItem("user");
-        if (!encrypted) return null;
-
-        try {
-            const bytes = CryptoJS.AES.decrypt(encrypted, SECRET_KEY);
-            const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            const now = new Date();
-            if (now.getTime() > decrypted.expiry) {
-                sessionStorage.removeItem("user");
-                localStorage.removeItem("user");
-                return null;
-            }
-            return decrypted;
-        } catch {
-            // En caso de error de descifrado → limpiar storage
-            sessionStorage.removeItem("user");
-            localStorage.removeItem("user");
-            return null;
-        }
-    };
-
-    /**  
-     * Restaurar usuario al cargar la app 
+     * Inyecta la función de actualización (contextUpdate) en el helper global.
+     * Se llama una sola vez para que el interceptor pueda usarla.
      */
     useEffect(() => {
-        const restoreAndCheckVersion = async () => {
-            const storedValues = getUserWithExpiry();
-            if (!storedValues) {
-                setLoading(false);
-                return;
-            }
-
-            setToken(storedValues.token);
-            setUser(storedValues.user);
-            setVersion(storedValues.version);
+        setUpdateUserState(contextUpdate);
+        return () => {
+            setUpdateUserState(null);
+        };
+    }, [contextUpdate]);
 
 
+    /** * Restaurar sesión al cargar la app usando cookie HttpOnly
+     */
+    useEffect(() => {
+        const restoreSession = async () => {
             try {
-                const result = await getVersion(storedValues.token);
-                if (result.success) {
-                    if (result.data.version !== storedValues.version) {
-                        //Si la versión no es correcta, cerrar sesión
-                        await contextLogout();
-                        await Swal.fire({
-                            icon: "warning",
-                            title: "Sesión expirada",
-                            html: 'Por motivos de seguridad su sesión expiró.<br> Por favor, vuelve a iniciar sesión.',
-                            confirmButtonText: "Aceptar",
-                        });
-                    }
-                }
+                const res = await refreshAccessToken();
+                if (!res.success) throw new Error("No hay sesión");
+
+                // Usamos contextUpdate para establecer el estado de manera consistente
+                contextUpdate(res.data.user);
             } catch {
-                //Si la cuenta no existe, cerrar sesión
-                await contextLogout();
-                await Swal.fire({
-                    icon: "warning",
-                    title: "Sesión eliminada",
-                    html: "Su cuenta ya no existe, <br> será redirigido al Inicio de Sesión.",
-                    confirmButtonText: "Aceptar",
-                });
+                // Si no hay sesión o hay error → limpiar estado
+                setUser(null);
+                setVersion(0);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
-        restoreAndCheckVersion();
-    }, []);
-
-    /** 
-     * Loguear usuario
-     * 
-     * @param {Object} credentials - { username, password, rememberMe }
-     * @return {Object} Resultado del login { success: boolean, data/message }
-     */ 
-    const contextLogin = async (credentials) => {
-        const result = await login(credentials);
-        if (result.success === true) {
-            const userLog = {
-                id: result.data.user.id,
-                username: result.data.user.username,
-                usertype: result.data.user.usertype,
-                forcePwdChange: result.data.user.forcePwdChange || false,
-                version: result.data.user.version || 0, // version desde backend
-            };
-            setUser(userLog);
-            setToken(result.data.token);
-            setVersion(userLog.version);
-            saveUserWithExpiry(result.data.token, userLog, credentials.remember);
-            return result;
-        } else {
-            setUser(null);
-            setToken(null);
-            setVersion(0);
-            sessionStorage.removeItem("user");
-            localStorage.removeItem("user");
-            return result;
-        }
-    };
+        restoreSession();
+    }, [contextUpdate]); // contextUpdate es estable gracias a useCallback.
 
     /**
-     * Actualiza el usuario y su versión en contexto y storage.
+     * Login
+     * @param {Object} credentials - { username, password, remember }
      */
-    const contextUpdate = (newUser, newToken) => {
-        setUser(newUser);
-        setVersion(newUser.version === version ? (version + 1) : newUser.version); // Incrementa si no viene versión del backend
+    const contextLogin = async (credentials) => {
+        try {
+            const result = await login(credentials);
 
-        // Guardar en storage
-        const storage = localStorage.getItem("user") ? localStorage : sessionStorage;
-        const existingEncrypted = storage.getItem("user");
-        if (existingEncrypted) {
-            try {
-                const bytes = CryptoJS.AES.decrypt(existingEncrypted, SECRET_KEY);
-                const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-                const updatedItem = {
-                    token: newToken,
-                    user: newUser,
-                    version: newUser.version,
-                    expiry: decrypted.expiry
+            if (result.success) {
+                // Reconstruimos el objeto para asegurar que tiene todas las propiedades clave
+                const userLog = {
+                    id: result.data.user.id,
+                    username: result.data.user.username,
+                    usertype: result.data.user.usertype,
+                    ...result.data.user, // Incluimos el resto de propiedades
+                    forcePwdChange: result.data.user.forcePwdChange || false,
+                    version: result.data.user.version || 0,
                 };
-                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(updatedItem), SECRET_KEY).toString();
-                storage.setItem("user", encrypted);
-            } catch {
-                storage.removeItem("user");
+                setUser(userLog);
+                setVersion(userLog.version);
+            } else {
+                setUser(null);
+                setVersion(0);
             }
+
+            return result;
+        } catch (err) {
+            setUser(null);
+            setVersion(0);
+            // Retorna un error consistente
+            return { success: false, message: err.message || "Error de inicio de sesión." };
         }
     };
 
     /**
-     * Cerrar sesión
+     * Logout
      */
     const contextLogout = async () => {
         try {
-            await logout(token);
-        }
-        finally {
+            await logout(); // la cookie HttpOnly se borra desde el backend
+        } finally {
             setUser(null);
-            setToken(null);
             setVersion(0);
-            sessionStorage.removeItem("user");
-            localStorage.removeItem("user");
         }
     };
+
 
     return (
         <AuthContext.Provider
             value={{
                 user,
-                token,
                 version,
                 loading,
                 login: contextLogin,
                 logout: contextLogout,
-                update: contextUpdate,
+                update: contextUpdate, // Exponer también la función para uso interno si es necesario
             }}
         >
-            {children}
+            {/* Mostrar un spinner de carga si es necesario antes de renderizar children */}
+            {loading ? <SpinnerComponent></SpinnerComponent> : children}
         </AuthContext.Provider>
     );
-};
+}

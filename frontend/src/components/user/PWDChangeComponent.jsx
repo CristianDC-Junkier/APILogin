@@ -7,11 +7,10 @@ import { useNavigate } from "react-router-dom";
 /**
  * Componente encargado de mostrar y gestionar el marcar a un usuario para cambio de contraseña
  * @param {Object} user - Usuario que va a ser marcado
- * @param {String} token - Token del usuario conectado
  * @returns
  */
 
-const PWDChangeComponent = ({ user, token }) => {
+const PWDChangeComponent = ({ user }) => {
     const { update, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -64,7 +63,7 @@ const PWDChangeComponent = ({ user, token }) => {
             });
 
             if (password) {
-                const res = await changePasswordPWD({ newPassword: password }, token, user.version);
+                const res = await changePasswordPWD({ newPassword: password }, user.version);
 
                 if (res.success) {
                     update({ ...user, forcePwdChange: false });
@@ -78,7 +77,7 @@ const PWDChangeComponent = ({ user, token }) => {
         };
 
         askPassword();
-    }, [user, token, update, logout, navigate]);
+    }, [user, update, logout, navigate]);
 
     return null; // No renderiza nada
 };

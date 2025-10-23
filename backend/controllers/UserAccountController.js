@@ -223,6 +223,66 @@ class UserAccountController {
     //#endregion
 
     //#region Métodos gestión de su propia cuenta
+
+    /**
+   * Recoge el perfil del usuario.
+   * 
+   * @param {Object} req - Objeto de petición de Express, con { user: { id }, query: { version } }.
+   * @param {Object} res - Objeto de respuesta de Express.
+   * @returns {JSON} - Perfil del usuario con sus departamentos, o mensaje de error.
+   */
+    static async getProfile(req, res) {
+        try {
+            const { id: userId } = req.user;
+            const { version } = req.query;
+
+            const user = await UserAccount.findByPk(userId, {
+                attributes: ['id', 'username', 'usertype', 'forcePwdChange', 'version', 'createdAt', 'updatedAt'],
+                include: [
+                    {
+                        model: Department,
+                        as: 'departments',
+                        attributes: ['id', 'name'],
+                        through: { attributes: [] }
+                    },
+                ],
+            });
+
+            if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+            if (user.version != version) {
+                return res.status(409).json({
+                    error: "Su usuario ha sido modificado anteriormente",
+                    latestUser: {
+                        id: user.id,
+                        username: user.username,
+                        usertype: user.usertype,
+                        forcePwdChange: user.forcePwdChange,
+                        version: user.version,
+                    },
+                });
+            }
+
+            res.json({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    forcePwdChange: user.forcePwdChange,
+                    version: user.version,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
+                },
+                departments: user.departments,
+            });
+
+
+        } catch (error) {
+            LoggerController.error('Error obtiendo el perfil del usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     /**
     * Permite al usuario autenticado modificar su propia cuenta.
     * 
@@ -237,8 +297,19 @@ class UserAccountController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(currentUser.id);
-            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
-            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+            if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+            if (user.version != version) {
+                return res.status(409).json({
+                    error: "Su usuario ha sido modificado anteriormente",
+                    latestUser: {
+                        id: user.id,
+                        username: user.username,
+                        usertype: user.usertype,
+                        forcePwdChange: user.forcePwdChange,
+                        version: user.version,
+                    },
+                });
+            };
 
             const updates = {};
 
@@ -318,9 +389,19 @@ class UserAccountController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
-
-            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+            if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+            if (user.version != version) {
+                return res.status(409).json({
+                    error: "Su usuario ha sido modificado anteriormente",
+                    latestUser: {
+                        id: user.id,
+                        username: user.username,
+                        usertype: user.usertype,
+                        forcePwdChange: user.forcePwdChange,
+                        version: user.version,
+                    },
+                });
+            };
 
             if (user.usertype === "SUPERADMIN") {
                 return res.status(403).json({ error: "Un SUPERADMIN no puede eliminarse" });
@@ -355,9 +436,19 @@ class UserAccountController {
             }
 
             const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
-
-            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+            if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+            if (user.version != version) {
+                return res.status(409).json({
+                    error: "Su usuario ha sido modificado anteriormente",
+                    latestUser: {
+                        id: user.id,
+                        username: user.username,
+                        usertype: user.usertype,
+                        forcePwdChange: user.forcePwdChange,
+                        version: user.version,
+                    },
+                });
+            };
 
             // Actualizar contraseña
             user.password = newPassword;
@@ -455,8 +546,19 @@ class UserAccountController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
-            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+            if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+            if (user.version != version) {
+                return res.status(409).json({
+                    error: "Su usuario ha sido modificado anteriormente",
+                    latestUser: {
+                        id: user.id,
+                        username: user.username,
+                        usertype: user.usertype,
+                        forcePwdChange: user.forcePwdChange,
+                        version: user.version,
+                    },
+                });
+            };
 
             const department = await Department.findByPk(departmentId);
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
@@ -497,8 +599,19 @@ class UserAccountController {
             const { version } = req.query;
 
             const user = await UserAccount.findByPk(id);
-            if (!user) return res.status(409).json({ error: "Su usuario no ha sido encontrado" });
-            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+            if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+            if (user.version != version) {
+                return res.status(409).json({
+                    error: "Su usuario ha sido modificado anteriormente",
+                    latestUser: {
+                        id: user.id,
+                        username: user.username,
+                        usertype: user.usertype,
+                        forcePwdChange: user.forcePwdChange,
+                        version: user.version,
+                    },
+                });
+            };
 
             const department = await Department.findByPk(departmentId);
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });

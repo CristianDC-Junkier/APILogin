@@ -18,7 +18,6 @@ import PaginationComponent from "../PaginationComponent";
  * 
  * @component
  * @param {Object} props - Propiedades del componente.
- * @param {string} props.token - Token JWT del usuario autenticado.
  * @param {string} props.search - Filtro de búsqueda por nombre del link.
  * @param {number} props.rowsPerPage - Número de filas mostradas por página.
  * @param {number} props.currentPage - Página actual de la tabla.
@@ -26,7 +25,7 @@ import PaginationComponent from "../PaginationComponent";
  * @param {function} props.onStatsUpdate - Callback para actualizar estadísticas de links.
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
-const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate }) => {
+const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate }) => {
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -48,10 +47,9 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
     /** Cargar links **/
     useEffect(() => {
         const fetchAll = async () => {
-            if (!token) return;
             setLoading(true);
             try {
-                const res = await getAllLinks(token);
+                const res = await getAllLinks();
                 if (res.success) {
                     setLinks(res.data.links || []);
 
@@ -70,7 +68,7 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
         const handler = () => fetchAll();
         window.addEventListener("refresh-links", handler);
         return () => window.removeEventListener("refresh-links", handler);
-    }, [token, onStatsUpdate]);
+    }, [onStatsUpdate]);
 
     /** Filtrado por búsqueda **/
     const filteredLinks = useMemo(
@@ -118,7 +116,7 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
             linkItem,
             action: "modify",
             onConfirm: async formValues => {
-                const result = await modifyLink(linkItem.id, formValues, token);
+                const result = await modifyLink(linkItem.id, formValues);
                 if (result.success) {
                     Swal.fire("Éxito", "Enlace modificado correctamente", "success");
                     window.dispatchEvent(new Event("refresh-links"));
@@ -132,7 +130,7 @@ const TableLinkComponent = ({ token, search, rowsPerPage, currentPage, setCurren
     /** Eliminar enlace **/
     const handleDelete = async linkItem => {
         await showCaptcha();
-        const result = await deleteLink(linkItem.id, token);
+        const result = await deleteLink(linkItem.id);
         if (result.success) {
             Swal.fire("Éxito", "Enlace eliminado correctamente", "success");
             window.dispatchEvent(new Event("refresh-links"));

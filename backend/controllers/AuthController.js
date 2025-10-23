@@ -1,7 +1,10 @@
-﻿const { UserAccount, Department, RefreshToken } = require("../models/Relations");
+﻿const { UserAccount, RefreshToken } = require("../models/Relations");
+const { v4: uuidv4 } = require("uuid");
 
-const { generateToken } = require("../utils/JWT");
 const LoggerController = require("../controllers/LoggerController");
+const { generateAccessToken, generateRefreshToken, verifyToken } = require("../utils/JWT");
+
+
 
 /**
  * Controlador de autenticación y gestión de usuarios.
@@ -25,32 +28,30 @@ class AuthController {
     static async login(req, res) {
         try {
             const { username, password, remember } = req.body;
-
-            if (!username || !password) {
+            if (!username || !password)
                 return res.status(400).json({ error: "Usuario y contraseña requeridos" });
-            }
 
-            const user = await UserAccount.findOne({
-                where: { username },
-                include: [
-                    {
-                        model: Department,
-                        as: 'departments',
-                        attributes: ['id', 'name'],
-                        through: { attributes: [] }
-                    },
-                ],
+            const user = await UserAccount.findOne({ where: { username } });
+            if (!user || user.password !== password)
+                return res.status(401).json({ error: "Credenciales incorrectas" });
+
+            // Genera tokens usando utilidades centralizadas
+            const accessToken = generateAccessToken({ id: user.id, username: user.username, usertype: user.usertype });
+            const refreshToken = await generateRefreshToken(user.id, remember);
+
+            // Envía refreshToken en cookie HTTP-only
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "Strict",
+                path: "/IDEE-Almonte/api/auth",
+                maxAge: remember ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
             });
 
-            if (!user || user.password !== password) {
-                return res.status(404).json({ error: "Credenciales incorrectas" });
-            }
+            LoggerController.info(`Sesión iniciada por ${user.username} (id: ${user.id})`);
 
-            const token = await generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
-            LoggerController.info('Sesion iniciada por ' + user.username + ' con id ' + user.id);
-
-            res.json({
-                token,
+            return res.json({
+                accessToken,
                 user: {
                     id: user.id,
                     username: user.username,
@@ -58,121 +59,121 @@ class AuthController {
                     forcePwdChange: user.forcePwdChange,
                     version: user.version,
                 },
-                departments: user.departments,
             });
+
         } catch (error) {
-            LoggerController.error('Error en el login - ' + error.message);
-            res.status(500).json({error: error.message });
+            LoggerController.error(`Error login - ${error.message}`);
+            return res.status(500).json({ error: error.message });
         }
     }
+
     /**
-    * Cierra la sesión de un usuario eliminando su refresh token.
-    * 
-    * El access token (JWT de 1h) no se elimina explícitamente, ya que expira
-    * automáticamente. El refresh token asociado al usuario se borra de la base
-    * de datos para evitar que se puedan generar nuevos access tokens.
+    * Cierra la sesión de un usuario eliminando su cookie HttpOnly.
     *
-    * @param {Object} req - Objeto de petición de Express, con { header: { token }, user: { id, username } }.
+    * @param {Object} req - Objeto de petición de Express (contiene req.cookies.refreshToken y req.user).
     * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Mensaje de exito o error.
+    * @returns {JSON} - Mensaje de éxito o error.
     */
     static async logout(req, res) {
         try {
-            const { id: userId, username: userName } = req.user;
-            const token = req.headers["authorization"].split(" ")[1];
+            const token = req.cookies?.refreshToken;
+            if (!token) return res.status(400).json({ error: "No hay sesión activa" });
 
-            // Buscar todos los refresh tokens del usuario
-            const userTokens = await RefreshToken.findAll({ where: { userId } });
 
-            // Buscar el token exacto comparando desencriptado
-            const tokenToDelete = userTokens.find(t => t.token === token);
-
-            LoggerController.info('Sesión cerrada correctamente por ' + userName + ' con id ' + userId);
-
-            if (tokenToDelete) {
-                // Eliminar el token correspondiente
-                await RefreshToken.destroy({ where: { id: tokenToDelete.id } });
-                return res.json({ message: "Logout exitoso" });
-            } else {
-                // No existe token de refresco asociado (no "recordar sesión")
-                return res.json({ message: "Logout exitoso" });
+            let payload;
+            try {
+                payload = verifyToken(token, "refresh");
+            } catch {
+                res.clearCookie("refreshToken", {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "Strict",
+                    path: "/IDEE-Almonte/api/auth"
+                });
+                return res.status(400).json({ error: "Sesión inválida" });
             }
+
+            await RefreshToken.destroy({ where: { uuid: payload.uuid } });
+            res.clearCookie("refreshToken", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "Strict",
+                path: "/IDEE-Almonte/api/auth"
+            });
+
+            LoggerController.info(`Logout exitoso usuario ${payload.userId}`);
+            return res.json({ message: "Logout exitoso" });
+
         } catch (error) {
-            LoggerController.error('Error en el logout por el usuario con id ' + req.user.id);
-            LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: "Error al cerrar sesión" });
+            LoggerController.error(`Error logout - ${error.message}`);
+            return res.status(500).json({ error: "Error al cerrar sesión" });
         }
     }
 
     /**
-    * Recoge el perfil del usuario.
-    * 
-    * @param {Object} req - Objeto de petición de Express, con { user: { id }, query: { version } }.
-    * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Perfil del usuario con sus departamentos, o mensaje de error.
-    */
-    static async getProfile(req, res) {
+     * Devuelve la información del usuario basada en la cookie HttpOnly y la renueva si es necesario.
+     * 
+     * @param {Object} req - Objeto de petición de Express
+     * @param {Object} res - Objeto de respuesta de Express
+     */
+    static async refreshToken(req, res) {
         try {
-            const { id: userId } = req.user;
-            const { version } = req.query;
+            const token = req.cookies?.refreshToken;
+            if (!token) return res.status(200).send("No existen tokens");
 
-            const user = await UserAccount.findByPk(userId, {
-                attributes: ['id', 'username', 'usertype', 'forcePwdChange', 'version', 'createdAt', 'updatedAt'],
-                include: [
-                    {
-                        model: Department,
-                        as: 'departments',
-                        attributes: ['id', 'name'],
-                        through: { attributes: [] }
-                    },
-                ],
-            });
+            let payload;
+            try {
+                payload = verifyToken(token, "refresh");
+            } catch {
+                return res.sendStatus(401);
+            }
 
-            if (!user) return res.status(409).json({ error: "Usuario no encontrado" });
-            if (user.version != version) return res.status(409).json({ error: "Su usuario ha sido modificado anteriormente" });
+            // Verifica que el UUID existe en DB
+            const tokenDB = await RefreshToken.findOne({ where: { uuid: payload.uuid, userId: payload.userId } });
+            if (!tokenDB) return res.sendStatus(401);
 
-            res.json({
+            // Verifica que no está caducado
+            const now = new Date();
+            if (tokenDB.expireDate < now) {
+                // Elimina token caducado
+                await RefreshToken.destroy({ where: { id: tokenDB.id } });
+                return res.sendStatus(401);
+            }
+
+            const user = await UserAccount.findByPk(payload.userId);
+            if (!user) return res.sendStatus(401);
+
+            // Genera nuevos tokens
+            const accessToken = generateAccessToken({ id: user.id, username: user.username, usertype: user.usertype });
+
+            if (payload.remember) {
+                await RefreshToken.destroy({ where: { uuid: payload.uuid } });
+                const newRefreshToken = await generateRefreshToken(user.id, payload.remember);
+
+                // Cookie con nuevo refreshToken
+                res.cookie("refreshToken", newRefreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "Strict",
+                    path: "/IDEE-Almonte/api/auth",
+                    maxAge: payload.remember ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
+                });
+            }
+
+            return res.json({
+                accessToken,
                 user: {
                     id: user.id,
                     username: user.username,
                     usertype: user.usertype,
                     forcePwdChange: user.forcePwdChange,
                     version: user.version,
-                    createdAt: user.createdAt,
-                    updatedAt: user.updatedAt,
                 },
-                departments: user.departments,
             });
 
-
         } catch (error) {
-            LoggerController.error('Error obtiendo el perfil del usuario con id ' + req.user.id);
-            LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
-        }
-    }
-
-    /**
-    * Recoge la versión del usuario.
-    * 
-    * @param {Object} req - Objeto de petición de Express, con { user: { id } }.
-    * @param {Object} res - Objeto de respuesta de Express.
-    * @returns {JSON} - Versión del usuario o mensaje de error.
-    */
-    static async getVersion(req, res) {
-        try {
-            const userVersion = await UserAccount.findByPk(req.user.id, {
-                attributes: ['version']
-            });
-
-            const version = userVersion?.version;
-
-            return res.json({ version });
-
-        } catch (error) {
-            LoggerController.error('Error recuperando la versión del usuario con id ' + req.user.id);
-            LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            LoggerController.error(`Error refreshToken - ${error.message}`);
+            return res.status(500).json({ error: "Error al refrescar token" });
         }
     }
 }

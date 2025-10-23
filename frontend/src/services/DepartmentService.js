@@ -16,14 +16,11 @@
 
 /**
  * Solicitud para obtener la lista de todos los departamentos existentes
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const getDepartmentList = async (token) => {
+export const getDepartmentList = async () => {
     try {
-        const res = await api.get('/department/', {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get('/department/');
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
@@ -36,14 +33,11 @@ export const getDepartmentList = async (token) => {
 /**
  * Solicitud de creación de un nuevo departamento
  * @param {Object} department - la información del departamento que se quiere crear
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const createDepartment = async (department, token) => {
+export const createDepartment = async (department) => {
     try {
-        const res = await api.post('/department/', department, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.post('/department/', department);
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
@@ -54,14 +48,11 @@ export const createDepartment = async (department, token) => {
  * Solicitud de modificación de un departamento existente
  * @param {String} id - ID del departamento que se quiere modificar
  * @param {Object} department - la información del departamento que se quiere modificar
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const modifyDepartment = async (id, department, token) => {
+export const modifyDepartment = async (id, department) => {
     try {
-        const res = await api.put(`/department/${id}`, department, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.put(`/department/${id}`, department);
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
@@ -71,14 +62,11 @@ export const modifyDepartment = async (id, department, token) => {
 /**
  * Solicitud de eliminación de un departamento
  * @param {Object} departmentId - ID del departamento que se quiere eliminar
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const deleteDepartment = async (departmentId, token) => {
+export const deleteDepartment = async (departmentId) => {
     try {
-        const res = await api.delete(`/department/${departmentId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.delete(`/department/${departmentId}`,);
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
@@ -91,14 +79,11 @@ export const deleteDepartment = async (departmentId, token) => {
  * Solicitud para añadir un enlace a un departamento
  * @param {String} depId - ID del departamento al que se va a añadir el enlace
  * @param {String} linkId - ID del enlace
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const addLinkToDepartment = async (depId, linkId, token) => {
+export const addLinkToDepartment = async (depId, linkId) => {
     try {
-        const res = await api.put(`/department/${depId}/add-links/${linkId}`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.put(`/department/${depId}/add-links/${linkId}`, {});
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
@@ -109,14 +94,11 @@ export const addLinkToDepartment = async (depId, linkId, token) => {
  * Solicitud para eliminar un enlace de un departamento
  * @param {String} depId - ID del departamento del que se va a eliminar el enlace
  * @param {String} linkId - ID del enlace
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const deleteLinkToDepartment = async (depId, linkId, token) => {
+export const deleteLinkToDepartment = async (depId, linkId) => {
     try {
-        const res = await api.put(`/department/${depId}/del-links/${linkId}`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.put(`/department/${depId}/del-links/${linkId}`, {});
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
@@ -125,15 +107,13 @@ export const deleteLinkToDepartment = async (depId, linkId, token) => {
 
 /**
  * Solicitud para obtener la lista de todos los departamentos del usuario que realiza la petición
- * @param {String} token - Token del usuario conectado para comprobar si tiene autorización
  * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
  * @returns {JSON} - Devuelve la información recibida de la llamada
  */
-export const getLinksByProfileList = async (token, version) => {
+export const getLinksByProfileList = async (version) => {
     try {
         const res = await api.get('/department/profile', {
-            params: { version },
-            headers: { Authorization: `Bearer ${token}` }
+            params: { version }
         });
         return { success: true, data: res.data };
     } catch (error) {

@@ -8,7 +8,6 @@
  * - Todos los usuarios tienen opción vacía en subdepartamento al crear nuevo usuario.
  * 
  * @param {Object} props
- * @param {string} props.token - Token de autenticación del usuario actual.
  * @param {Object} [props.userItem] - Usuario a modificar (si action === "modify").
  * @param {Object} props.currentUser - Usuario que está realizando la acción.
  * @param {string} props.action - "create" o "modify".
