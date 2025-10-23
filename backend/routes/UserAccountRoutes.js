@@ -9,6 +9,7 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  * Rutas para la gestión de cuentas de usuario.
  *
  * Endpoints:
+ * - GET    /profile                               → Recuperar perfil de usuario. (Usuarios identificados)
  * - PUT    /profile/update                        → Modificar la cuenta del usuario identificado. (Usuarios identificados)
  * - DELETE /profile/delete                        → Eliminar la cuenta del usuario identificado. (Usuarios identificados)
  * - PATCH  /profile/PWD                           → Modificar solo la contraseña del usuario identificado. (Usuarios identificados)
@@ -29,6 +30,7 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  * - `isAuthenticated`  → Restringe el acceso a usuarios autenticados.
  */
 
+router.get("/profile", isAuthenticated, UserAccountController.getProfile);
 router.put("/profile/update", isAuthenticated, UserAccountController.updateMyAccount);
 router.delete("/profile/delete", isAuthenticated, UserAccountController.deleteMyAccount);
 router.patch("/profile/PWD", isAuthenticated, UserAccountController.forcedPasswordChange);

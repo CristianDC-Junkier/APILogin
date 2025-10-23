@@ -7,7 +7,14 @@ import { FaUser, FaEdit, FaTrash, FaCalendarAlt } from 'react-icons/fa';
 import Spinner from '../../components/utils/SpinnerComponent';
 import { useAuth } from "../../hooks/useAuth";
 
-import { getProfile, modifyProfile, deleteProfile, addDepartmentProfile, deleteDepartmentProfile } from "../../services/UserService";
+import {
+    getProfile,
+    modifyProfile,
+    deleteProfile,
+    addDepartmentProfile,
+    deleteDepartmentProfile
+} from "../../services/UserService";
+
 import { getDepartmentList } from "../../services/DepartmentService";
 
 import BackButton from "../../components/utils/BackButtonComponent";
@@ -19,67 +26,81 @@ import ModifyUserAccountComponent from '../../components/user/ModifyUserAccountC
 /**
  * Página del perfil de usuario
  */
-
 const ProfileUser = () => {
-    const [profile, setProfile] = useState();
+    const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [availableDepartments, setAvailableDepartments] = useState([]);
     const navigate = useNavigate();
-    const { token, version, logout, update } = useAuth();
 
-    const fetchData = async (updatedVersion) => {
+    // Desde el AuthContext
+    const { version, logout, update } = useAuth();
 
-        if (!token) return;
+    /**
+     * Cargar perfil del usuario
+     */
+    const fetchData = async (forcedVersion) => {
         setLoading(true);
 
         try {
-            const profileResp = await getProfile(token, updatedVersion || version);
-            if (profileResp.success) {
-                profileResp.data.departments = [...profileResp.data.departments].sort((a, b) =>
+            const currentVersion = forcedVersion ?? version;
+
+            let profileResp = await getProfile(currentVersion);            
+
+            if (profileResp.success && profileResp.data) {
+                const sortedDepartments = [...profileResp.data.departments].sort((a, b) =>
                     a.name.localeCompare(b.name)
                 );
-                setProfile(profileResp.data);
-            }
+                const fullProfile = { ...profileResp.data, departments: sortedDepartments };
+                setProfile(fullProfile);
 
-            // Traer todos los departamentos disponibles
-            if (profileResp.data.user.usertype !== "USER") {
-                const deptResp = await getDepartmentList(token);
-                if (deptResp.success) {
-                    const availableDepartmentsAux = deptResp.data.departments
-                        .filter(d => !profileResp.data.departments.some(pd => pd.id === d.id))
-                        .sort((a, b) => a.name.localeCompare(b.name));
-
-                    setAvailableDepartments(availableDepartmentsAux);
+                if (fullProfile.user.usertype !== "USER") {
+                    const deptResp = await getDepartmentList();
+                    if (deptResp.success) {
+                        const availableDepartmentsAux = deptResp.data.departments
+                            .filter(d => !fullProfile.departments.some(pd => pd.id === d.id))
+                            .sort((a, b) => a.name.localeCompare(b.name));
+                        setAvailableDepartments(availableDepartmentsAux);
+                    }
                 }
             }
+        } catch (error) {
+            console.log(error);
+            const status = error.response?.status;
+            if (status === 401) {
+                logout();
+                navigate('/');
+                return;
+            }
 
-
-        } catch (err) {
-            Swal.fire('Error', err.message || 'Error al obtener perfil', 'error');
+            Swal.fire('Error', error.message || 'Error al obtener perfil', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    // Recuperar usuario
+    /**
+     * Recargar perfil cuando cambia la versión del usuario globalmente
+     */
     useEffect(() => {
-        fetchData();
-    }, [logout, navigate, token, version]);
+        if (!version) return;
+        fetchData(version);
+    }, [version]); 
 
-    if (loading) return <Spinner />;
+    if (loading || !profile?.user) return <Spinner />;
 
-    // Modificar Perfil
+    /**
+     * Modificar Perfil
+     */
     const handleModify = async () => {
         try {
             await ModifyUserAccountComponent({
-                token,
                 profile: profile.user,
                 action: "modify",
                 onConfirm: async (formValues) => {
-                    const result = await modifyProfile(formValues, token, version);
+                    const result = await modifyProfile(formValues, version);
                     if (result.success) {
-                        Swal.fire("Éxito", "Datos de la cuenta modificados correctamente", "success");
-                        update(result.data.user, result.data.token);
+                        Swal.fire("Éxito", "Datos modificados correctamente", "success");
+                        update(result.data.user);
                     } else {
                         Swal.fire("Error", result.error || "No se pudo modificar el perfil", "error");
                     }
@@ -90,7 +111,9 @@ const ProfileUser = () => {
         }
     };
 
-    // Eliminar el Perfil 
+    /**
+     * Eliminar el Perfil
+     */
     const handleDelete = async () => {
         try {
             const swal = await Swal.fire({
@@ -104,7 +127,7 @@ const ProfileUser = () => {
             });
 
             if (swal.isConfirmed) {
-                const response = await deleteProfile(token, version);
+                const response = await deleteProfile(version);
                 if (response.success) {
                     Swal.fire("Éxito", "Cuenta eliminada correctamente. Cerrando sesión", "success");
                     logout();
@@ -118,14 +141,14 @@ const ProfileUser = () => {
         }
     };
 
-    // Función para formatear fecha
+    /**
+     * Formatear fecha
+     */
     const formatDate = (dateString) => {
         if (!dateString) return "-";
         const date = new Date(dateString);
         return date.toLocaleDateString() + " " + date.toLocaleTimeString();
     };
-
-
 
     return (
         <Container fluid className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
@@ -179,10 +202,10 @@ const ProfileUser = () => {
                                                                 objName={dep.name}
                                                                 objType="departamento"
                                                                 onDelete={async () => {
-                                                                    const result = await deleteDepartmentProfile(dep.id, token, version);
+                                                                    const result = await deleteDepartmentProfile(dep.id, version);
 
                                                                     if (result.success) {
-                                                                        update(result.data.user, token);
+                                                                        update(result.data.user);
                                                                         fetchData(result.data.user.version);
                                                                     } else {
                                                                         Swal.fire("Error", result.error || "No se pudo eliminar", "error");
@@ -198,10 +221,10 @@ const ProfileUser = () => {
                                                         availableObjs={availableDepartments}
                                                         objType="departamento"
                                                         onAdded={async (dep) => {
-                                                            const result = await addDepartmentProfile(dep.id, token, version);
+                                                            const result = await addDepartmentProfile(dep.id, version);
 
                                                             if (result.success) {
-                                                                update(result.data.user, token);
+                                                                update(result.data.user);
                                                                 fetchData(result.data.user.version);
                                                             } else {
                                                                 Swal.fire("Error", result.error || "No se pudo eliminar", "error");

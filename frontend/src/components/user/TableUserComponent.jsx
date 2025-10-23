@@ -31,7 +31,6 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
  *
  * @component
  * @param {Object} props - Propiedades del componente.
- * @param {string} props.token - Token JWT del usuario autenticado.
  * @param {Object} props.currentUser - Información del usuario actualmente conectado.
  * @param {string} props.search - Texto utilizado para filtrar usuarios por nombre o tipo.
  * @param {number} props.currentPage - Número de la página actualmente visible.
@@ -42,7 +41,6 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
  * @returns {JSX.Element} Tabla interactiva con los usuarios del sistema.
  */
 const TableUserComponent = ({
-    token,
     currentUser,
     search,
     currentPage,
@@ -75,12 +73,11 @@ const TableUserComponent = ({
     /** Cargar usuarios y departamentos **/
     useEffect(() => {
         const fetchAll = async () => {
-            if (!token) return;
             setLoading(true);
             try {
                 const [userRes, depRes] = await Promise.all([
-                    getUsersList(token),
-                    getDepartmentList(token)
+                    getUsersList(),
+                    getDepartmentList()
                 ]);
                 if (userRes.success) {
                     setUsers(userRes.data.users ?? []);
@@ -106,7 +103,7 @@ const TableUserComponent = ({
         const handler = () => fetchAll();
         window.addEventListener("refresh-users", handler);
         return () => window.removeEventListener("refresh-users", handler);
-    }, [token, onStatsUpdate]);
+    }, [onStatsUpdate]);
 
 
     /** Filtrado por búsqueda y tipo **/
@@ -159,12 +156,11 @@ const TableUserComponent = ({
     /** Modificar usuario */
     const handleModify = async userItem => {
         await AddModifyUserComponent({
-            token,
             userItem,
             currentUser,
             action: "modify",
             onConfirm: async formValues => {
-                const result = await modifyUser(userItem.id, formValues, token);
+                const result = await modifyUser(userItem.id, formValues);
                 if (result.success) {
                     Swal.fire("Éxito", "Usuario modificado correctamente", "success");
                     window.dispatchEvent(new Event("refresh-users"));
@@ -178,7 +174,7 @@ const TableUserComponent = ({
     /** Eliminar usuario */
     const handleDelete = async userItem => {
         await showCaptcha();
-        const result = await deleteUser(userItem.id, token, userItem.version);
+        const result = await deleteUser(userItem.id, userItem.version);
         if (result.success) {
             Swal.fire("Éxito", "Usuario eliminado correctamente", "success");
             window.dispatchEvent(new Event("refresh-users"));
@@ -192,7 +188,7 @@ const TableUserComponent = ({
         try {
             const password = await PWDAskComponent({ userItem });
             if (!password) return;
-            const result = await markPWDCUser(userItem.id, { password }, token, userItem.version);
+            const result = await markPWDCUser(userItem.id, { password }, userItem.version);
             if (result.success) {
                 Swal.fire("¡Éxito!", "Contraseña reiniciada correctamente", "success");
                 window.dispatchEvent(new Event("refresh-users"));
@@ -253,11 +249,11 @@ const TableUserComponent = ({
                                                     userObjects={userDeps}
                                                     availableObjs={userAviableDeps}
                                                     onAdded={async dep => {
-                                                        await addDepartment(user.id, dep.id, token, user.version);
+                                                        await addDepartment(user.id, dep.id, user.version);
                                                         window.dispatchEvent(new Event("refresh-users"));
                                                     }}
                                                     onDeleted={async dep => {
-                                                        await deleteDepartment(user.id, dep.id, token, user.version);
+                                                        await deleteDepartment(user.id, dep.id, user.version);
                                                         window.dispatchEvent(new Event("refresh-users"));
                                                     }}
                                                 />
@@ -266,7 +262,7 @@ const TableUserComponent = ({
                                                     availableObjs={userAviableDeps}
                                                     objType="departamento"
                                                     onAdded={async dep => {
-                                                        await addDepartment(user.id, dep.id, token, user.version);
+                                                        await addDepartment(user.id, dep.id, user.version);
                                                         window.dispatchEvent(new Event("refresh-users"));
                                                     }}
                                                 />
@@ -280,7 +276,7 @@ const TableUserComponent = ({
                                                             objName={dep.name}
                                                             objType="departamento"
                                                             onDelete={async () => {
-                                                                await deleteDepartment(user.id, dep.id, token, user.version);
+                                                                await deleteDepartment(user.id, dep.id, user.version);
                                                                 window.dispatchEvent(new Event("refresh-users"));
                                                             }}
                                                         />
@@ -298,11 +294,11 @@ const TableUserComponent = ({
                                                         userObjects={userDeps}
                                                         availableObjs={userAviableDeps}
                                                         onAdded={async dep => {
-                                                            await addDepartment(user.id, dep.id, token, user.version);
+                                                            await addDepartment(user.id, dep.id, user.version);
                                                             window.dispatchEvent(new Event("refresh-users"));
                                                         }}
                                                         onDeleted={async dep => {
-                                                            await deleteDepartment(user.id, dep.id, token, user.version);
+                                                            await deleteDepartment(user.id, dep.id, user.version);
                                                             window.dispatchEvent(new Event("refresh-users"));
                                                         }}
                                                     />
@@ -313,7 +309,7 @@ const TableUserComponent = ({
                                                         availableObjs={userAviableDeps}
                                                         objType="departamento"
                                                         onAdded={async dep => {
-                                                            await addDepartment(user.id, dep.id, token, user.version);
+                                                            await addDepartment(user.id, dep.id, user.version);
                                                             window.dispatchEvent(new Event("refresh-users"));
                                                         }}
                                                     />

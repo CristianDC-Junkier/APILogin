@@ -1,6 +1,5 @@
 ﻿const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const { encrypt, decrypt } = require("../utils/Crypto");
 
 /**
  * Modelo Sequelize para generar token.
@@ -18,15 +17,12 @@ const RefreshToken = sequelize.define("RefreshToken", {
         primaryKey: true,
         autoIncrement: true,
     },
-    token: {
+    uuid: {
         type: DataTypes.STRING,
         allowNull: false,
-        set(value) {
-            this.setDataValue("token", encrypt(value));
-        },
-        get() {
-            const encrypted = this.getDataValue("token");
-            return encrypted ? decrypt(encrypted) : null;
+        unique: {
+            name: 'unique_refreshUUID',
+            msg: 'UUID del refresh ya existente'
         },
     },
     expireDate: {

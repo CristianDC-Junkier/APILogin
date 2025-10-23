@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 
 const AuthController = require("../controllers/AuthController");
-const { isAuthenticated } = require("../middlewares/Auth");
 
 /**
  * Rutas para gestión de usuarios.
@@ -11,9 +10,7 @@ const { isAuthenticated } = require("../middlewares/Auth");
  * Endpoints:
  * - POST   /login               → Iniciar sesión y obtener token JWT.
  * - GET    /logout              → Desconectar Usuario (Usuarios Autentificados).
- * 
- * - GET    /profile             → Recoger datos del usuario (Usuarios Autentificados).
- * - GET    /version             → Recoger datos de la version del usuario (Usuarios Autentificados).
+ * - GET    /refresh             → Recoger y renovar el refreshtoken (Usuarios Autentificados).
  * 
  * Middleware:
  * - `isAuthenticated` → Restringe el acceso a usuarios conectados.
@@ -21,9 +18,7 @@ const { isAuthenticated } = require("../middlewares/Auth");
 
 
 router.post("/login", AuthController.login);
-router.get("/logout", isAuthenticated, AuthController.logout);
-
-router.get("/profile", isAuthenticated, AuthController.getProfile);
-router.get("/version", isAuthenticated, AuthController.getVersion);
+router.get("/logout", AuthController.logout);
+router.get("/refresh", AuthController.refreshToken);
 
 module.exports = router;

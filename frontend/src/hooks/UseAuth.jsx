@@ -6,7 +6,6 @@ import { AuthContext } from '../context/AuthContext';
  *
  * Devuelve:
  * - user: Objeto del usuario autenticado (o null si no hay sesión).
- * - token: Objeto con el token asociado a la sesión actual
  * - version: String que contiene la versión actual del usuario autentificado
  * - loading: Boolean que indica si el estado de autenticación se está cargando.
  * - login: Función para iniciar sesión con credenciales.
@@ -14,7 +13,7 @@ import { AuthContext } from '../context/AuthContext';
  * - update: Función que se encarga de actualizar la información del usuario conectado en caso de que haya sido modificada
  *
  * Uso:
- * const { user, token, version, loading, login, logout, update } = useAuth();
+ * const { user, version, loading, login, logout, update } = useAuth();
  *
  * @returns {Object} Contexto de autenticación
  */

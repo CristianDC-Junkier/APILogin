@@ -77,12 +77,7 @@ const Login = () => {
             const response = await login({ username, password, remember });
 
             if (response.success) {
-                const user = response.data.user;
-                if (user.usertype === 'USER') {
-                    navigate('/list');
-                } else {
-                    navigate('/home');
-                }
+                navigate('/home');
             } else {
                 Swal.fire('Error', response.error || 'Login fallido', 'error');
             }
@@ -98,7 +93,7 @@ const Login = () => {
                     <CardBody className="p-0">
                         <h3 className="text-center mb-4 fw-bold mt-4">Login</h3>
                         <Form onSubmit={handleSubmit} className="px-4">
-                            {/* Campo de entrada del nombre de usuario */ }
+                            {/* Campo de entrada del nombre de usuario */}
                             <FormGroup className="mb-2">
                                 <Label className="fw-semibold">Usuario</Label>
                                 <Input

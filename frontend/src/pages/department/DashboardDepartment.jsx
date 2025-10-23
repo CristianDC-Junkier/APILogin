@@ -16,7 +16,7 @@ import AddModifyLinkComponent from "../../components/link/AddModifyLinkComponent
  * Página encargada de mostrar la tabla de departamentos y de enlaces y las acciones asociadas a la gestión de los mismos
  */
 const DepartmentList = () => {
-    const { user: currentUser, token } = useAuth();
+    const { user: currentUser } = useAuth();
     const [currentView, setCurrentView] = useState("departments"); // "departments" | "links"
     const [rowsPerPage, setRowsPerPage] = useState(8);
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,7 +47,7 @@ const DepartmentList = () => {
         await AddModifyDepartmentComponent({
             action: "create",
             onConfirm: async (formValues) => {
-                const result = await createDepartment(formValues, token);
+                const result = await createDepartment(formValues);
                 if (result.success) {
                     Swal.fire("Éxito", "Departamento creado correctamente", "success");
                     window.dispatchEvent(new Event("refresh-departments"));
@@ -63,7 +63,7 @@ const DepartmentList = () => {
         await AddModifyLinkComponent({
             action: "create",
             onConfirm: async (formValues) => {
-                const result = await createLink(formValues, token);
+                const result = await createLink(formValues);
                 if (result.success) {
                     Swal.fire("Éxito", "Enlace creado correctamente", "success");
                     window.dispatchEvent(new Event("refresh-links"));
@@ -141,7 +141,6 @@ const DepartmentList = () => {
             {/* Tabla */}
             {currentView === "departments" ? (
                 <TableDepartmentComponent
-                    token={token}
                     search={search}
                     rowsPerPage={rowsPerPage}
                     currentPage={currentPage}
@@ -152,7 +151,6 @@ const DepartmentList = () => {
                 />
             ) : (
                 <TableLinkComponent
-                    token={token}
                     search={search}
                     rowsPerPage={rowsPerPage}
                     currentPage={currentPage}
