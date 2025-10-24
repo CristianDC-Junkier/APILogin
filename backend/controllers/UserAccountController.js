@@ -354,11 +354,9 @@ class UserAccountController {
             // Aplicar cambios
             await user.update(updates);
 
-            const accessToken = await generateAccessToken({ id: user.id, username: user.username, usertype: user.usertype});
             LoggerController.info('El usuario con id ' + user.id + ' actualizó su perfil correctamente');
 
             res.json({
-                accessToken,
                 user: {
                     id: user.id,
                     username: user.username,

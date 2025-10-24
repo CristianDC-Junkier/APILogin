@@ -12,15 +12,3 @@ UserAccount.beforeUpdate((user, options) => {
         user.version = 0;
     }
 });
-
-/**
- * Hook: después de actualizar un UserAccount.
- * 
- * - Destruir todos los refresh tokens asociados al usuario modificado
- */
-UserAccount.afterUpdate(async (user, options) => {
-    if (!options.skipRefreshTokens) {
-        await RefreshToken.destroy({ where: { userId: user.id } });
-    }
-});
-

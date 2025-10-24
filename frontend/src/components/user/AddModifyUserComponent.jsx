@@ -52,7 +52,7 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
             </div>
         </div>
          ${action !== 'modify' ?
-        `<div style="margin-bottom:1rem; font-size:0.75rem; color:gray; text-align:left;">
+            `<div style="margin-bottom:1rem; font-size:0.75rem; color:gray; text-align:left;">
             Se solicitará cambiar al conectarse por primera vez
         </div>` : ''}
         <div style="${rowStyle}">
@@ -89,7 +89,10 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
             if (!username) { Swal.showValidationMessage("El nombre de usuario no puede estar vacío"); return false; }
             if (!password) { Swal.showValidationMessage("La contraseña no puede estar vacía"); return false; }
 
-            return { username, password, usertype };
+            let version = null;
+            if (action === "modify" && userItem.version) { version = userItem.version; }
+
+            return { username, password, usertype, version };
         }
     });
 
@@ -97,9 +100,9 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
     const formValues = swalStep.value;
 
     if (action === "modify") {
-        onConfirm( formValues );
+        onConfirm(formValues);
     } else {
-        onConfirm( formValues );
+        onConfirm(formValues);
     }
 };
 

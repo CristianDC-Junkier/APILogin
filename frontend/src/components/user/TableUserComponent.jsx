@@ -81,7 +81,6 @@ const TableUserComponent = ({
                 ]);
                 if (userRes.success) {
                     setUsers(userRes.data.users ?? []);
-
                     if (onStatsUpdate) {
                         const stats = {
                             total: userRes.data.users.length,

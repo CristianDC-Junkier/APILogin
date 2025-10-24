@@ -70,8 +70,8 @@ async function initDatabase() {
         if (!existing) {
 
             await UserAccount.create({
-                username: 'admin',
-                password: 'admin',
+                username: 'admin',//InformaticaAlcaldia
+                password: 'admin',//InformaticaAlcaldia#Almonte
                 usertype: superAdminType,
                 forcePwdChange: false,
             });
