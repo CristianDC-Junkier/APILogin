@@ -1,5 +1,4 @@
-﻿
-import Swal from "sweetalert2";
+﻿import Swal from "sweetalert2";
 ;
 /**
  * Componente para modificar usuario: solo permite cambiar username, password y usertype.

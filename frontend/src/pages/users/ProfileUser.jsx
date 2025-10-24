@@ -44,7 +44,7 @@ const ProfileUser = () => {
         try {
             const currentVersion = forcedVersion ?? version;
 
-            let profileResp = await getProfile(currentVersion);            
+            let profileResp = await getProfile(currentVersion);
 
             if (profileResp.success && profileResp.data) {
                 const sortedDepartments = [...profileResp.data.departments].sort((a, b) =>
@@ -63,16 +63,6 @@ const ProfileUser = () => {
                     }
                 }
             }
-        } catch (error) {
-            console.log(error);
-            const status = error.response?.status;
-            if (status === 401) {
-                logout();
-                navigate('/');
-                return;
-            }
-
-            Swal.fire('Error', error.message || 'Error al obtener perfil', 'error');
         } finally {
             setLoading(false);
         }
@@ -84,7 +74,7 @@ const ProfileUser = () => {
     useEffect(() => {
         if (!version) return;
         fetchData(version);
-    }, [version]); 
+    }, [version]);
 
     if (loading || !profile?.user) return <Spinner />;
 

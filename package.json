@@ -11,9 +11,5 @@
   "description": "",
   "devDependencies": {
     "concurrently": "^9.2.1"
-  },
-  "dependencies": {
-    "cookie-parser": "^1.4.7",
-    "react-icons": "^5.5.0"
   }
 }

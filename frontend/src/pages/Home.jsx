@@ -19,7 +19,6 @@ import {
 /**
  * Página que muestra las acciones disponibles al usuario
  */
-
 const Home = () => {
     const [loadingLogout, setLoadingLogout] = useState(false);
 

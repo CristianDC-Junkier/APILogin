@@ -11,7 +11,6 @@ import "../../styles/web/WebListPage.css";
 /**
  * Página encargada de mostrar los enlaces disponibles a cada usuario
  */
-
 const WebListPage = () => {
     const { user } = useAuth();
     const [departments, setDepartments] = useState([]);
@@ -25,8 +24,6 @@ const WebListPage = () => {
             try {
                 const response = await getLinksByProfileList(user.version);
                 setDepartments(response.data.departments || []);
-            } catch (err) {
-                console.error(err);
             } finally {
                 setLoading(false);
             }

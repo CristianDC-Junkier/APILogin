@@ -7,7 +7,6 @@ import BackButtonComponent from "../../components/utils/BackButtonComponent";
 /**
  * Página encarga de mostrar la página elegida en el WebList
  */
-
 const ExternalWebPage = () => {
     const { user } = useAuth();
     const location = useLocation();

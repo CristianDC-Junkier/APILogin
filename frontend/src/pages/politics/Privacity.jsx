@@ -2,6 +2,10 @@
 import { Container, Row, Col } from "reactstrap";
 import BackButton from '../../components/utils/BackButtonComponent';
 
+/**
+ * Página encargada de mostrar la política de privacidad
+ * @returns {JSX.Element} Componente de React con la política de privacidad
+ */
 const Privacity = () => {
     return (
         <Container fluid className="my-4 position-relative" style={{ paddingLeft: 0, paddingRight: 0 }}>

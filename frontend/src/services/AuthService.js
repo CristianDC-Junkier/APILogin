@@ -1,6 +1,6 @@
 ﻿import api from './AxiosService';
 
-// Token en memoria (no se guarda en localStorage por seguridad)
+// Token en memoria
 let accessToken = null;
 
 /**

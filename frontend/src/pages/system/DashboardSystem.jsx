@@ -9,9 +9,6 @@ import LogListComponent from '../../components/system/LogListComponent';
 import LogViewerComponent from '../../components/system/LogViewerComponent';
 import Spinner from '../../components/utils/SpinnerComponent';
 
-/**
- * Página encarga de mostrar los logs y las estdísticas del servidor
- */
 
 /**
  * Función que da formato a una cantidad de tiempo recibida
@@ -26,6 +23,9 @@ function formatUptime(totalSeconds) {
     return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+/**
+ * Página encarga de mostrar los logs y las estdísticas del servidor
+ */
 export default function DashboardSystemPage() {
     const [logs, setLogs] = useState([]);
     const [selectedLog, setSelectedLog] = useState(null);
@@ -45,8 +45,6 @@ export default function DashboardSystemPage() {
             try {
                 const res = await getLogs();
                 if (res.success) setLogs(res.data);
-            } catch (err) {
-                console.error(err);
             } finally {
                 setLoading(false);
             }

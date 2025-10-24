@@ -1,13 +1,10 @@
 ﻿import React from 'react';
-import { useLocation } from 'react-router-dom';
 import logo from '../assets/ayto_almonte.png';
 
 /**
  * Página comodín que se muestra cuando se introduce una página que no se recoge en el AppRouter
  */
-
 const NotFound = () => {
-    const location = useLocation();
 
     return (
         <div className="row vh-80 d-flex align-items-center justify-content-center">

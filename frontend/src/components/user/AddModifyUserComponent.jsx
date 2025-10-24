@@ -1,4 +1,5 @@
 ﻿import Swal from "sweetalert2";
+
 /**
  * Componente que permite crear o modificar un usuario mediante un modal de SweetAlert2.
  * 

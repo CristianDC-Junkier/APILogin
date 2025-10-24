@@ -1,4 +1,5 @@
 ﻿import Swal from "sweetalert2";
+
 /**
  * Componente que permite crear o modificar un link mediante un modal de SweetAlert2.
  * 

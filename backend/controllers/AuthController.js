@@ -1,10 +1,6 @@
 ﻿const { UserAccount, RefreshToken } = require("../models/Relations");
-const { v4: uuidv4 } = require("uuid");
-
 const LoggerController = require("../controllers/LoggerController");
 const { generateAccessToken, generateRefreshToken, verifyToken } = require("../utils/JWT");
-
-
 
 /**
  * Controlador de autenticación y gestión de usuarios.
@@ -12,8 +8,7 @@ const { generateAccessToken, generateRefreshToken, verifyToken } = require("../u
  * Proporciona métodos estáticos para:      
  *  - Login de usuario                               
  *  - Logout de usuario
- *  - Recoger perfil del usuario
- *  - Recoger version del usuario 
+ *  - Refrescar token y perfil del usuario
  */
 class AuthController {
 
@@ -70,7 +65,7 @@ class AuthController {
     /**
     * Cierra la sesión de un usuario eliminando su cookie HttpOnly.
     *
-    * @param {Object} req - Objeto de petición de Express (contiene req.cookies.refreshToken y req.user).
+    * @param {Object} req - Objeto de petición de Express, con { cookies: { refreshToken } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Mensaje de éxito o error.
     */
@@ -78,7 +73,6 @@ class AuthController {
         try {
             const token = req.cookies?.refreshToken;
             if (!token) return res.status(400).json({ error: "No hay sesión activa" });
-
 
             let payload;
             try {
@@ -113,8 +107,9 @@ class AuthController {
     /**
      * Devuelve la información del usuario basada en la cookie HttpOnly y la renueva si es necesario.
      * 
-     * @param {Object} req - Objeto de petición de Express
-     * @param {Object} res - Objeto de respuesta de Express
+     * @param {Object} req - Objeto de petición de Express, con { cookies: { refreshToken } }.
+     * @param {Object} res - Objeto de respuesta de Express.
+     * @returns {JSON} - JSON con nuevo accessToken y datos del usuario, o estado 401 si el token es inválido.
      */
     static async refreshToken(req, res) {
         try {

@@ -7,7 +7,23 @@ import SpinnerComponent from '../components/utils/SpinnerComponent';
 export const AuthContext = createContext();
 
 /**
- * Proveedor de autenticación usando cookie HttpOnly
+ * Contexto de autenticación global.
+ * @typedef {Object} AuthContextType
+ * @property {Object|null} user - Usuario actualmente autenticado.
+ * @property {number} version - Versión actual del usuario.
+ * @property {boolean} loading - Indica si se está restaurando la sesión.
+ * @property {Function} login - Inicia sesión con credenciales.
+ * @property {Function} logout - Cierra la sesión.
+ * @property {Function} update - Actualiza los datos del usuario globalmente.
+ */
+
+/**
+ * Proveedor de autenticación con gestión automática de sesión y refresh token.
+ * Inyecta en el interceptor global la función `contextUpdate` para mantener sincronizado
+ * el estado del usuario ante actualizaciones (por ejemplo, error 409 del backend).
+ *
+ * @param {{ children: React.ReactNode }} props
+ * @returns {JSX.Element}
  */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);      // Usuario actual
@@ -22,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     const contextUpdate = useCallback((newUser) => {
         setUser(newUser);
         setVersion(newUser.version || 0);
-    }, [version]); // Incluimos 'version' en dependencias para fines de logging y para que React sepa cuándo re-crear la función.
+    }, []); 
 
     /**
      * Inyecta la función de actualización (contextUpdate) en el helper global.
@@ -117,7 +133,13 @@ export const AuthProvider = ({ children }) => {
             }}
         >
             {/* Mostrar un spinner de carga si es necesario antes de renderizar children */}
-            {loading ? <SpinnerComponent></SpinnerComponent> : children}
+            {loading ? (
+                <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                    <SpinnerComponent />
+                </div>
+            ) : (
+                children
+            )}
         </AuthContext.Provider>
     );
 }

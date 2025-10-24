@@ -6,21 +6,21 @@ const JWT_SECRET_ACS = process.env.JWT_SECRET_ACS;
 const JWT_SECRET_RFH = process.env.JWT_SECRET_RFH;
 
 /**
- * Genera un accessToken JWT
- * @param {Object} payload - Datos del usuario {id, username, usertype}
- * @param {string|number} [expiresIn='15m']
- * @returns {string} accessToken
- */
-function generateAccessToken(payload, expiresIn = '15m') {
+* Genera un accessToken JWT
+* @param {Object} payload - Datos del usuario {id, username, usertype}
+* @param {string|number} [expiresIn='15m']
+* @returns {string} accessToken
+*/
+function generateAccessToken(payload, expiresIn = '10s') {
     return jwt.sign(payload, JWT_SECRET_ACS, { expiresIn });
 }
 
 /**
- * Genera un refreshToken JWT con UUID y lo guarda en DB
- * @param {number} userId 
- * @param {boolean} remember 
- * @returns {Promise<{ token: string, uuid: string }>} refreshToken + uuid
- */
+* Genera un refreshToken JWT con UUID y lo guarda en DB
+* @param {number} userId 
+* @param {boolean} remember 
+* @returns {Promise<{ token: string, uuid: string }>} refreshToken + uuid
+*/
 async function generateRefreshToken(userId, remember = false) {
     const uuid = uuidv4();
     const expiresIn = remember ? '7d' : '1h';
@@ -36,11 +36,11 @@ async function generateRefreshToken(userId, remember = false) {
 }
 
 /**
- * Verifica un token de acceso
- * @param {string} token 
- * @returns {Object} payload
- * @throws Error si inválido o expirado
- */
+* Verifica un token de acceso 
+* @param {string} token 
+* @returns {Object} payload
+* @throws Error si inválido o expirado
+*/
 function verifyToken(token, type = 'access') {
     const secret = type === 'access' ? JWT_SECRET_ACS : JWT_SECRET_RFH;
     return jwt.verify(token, secret);
@@ -48,10 +48,10 @@ function verifyToken(token, type = 'access') {
 
 
 /**
- * Decodifica cualquier token sin validar
- * @param {string} token 
- * @param {'access'|'refresh'} type 
- */
+* Decodifica cualquier token sin validar
+* @param {string} token 
+* @param {'access'|'refresh'} type 
+*/
 function decodeToken(token, type = 'access') {
     const secret = type === 'access' ? JWT_SECRET_ACS : JWT_SECRET_RFH;
     return jwt.decode(token, secret);
