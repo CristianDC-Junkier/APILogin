@@ -162,10 +162,10 @@ const TableUserComponent = ({
                 const result = await modifyUser(userItem.id, formValues);
                 if (result.success) {
                     Swal.fire("Éxito", "Usuario modificado correctamente", "success");
-                    window.dispatchEvent(new Event("refresh-users"));
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo modificar el usuario", "error");
+                    Swal.fire("Error", result.error || "No se pudo modificar el usuario, reintentelo de nuevo", "error");
                 }
+                window.dispatchEvent(new Event("refresh-users"));
             }
         });
     };
@@ -176,27 +176,23 @@ const TableUserComponent = ({
         const result = await deleteUser(userItem.id, userItem.version);
         if (result.success) {
             Swal.fire("Éxito", "Usuario eliminado correctamente", "success");
-            window.dispatchEvent(new Event("refresh-users"));
         } else {
-            Swal.fire("Error", result.error || "No se pudo eliminar el usuario", "error");
+            Swal.fire("Error", result.error || "No se pudo eliminar el usuario, reintentelo de nuevo", "error");
         }
+        window.dispatchEvent(new Event("refresh-users"));
     };
 
     /** Cambio de contraseña */
     const handlePWDC = async userItem => {
-        try {
-            const password = await PWDAskComponent({ userItem });
-            if (!password) return;
-            const result = await markPWDCUser(userItem.id, { password }, userItem.version);
-            if (result.success) {
-                Swal.fire("¡Éxito!", "Contraseña reiniciada correctamente", "success");
-                window.dispatchEvent(new Event("refresh-users"));
-            } else {
-                Swal.fire("Error", result.error || "No se pudo reiniciar la contraseña", "error");
-            }
-        } catch (err) {
-            Swal.fire("Error", err.message || "No se pudo marcar contraseña temporal", "error");
+        const password = await PWDAskComponent({ userItem });
+        if (!password) return;
+        const result = markPWDCUser(userItem.id, { password }, userItem.version);
+        if (result.success) {
+            Swal.fire("¡Éxito!", "Contraseña reiniciada correctamente", "success");
+        } else {
+            Swal.fire("Error", result.error || "No se pudo reiniciar la contraseña, reintentelo de nuevo", "error");
         }
+        window.dispatchEvent(new Event("refresh-users"));
     };
 
 

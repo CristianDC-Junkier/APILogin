@@ -92,7 +92,7 @@ const ProfileUser = () => {
                         Swal.fire("Éxito", "Datos modificados correctamente", "success");
                         update(result.data.user);
                     } else {
-                        Swal.fire("Error", result.error || "No se pudo modificar el perfil", "error");
+                        Swal.fire("Error", result.error || "No se pudo modificar el perfil, reintentelo de nuevo", "error");
                     }
                 }
             });
@@ -105,7 +105,6 @@ const ProfileUser = () => {
      * Eliminar el Perfil
      */
     const handleDelete = async () => {
-        try {
             const swal = await Swal.fire({
                 title: "Eliminar su Cuenta",
                 html: "¿Está seguro de que quiere eliminar su usuario?<br>Esta acción no se podrá deshacer",
@@ -126,9 +125,6 @@ const ProfileUser = () => {
                     Swal.fire("Error", response.error || "No se eliminó el usuario", "error");
                 }
             }
-        } catch (err) {
-            Swal.fire("Error", err.message || "Error al eliminar usuario", "error");
-        }
     };
 
     /**
