@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
  * @param {Object} user - Usuario que va a ser marcado
  * @returns
  */
-
 const PWDChangeComponent = ({ user }) => {
     const { update, logout } = useAuth();
     const navigate = useNavigate();

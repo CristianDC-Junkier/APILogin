@@ -15,7 +15,7 @@ async function getTokenPayload(req, res) {
     const token = authHeader.split(" ")[1];
 
     try {
-        const payload = await verifyToken(token, "access"); // ahora usamos accessToken
+        const payload = await verifyToken(token, "access"); 
         if (!payload || !payload.id) {
             res.status(401).json({ error: "Token inválido" });
             return null;

@@ -7,7 +7,6 @@ import "../styles/FooterComponent.css"; // Archivo CSS con efectos
 /**
  * Componente encargado de hacer el footer de la página web
  */
-
 const FooterComponent = () => {
     const location = useLocation(); // Detecta la URL actual
 

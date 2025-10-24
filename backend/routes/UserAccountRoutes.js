@@ -38,7 +38,6 @@ router.post("/profile/add-department/:departmentId", adminOnly, UserAccountContr
 router.delete("/profile/del-department/:departmentId", adminOnly, UserAccountController.delDepartmentProfile);
 
 router.get("/", adminOnly, UserAccountController.list);
-
 router.post("/", adminOnly, UserAccountController.create);
 router.put("/:id", adminOnly, UserAccountController.update);
 router.delete("/:id", adminOnly, UserAccountController.delete);

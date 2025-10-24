@@ -1,11 +1,5 @@
 ﻿import React from "react";
 
-/**
- * Muestra una insignia con el nombre de un objeto.
- * @param {Object} props
- * @param {string} props.objName Nombre del objeto.
- */
-
 // Función encargada de determinar el color de fonde del badge
 function stringToColor(str) {
     let hash = 0;
@@ -20,6 +14,11 @@ function stringToColor(str) {
     return color;
 }
 
+/**
+ * Muestra una insignia con el nombre de un objeto.
+ * @param {Object} props
+ * @param {string} props.objName Nombre del objeto.
+ */
 const BadgeComponent = ({ objName }) => {
     const bgColor = stringToColor(objName);
     return (
