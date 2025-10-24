@@ -1,4 +1,5 @@
 ﻿import api from './AxiosService';
+import { setAccessToken } from './AuthService';
 
 /**
  * Servicio encargado de hacer las llamadas al servidor 
@@ -157,6 +158,9 @@ export const modifyProfile = async (useraccount, version) => {
         const res = await api.put(`/user/profile/update`, useraccount, {
             params: { version }
         });
+        if (res.data?.accessToken) {
+            setAccessToken(res.data.accessToken);
+        }
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
