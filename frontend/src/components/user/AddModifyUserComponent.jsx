@@ -89,7 +89,7 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
             if (!username) { Swal.showValidationMessage("El nombre de usuario no puede estar vacío"); return false; }
             if (!password) { Swal.showValidationMessage("La contraseña no puede estar vacía"); return false; }
 
-            return { username, password, usertype, version: userItem?.version ? userItem.version : 0 };
+            return { username, password, usertype };
         }
     });
 

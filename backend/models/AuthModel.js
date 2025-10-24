@@ -55,8 +55,8 @@ const User = sequelize.define("UserAccount", {
     version: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 0,
-        validate: { min: 0, max: 100000 },
+        defaultValue: 1,
+        validate: { min: 1, max: 100000000 },
     },
 });
 

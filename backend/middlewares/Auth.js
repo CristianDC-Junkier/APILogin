@@ -1,5 +1,5 @@
 ﻿const LoggerController = require("../controllers/LoggerController");
-const { verifyToken } = require("../utils/JWT");
+const { verifyToken, decodeToken } = require("../utils/JWT");
 
 /**
  * Función auxiliar para validar accessToken del header Authorization
@@ -22,7 +22,10 @@ async function getTokenPayload(req, res) {
         }
         return payload;
     } catch (err) {
-        LoggerController.warn(`Token inválido: ${err.message}`);
+        payload = decodeToken(token);
+        if (payload && payload.id) {
+            LoggerController.warn(`Token inválido: ${err.message} para el usuario con id ${payload.id}`);
+        }
         res.status(401).json({ error: "Token inválido o expirado" });
         return null;
     }
