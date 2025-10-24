@@ -72,7 +72,7 @@ const ProfileUser = () => {
      * Recargar perfil cuando cambia la versión del usuario globalmente
      */
     useEffect(() => {
-        if (!version) return;
+        if (version === null || version === undefined) return;
         fetchData(version);
     }, [version]);
 
