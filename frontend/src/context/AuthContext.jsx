@@ -88,9 +88,8 @@ export const AuthProvider = ({ children }) => {
                     id: result.data.user.id,
                     username: result.data.user.username,
                     usertype: result.data.user.usertype,
-                    ...result.data.user, // Incluimos el resto de propiedades
                     forcePwdChange: result.data.user.forcePwdChange || false,
-                    version: result.data.user.version || 0,
+                    version: result.data.user.version || 1,
                 };
                 setUser(userLog);
                 setVersion(userLog.version);

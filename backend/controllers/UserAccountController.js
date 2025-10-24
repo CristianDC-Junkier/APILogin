@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 
 const LoggerController = require("../controllers/LoggerController");
 
-const { generateToken } = require("../utils/JWT");
+const { generateAccessToken } = require("../utils/JWT");
 
 /**
  * Controlador de autenticación y gestión de usuarios.
@@ -354,11 +354,11 @@ class UserAccountController {
             // Aplicar cambios
             await user.update(updates);
 
-            const token = await generateToken({ id: user.id, username: user.username, usertype: user.usertype, remember: remember });
+            const accessToken = await generateAccessToken({ id: user.id, username: user.username, usertype: user.usertype});
             LoggerController.info('El usuario con id ' + user.id + ' actualizó su perfil correctamente');
 
             res.json({
-                token,
+                accessToken,
                 user: {
                     id: user.id,
                     username: user.username,

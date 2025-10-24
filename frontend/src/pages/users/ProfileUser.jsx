@@ -74,7 +74,7 @@ const ProfileUser = () => {
     useEffect(() => {
         if (version === null || version === undefined) return;
         fetchData(version);
-    }, [version]);
+    }, []);
 
     if (loading || !profile?.user) return <Spinner />;
 
