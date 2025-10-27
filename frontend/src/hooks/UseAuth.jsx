@@ -2,7 +2,7 @@
 import { AuthContext } from '../context/AuthContext';
 
 /**
- * Custom hook para acceder al contexto de autenticación.
+ * Hook para acceder al contexto de autenticación.
  *
  * Devuelve:
  * - user: Objeto del usuario autenticado (o null si no hay sesión).

@@ -1,20 +1,11 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    Button,
-    Form,
-    FormGroup,
-    Input,
-    Row,
-    Col,
-    Card,
-    CardBody,
-    Label,
-} from 'reactstrap';
+import { Button, Form, FormGroup, Input, Row, Col, Card, CardBody,Label } from 'reactstrap';
 import Swal from 'sweetalert2';
+
 import { createRoot } from 'react-dom/client';
 import { useAuth } from '../hooks/useAuth';
-import CaptchaSlider from '../components/utils/CaptchaSliderComponent';
+import CaptchaSliderComponent from '../components/utils/CaptchaSliderComponent';
 import '../styles/Global.css';
 import '../styles/auth/Login.css';
 
@@ -37,7 +28,7 @@ const Login = () => {
             let completed = false;
 
             reactRoot.render(
-                <CaptchaSlider
+                <CaptchaSliderComponent
                     onSuccess={() => {
                         completed = true;
                         resolve(true);
@@ -72,8 +63,14 @@ const Login = () => {
             // Mostrar captcha obligatorio
             await showCaptcha();
 
+            // Comprobamos si el usuario aceptó cookies
+            const cookiesAccepted = localStorage.getItem("cookiesAccepted") === "true";
+
+            // Si no ha aceptado cookies, forzamos remember a false
+            const finalRemember = cookiesAccepted ? remember : false;
+
             // Hacer login
-            const response = await login({ username, password, remember });
+            const response = await login({ username, password, finalRemember });
 
             if (response.success) {
                 navigate('/home');

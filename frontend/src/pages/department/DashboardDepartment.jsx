@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import { createDepartment } from "../../services/DepartmentService";
 import { createLink } from "../../services/LinkService";
 
-import BackButton from "../../components/utils/BackButtonComponent";
+import BackButtonComponent from "../../components/utils/BackButtonComponent";
 import TableDepartmentComponent from "../../components/department/TableDepartmentComponent";
 import TableLinkComponent from "../../components/link/TableLinkComponent";
 import AddModifyDepartmentComponent from "../../components/department/AddModifyDepartmentComponent";
@@ -78,7 +78,7 @@ const DepartmentList = () => {
         <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
             {/* Botón Volver arriba a la izquierda */}
             <div className="position-absolute top-0 start-0">
-                <BackButton back="/home" />
+                <BackButtonComponent back="/home" />
             </div>
 
             {/* Botón Crear Departamento/Enlace arriba a la derecha */}

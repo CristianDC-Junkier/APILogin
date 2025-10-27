@@ -2,10 +2,10 @@
 import { Container, Row, Col, Card, CardBody, CardTitle, CardText, Button, Input } from "reactstrap";
 import Swal from "sweetalert2";
 
-import { createUser } from "../../services/UserService";
 import { useAuth } from "../../hooks/useAuth";
+import { createUser } from "../../services/UserService";
 
-import BackButton from "../../components/utils/BackButtonComponent";
+import BackButtonComponent from "../../components/utils/BackButtonComponent";
 import TableUserComponent from "../../components/user/TableUserComponent";
 import AddModifyUserComponent from "../../components/user/AddModifyUserComponent"; 
 
@@ -59,7 +59,7 @@ const DashBoardUser = () => {
         <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
             {/* Botón Volver arriba a la izquierda */}
             <div className="position-absolute top-0 start-0">
-                <BackButton back="/home" />
+                <BackButtonComponent back="/home" />
             </div>
 
             {/* Botón Crear Usuario arriba a la derecha */}

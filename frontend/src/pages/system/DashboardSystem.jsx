@@ -4,10 +4,10 @@ import Swal from 'sweetalert2';
 
 import { getLogs, getLog, downloadLog, getSystemMetrics } from '../../services/SystemService';
 
-import BackButton from '../../components/utils/BackButtonComponent';
+import BackButtonComponent from '../../components/utils/BackButtonComponent';
 import LogListComponent from '../../components/system/LogListComponent';
 import LogViewerComponent from '../../components/system/LogViewerComponent';
-import Spinner from '../../components/utils/SpinnerComponent';
+import SpinnerComponent from '../../components/utils/SpinnerComponent';
 
 
 /**
@@ -24,9 +24,11 @@ function formatUptime(totalSeconds) {
 }
 
 /**
- * Página encarga de mostrar los logs y las estdísticas del servidor
+ * Página encarga de mostrar los logs y las estadísticas del servidor
  */
 export default function DashboardSystemPage() {
+
+
     const [logs, setLogs] = useState([]);
     const [selectedLog, setSelectedLog] = useState(null);
     const [logContent, setLogContent] = useState('Selecciona un archivo para ver su contenido');
@@ -55,16 +57,12 @@ export default function DashboardSystemPage() {
     //Función encargada de obtener la información del estado del servidor
     useEffect(() => {
         const fetchMetrics = async () => {
-            try {
-                const res = await getSystemMetrics();
-                if (res.success) {
-                    setCpuUsage(res.data.CpuUsagePercent);
-                    setMemoryUsed(res.data.MemoryUsedMB);
-                    setThreadsCount(res.data.ThreadsCount);
-                    setUptimeSeconds(res.data.UptimeSeconds);
-                }
-            } catch (err) {
-                console.error(err);
+            const res = await getSystemMetrics();
+            if (res.success) {
+                setCpuUsage(res.data.CpuUsagePercent);
+                setMemoryUsed(res.data.MemoryUsedMB);
+                setThreadsCount(res.data.ThreadsCount);
+                setUptimeSeconds(res.data.UptimeSeconds);
             }
         };
 
@@ -105,14 +103,14 @@ export default function DashboardSystemPage() {
         });
     };
 
-    if (loading) return <Spinner />;
+    if (loading) return <SpinnerComponent />;
 
     return (
-        <Container className="mt-4 d-flex flex-column"  style={{ minHeight: '70vh' }}>
+        <Container className="mt-4 d-flex flex-column" style={{ minHeight: '70vh' }}>
             <h3 className="text-center mb-4">Estadísticas del Servidor</h3>
 
             <div className="position-absolute top-0 start-0">
-                <BackButton back="/home" />
+                <BackButtonComponent back="/home" />
             </div>
 
             {/* Métricas */}
@@ -138,7 +136,7 @@ export default function DashboardSystemPage() {
                                                 case "Threads Activos":
                                                     return metric.value;
                                                 case "Uptime":
-                                                    return metric.value; // ya viene formateado con formatUptime
+                                                    return metric.value; 
                                                 default:
                                                     return metric.value;
                                             }
@@ -166,7 +164,7 @@ export default function DashboardSystemPage() {
                 <Col
                     lg="3"
                     style={{
-                        height: 'calc(55vh)', 
+                        height: 'calc(55vh)',
                         overflowY: 'auto',
                         paddingRight: '0.5rem'
                     }}
@@ -181,7 +179,7 @@ export default function DashboardSystemPage() {
                 <Col
                     lg="9"
                     style={{
-                        height: 'calc(55vh)', 
+                        height: 'calc(55vh)',
                         overflowY: 'auto',
                         paddingLeft: '1rem'
                     }}
@@ -203,7 +201,7 @@ export default function DashboardSystemPage() {
                     <LogViewerComponent content={logContent} />
                 </Col>
                 <Col xs="12">
-                    <hr/>
+                    <hr />
                 </Col>
                 <Col
                     xs="12"

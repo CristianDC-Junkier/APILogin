@@ -1,5 +1,4 @@
-﻿
-import React, { useEffect, useRef } from "react";
+﻿import React, { useEffect, useRef } from "react";
 
 /**
  * Inyecta estilos CSS para el slider CAPTCHA una sola vez.
