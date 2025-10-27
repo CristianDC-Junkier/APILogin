@@ -1,6 +1,5 @@
 ﻿import React, { useState, useEffect } from "react";
 import { Button, Container, Row, Col } from "reactstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 import logo from "../../assets/ayto_almonte_notext.png";
 
 /**

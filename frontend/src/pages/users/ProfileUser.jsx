@@ -17,7 +17,7 @@ import {
 
 import { getDepartmentList } from "../../services/DepartmentService";
 
-import BackButton from "../../components/utils/BackButtonComponent";
+import BackButtonComponent from "../../components/utils/BackButtonComponent";
 import BadgeComponent from "../../components/badge/BadgeComponent";
 import AddBadgeComponent from "../../components/badge/AddBadgeComponent";
 import RemovableBadgeComponent from "../../components/badge/RemovableBadgeComponent";
@@ -140,7 +140,7 @@ const ProfileUser = () => {
         <Container fluid className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
             {/* Botón Volver */}
             <div className="position-absolute top-0 start-0">
-                <BackButton back="/home" />
+                <BackButtonComponent back="/home" />
             </div>
 
             {/* Contenedor para centrar verticalmente */}

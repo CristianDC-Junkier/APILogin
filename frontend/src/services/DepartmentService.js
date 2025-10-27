@@ -12,7 +12,7 @@
  * 
  */
 
-//#region Get Lists Functions
+//#region Recoger departamentos
 
 /**
  * Solicitud para obtener la lista de todos los departamentos existentes
@@ -29,7 +29,7 @@ export const getDepartmentList = async () => {
 
 //#endregion
 
-//#region Generic Department Action
+//#region Operaciones CRUD en departamentos
 /**
  * Solicitud de creación de un nuevo departamento
  * @param {Object} department - la información del departamento que se quiere crear
@@ -74,7 +74,7 @@ export const deleteDepartment = async (departmentId) => {
 };
 //#endregion
 
-//#region Link Association Actions
+//#region Operaciones sobre enlaces en departamentos
 /**
  * Solicitud para añadir un enlace a un departamento
  * @param {String} depId - ID del departamento al que se va a añadir el enlace

@@ -10,10 +10,19 @@ import { setAccessToken } from './AuthService';
  *  - Crear un usuario
  *  - Modificar un usuario
  *  - Eliminar un usuario
+ *  - Recoger la información del perfil conectado
+ *  - Modificar la información del perfil conectado
+ *  - Eliminar el perfil conectado
+ *  - Forzar cambio de contraseña a un usuario
+ *  - Cambiar la contraseña de un usuario marcado para cambio de contraseña
+ *  - Añadir departamentos a usuarios
+ *  - Eliminar departamentos de usuarios
+ *  - Añadir departamentos al perfil conectado
+ *  - Eliminar departamentos del perfil conectado
  * 
  */
 
-//#region Get Lists Functions
+//#region Recoger usuarios
 
 /**
  * Solicitud para obtener la lista de todos los usuario existentes
@@ -30,7 +39,7 @@ export const getUsersList = async () => {
 
 //#endregion
 
-//#region Generic User Action
+//#region Operacione CRUD de usuarios
 /**
  * Solicitud de creación de un nuevo usuario
  * @param {Object} user - la información del usuario que se quiere crear
@@ -77,6 +86,9 @@ export const deleteUser = async (userId, version) => {
     }
 };
 
+//#endregion
+
+//#region Operaciones de departamentos en usuarios
 /**
 * Solicitud para añadir un departamento a un usuario
 * @param {String} userId - ID del usuario al que se va a añadir el departamento
@@ -112,9 +124,42 @@ export const deleteDepartment = async (userId, departmentId, version) => {
         return { success: false, error: error.response?.data?.error };
     }
 }
+/**
+* Solicitud para añadir un departamento al perfil conectado
+* @param {String} departmentId - ID del departamento a añadir al perfil conectado
+* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
+* @returns {JSON} - Devuelve la información recibida de la llamada
+*/
+export const addDepartmentProfile = async (departmentId, version) => {
+    try {
+        const res = await api.post(`/user/profile/add-department/${departmentId}`, {}, {
+            params: { version }
+        });
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+}
+
+/**
+* Solicitud para eliminar un departamento del perfil conectado
+* @param {String} departmentId - ID del departamento a eliminar del perfil conectado
+* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
+* @returns {JSON} - Devuelve la información recibida de la llamada
+*/
+export const deleteDepartmentProfile = async (departmentId, version) => {
+    try {
+        const res = await api.delete(`/user/profile/del-department/${departmentId}`, {
+            params: { version }
+        });
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+}
 //#endregion
 
-//#region Profile Actions
+//#region Operaciones sobre el perfil del usuario conectado
 /**
  * Solicitud para obtener la información del usuario conectado
  * @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
@@ -166,44 +211,9 @@ export const modifyProfile = async (useraccount, version) => {
         return { success: false, error: error.response?.data?.error };
     }
 }
-
-/**
-* Solicitud para añadir un departamento al perfil conectado
-* @param {String} departmentId - ID del departamento a añadir al perfil conectado
-* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
-* @returns {JSON} - Devuelve la información recibida de la llamada
-*/
-export const addDepartmentProfile = async (departmentId, version) => {
-    try {
-        const res = await api.post(`/user/profile/add-department/${departmentId}`, {}, {
-            params: { version }
-        });
-        return { success: true, data: res.data };
-    } catch (error) {
-        return { success: false, error: error.response?.data?.error };
-    }
-}
-
-/**
-* Solicitud para eliminar un departamento del perfil conectado
-* @param {String} departmentId - ID del departamento a eliminar del perfil conectado
-* @param {String} version - Version del usuario conectado para comprobar si ya fue modificado
-* @returns {JSON} - Devuelve la información recibida de la llamada
-*/
-export const deleteDepartmentProfile = async (departmentId, version) => {
-    try {
-        const res = await api.delete(`/user/profile/del-department/${departmentId}`, {
-            params: { version }
-        });
-        return { success: true, data: res.data };
-    } catch (error) {
-        return { success: false, error: error.response?.data?.error };
-    }
-}
-
 //#endregion
 
-//#region Forced Password Change Actions
+//#region Operaciones de cambios de contraseña
 /**
  * Solicitud para marcar a un usuario para forzar un cambio de contraseña
  * @param {Object} userId - el ID del usuario que se quiere va a marcar

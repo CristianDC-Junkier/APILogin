@@ -27,7 +27,7 @@ export const AuthContext = createContext();
  */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);      // Usuario actual
-    const [version, setVersion] = useState(0);   // Versión del usuario
+    const [version, setVersion] = useState(1);   // Versión del usuario
     const [loading, setLoading] = useState(true); // Estado de carga inicial
 
     /**
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
      */
     const contextUpdate = useCallback((newUser) => {
         setUser(newUser);
-        setVersion(newUser.version || 0);
+        setVersion(newUser.version || 1);
     }, []); 
 
     /**
@@ -52,7 +52,8 @@ export const AuthProvider = ({ children }) => {
     }, [contextUpdate]);
 
 
-    /** * Restaurar sesión al cargar la app usando cookie HttpOnly
+    /** 
+     *  Restaurar sesión al cargar la app usando cookie HttpOnly
      */
     useEffect(() => {
         const restoreSession = async () => {
@@ -75,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     }, [contextUpdate]); // contextUpdate es estable gracias a useCallback.
 
     /**
-     * Login
+     * Inicio de sesión
      * @param {Object} credentials - { username, password, remember }
      */
     const contextLogin = async (credentials) => {
@@ -108,7 +109,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     /**
-     * Logout
+     * Desconectar usuario
      */
     const contextLogout = async () => {
         try {
@@ -128,7 +129,7 @@ export const AuthProvider = ({ children }) => {
                 loading,
                 login: contextLogin,
                 logout: contextLogout,
-                update: contextUpdate, // Exponer también la función para uso interno si es necesario
+                update: contextUpdate,
             }}
         >
             {/* Mostrar un spinner de carga si es necesario antes de renderizar children */}

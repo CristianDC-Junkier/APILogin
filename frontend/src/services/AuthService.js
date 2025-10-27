@@ -1,5 +1,10 @@
 ﻿import api from './AxiosService';
 
+/**
+ * Servicio de autenticación
+ * Maneja el login, logout y refresh del accessToken
+ */
+
 // Token en memoria
 let accessToken = null;
 
@@ -23,8 +28,9 @@ export const clearAccessToken = () => {
 };
 
 /**
- * Login
- * credentials: { username, password, remember }
+ * Solicitud de inicio de sesión
+ * @param {Object} credentials - El usuario, contraseña y si quiere recordar de quien realiza la solicitud 
+ * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const login = async (credentials) => {
     try {
@@ -45,7 +51,26 @@ export const login = async (credentials) => {
 };
 
 /**
+ * Solicitud de cierre de sesión
+ * @returns {JSON} - Devuelve la información recibida de la llamada
+ */
+export const logout = async () => {
+    try {
+        await api.get('/auth/logout'); // el backend borra la cookie refreshToken
+        clearAccessToken();
+        return { success: true };
+    } catch (error) {
+        clearAccessToken();
+        return {
+            success: false,
+            error: error.response?.data?.error || 'Error al cerrar sesión',
+        };
+    }
+};
+
+/**
  * Llamada al backend para refrescar el accessToken usando la cookie refreshToken
+ * @returns {JSON} - Devuelve la información recibida de la llamada
  */
 export const refreshAccessToken = async () => {
     try {
@@ -58,23 +83,6 @@ export const refreshAccessToken = async () => {
         return {
             success: false,
             error: error.response?.data?.error || 'Error al recargar Token',
-        };
-    }
-};
-
-/**
- * Logout
- */
-export const logout = async () => {
-    try {
-        await api.get('/auth/logout'); // el backend borra la cookie refreshToken
-        clearAccessToken();
-        return { success: true };
-    } catch (error) {
-        clearAccessToken();
-        return {
-            success: false,
-            error: error.response?.data?.error || 'Error al cerrar sesión',
         };
     }
 };
