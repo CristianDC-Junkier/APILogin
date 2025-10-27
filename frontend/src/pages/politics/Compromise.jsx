@@ -17,9 +17,11 @@ const Compromise = () => {
 
             <Row className="justify-content-center">
                 <Col md="10">
-                    <h1 className="mb-3 text-center mt-4"><strong>Compromiso con la Protección de Datos</strong></h1>
+                    <h1 className="mb-3 text-center mt-4">
+                        <strong>Compromiso con la Protección de Datos</strong>
+                    </h1>
                     <p className="mb-3">
-                        La <strong>Dirección / Órgano de Gobierno del Ayuntamiento de Almonte</strong>, responsable del <strong>Listín Telefónico</strong>,
+                        La <strong>Dirección / Órgano de Gobierno del Ayuntamiento de Almonte</strong>, responsable del <strong>IDEE Almonte</strong>,
                         asume la máxima responsabilidad y compromiso con la <strong>protección de datos personales</strong>, garantizando el cumplimiento
                         del <strong>Reglamento (UE) 2016/679</strong> y de la <strong>normativa española</strong> en materia de protección de datos.
                     </p>
@@ -52,10 +54,10 @@ const Compromise = () => {
 
                 <Col md="10" className="mb-3">
                     <h4 className="mb-2"><strong>Comunicación y revisión</strong></h4>
-                    La política de protección de datos se comunica a todos los <strong>trabajadores con acceso al Listín Telefónico</strong>
+                    La política de protección de datos se comunica a todos los <strong>trabajadores con acceso al IDEE de Almonte </strong>
                     y se pone a disposición de las partes interesadas.<br />
                     Cada miembro del personal es responsable de <strong>aplicarla y de identificar oportunidades de mejora</strong>.<br />
-                    Esta política será revisada periódicamente por la <strong>Dirección / Órgano de Gobierno del Ayuntamiento de Almonte</strong>
+                    Esta política será revisada periódicamente por la <strong>Dirección / Órgano de Gobierno del Ayuntamiento de Almonte </strong>
                     para adecuarse en todo momento a la normativa vigente.
                 </Col>
             </Row>
