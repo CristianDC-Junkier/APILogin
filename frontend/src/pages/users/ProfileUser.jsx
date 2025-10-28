@@ -4,19 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import { FaUser, FaEdit, FaTrash, FaCalendarAlt } from 'react-icons/fa';
-import Spinner from '../../components/utils/SpinnerComponent';
+
 import { useAuth } from "../../hooks/useAuth";
-
-import {
-    getProfile,
-    modifyProfile,
-    deleteProfile,
-    addDepartmentProfile,
-    deleteDepartmentProfile
-} from "../../services/UserService";
-
+import { getProfile, modifyProfile, deleteProfile, addDepartmentProfile, deleteDepartmentProfile } from "../../services/UserService";
 import { getDepartmentList } from "../../services/DepartmentService";
 
+import SpinnerComponent from '../../components/utils/SpinnerComponent';
 import BackButtonComponent from "../../components/utils/BackButtonComponent";
 import BadgeComponent from "../../components/badge/BadgeComponent";
 import AddBadgeComponent from "../../components/badge/AddBadgeComponent";
@@ -38,13 +31,11 @@ const ProfileUser = () => {
     /**
      * Cargar perfil del usuario
      */
-    const fetchData = async (forcedVersion) => {
+    const fetchData = async () => {
         setLoading(true);
 
         try {
-            const currentVersion = forcedVersion ?? version;
-
-            let profileResp = await getProfile(currentVersion);
+            let profileResp = await getProfile(version);
 
             if (profileResp.success && profileResp.data) {
                 const sortedDepartments = [...profileResp.data.departments].sort((a, b) =>
@@ -76,7 +67,7 @@ const ProfileUser = () => {
         fetchData(version);
     }, [version]);
 
-    if (loading || !profile?.user) return <Spinner />;
+    if (loading || !profile?.user) return <SpinnerComponent />;
 
     /**
      * Modificar Perfil
@@ -192,7 +183,6 @@ const ProfileUser = () => {
 
                                                                     if (result.success) {
                                                                         update(result.data.user);
-                                                                        fetchData(result.data.user.version);
                                                                     } else {
                                                                         Swal.fire("Error", result.error || "No se pudo eliminar", "error");
                                                                     }
@@ -211,7 +201,6 @@ const ProfileUser = () => {
 
                                                             if (result.success) {
                                                                 update(result.data.user);
-                                                                fetchData(result.data.user.version);
                                                             } else {
                                                                 Swal.fire("Error", result.error || "No se pudo eliminar", "error");
                                                             }

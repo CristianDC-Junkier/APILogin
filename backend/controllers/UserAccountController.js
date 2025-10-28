@@ -4,8 +4,6 @@ const { Op } = require("sequelize");
 
 const LoggerController = require("../controllers/LoggerController");
 
-const { generateAccessToken } = require("../utils/JWT");
-
 /**
  * Controlador de autenticación y gestión de usuarios.
  * 
@@ -77,13 +75,13 @@ class UserAccountController {
                 }))
             }));
 
-            res.json({ users: formattedUsers });
+            return res.json({ users: formattedUsers });
 
 
         } catch (error) {
             LoggerController.error('Error recogiendo los usuarios por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
     //#endregion
@@ -111,11 +109,11 @@ class UserAccountController {
             const user = await UserAccount.create({ username, password, usertype });
 
             LoggerController.info('Usuario con id ' + user.id + ' creado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id: user.id });
+            return res.json({ id: user.id });
         } catch (error) {
             LoggerController.error('Error creando un usuario por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -150,11 +148,11 @@ class UserAccountController {
             await user.save();
 
             LoggerController.info('Usuario con id ' + user.id + ' actualizado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id: user.id });
+            return res.json({ id: user.id });
         } catch (error) {
             LoggerController.error('Error modificando al usuario con id ' + user.id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -181,11 +179,11 @@ class UserAccountController {
             await user.save();
 
             LoggerController.info('Usuario con id ' + user.id + ' marcado para cambio de contraseña por el usuario con id ' + req.user.id);
-            res.json({ id });
+            return res.json({ id });
         } catch (error) {
             LoggerController.error('Error forzando la recuperación de contraseña del un usuario con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -211,12 +209,12 @@ class UserAccountController {
             await user.destroy();
 
             LoggerController.info('Usuario con id ' + user.id + ' eliminado por el usuario con id ' + req.user.id);
-            res.json({ id });
+            return res.json({ id });
 
         } catch (error) {
             LoggerController.error('Error eliminando un usuario con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -262,7 +260,7 @@ class UserAccountController {
                 });
             }
 
-            res.json({
+            return res.json({
                 user: {
                     id: user.id,
                     username: user.username,
@@ -279,7 +277,7 @@ class UserAccountController {
         } catch (error) {
             LoggerController.error('Error obtiendo el perfil del usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -356,7 +354,7 @@ class UserAccountController {
 
             LoggerController.info('El usuario con id ' + user.id + ' actualizó su perfil correctamente');
 
-            res.json({
+            return res.json({
                 user: {
                     id: user.id,
                     username: user.username,
@@ -370,7 +368,7 @@ class UserAccountController {
         } catch (error) {
             LoggerController.error('Error modificando su perfil del usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -408,11 +406,11 @@ class UserAccountController {
             await user.destroy();
 
             LoggerController.info('El usuario con id ' + req.user.id + ' se elimino a si mismo correctamente');
-            res.json({ id });
+            return res.json({ id });
         } catch (error) {
             LoggerController.error('Error eliminando su perfil del usuario con id ' + req.user.id);
             LoggerController.error('Error en la eliminación de usuario: ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -453,12 +451,12 @@ class UserAccountController {
             user.forcePwdChange = false;
             await user.save();
 
-            res.json({ id });
+            return res.json({ id });
             LoggerController.info('El usuario con id ' + id + ' cambió su contraseña correctamente');
         } catch (error) {
             LoggerController.error('Error actualizando la contraseña de su perfil del usuario con id ' + req.user.id);
             LoggerController.error(`Error actualizando contraseña: ${error.message}`);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
     //#endregion
@@ -487,13 +485,12 @@ class UserAccountController {
             const departments = await user.getDepartments();
 
             LoggerController.info('Departamento con id ' + departmentId + ' añadido correctamente al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
-            res.json({ departmentsSize: departments.length });
-
+            return res.json({ departmentsSize: departments.length });
 
         } catch (error) {
             LoggerController.error('Error al añadir el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -521,12 +518,12 @@ class UserAccountController {
             const departments = await user.getDepartments();
 
             LoggerController.info('Departamento con id ' + departmentId + ' eliminado correctamente del usuario con id ' + id + ' por el usuario con id ' + req.user.id);
-            res.json({ departmentsSize: departments.length });
+            return res.json({ departmentsSize: departments.length });
 
         } catch (error) {
             LoggerController.error('Error al eliminar el departamento con id ' + departmentId + ' al usuario con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -567,7 +564,7 @@ class UserAccountController {
             await user.save({ skipRefreshTokens: true }); 
 
             LoggerController.info('Departamento con id ' + departmentId + ' añadido correctamente a su usuario con id ' + id);
-            res.json({
+            return res.json({
                 user: {
                     id: user.id,
                     username: user.username,
@@ -579,7 +576,7 @@ class UserAccountController {
         } catch (error) {
             LoggerController.error('Error al añadir el departamento con id ' + departmentId + ' a su usuario con id ' + id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -620,7 +617,7 @@ class UserAccountController {
             await user.save({ skipRefreshTokens: true }); 
 
             LoggerController.info('Departamento con id ' + departmentId + ' eliminado correctamente a su usuario con id ' + id);
-            res.json({
+            return res.json({
                 user: {
                     id: user.id,
                     username: user.username,
@@ -632,7 +629,7 @@ class UserAccountController {
         } catch (error) {
             LoggerController.error('Error al eliminar el departamento con id ' + departmentId + ' a su usuario con id ' + id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
     //#endregion

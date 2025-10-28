@@ -24,11 +24,11 @@ class LinksController {
     static async list(req, res) {
         try {
             const links = await Links.findAll();
-            res.json({ links });
+            return res.json({ links });
         } catch (error) {
             LoggerController.error('Error recogiendo los links por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -50,11 +50,11 @@ class LinksController {
             const link = await Links.create({ name, web });
 
             LoggerController.info('Nuevo link con id ' + link.id + ' creado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id: link.id });
+            return res.json({ id: link.id });
         } catch (error) {
             LoggerController.error('Error en la creación del link por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -79,11 +79,11 @@ class LinksController {
             await link.save();
 
             LoggerController.info('Link con id ' + link.id + ' modificado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id: link.id });
+            return res.json({ id: link.id });
         } catch (error) {
             LoggerController.error('Error en la modificación del link con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -104,11 +104,11 @@ class LinksController {
             await link.destroy();
 
             LoggerController.info('Link con id ' + link.id + ' modificado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id });
+            return res.json({ id });
         } catch (error) {
             LoggerController.error('Error en la eliminación del link con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 

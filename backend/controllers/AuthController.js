@@ -95,7 +95,7 @@ class AuthController {
                 path: "/IDEE-Almonte/api/auth"
             });
 
-            LoggerController.info(`Logout exitoso usuario ${payload.userId}`);
+            LoggerController.info(`Logout exitoso usuario con id ${payload.userId}`);
             return res.json({ message: "Logout exitoso" });
 
         } catch (error) {

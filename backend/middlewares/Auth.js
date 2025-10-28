@@ -39,7 +39,7 @@ async function isAuthenticated(req, res, next) {
     if (!payload) return; // ya respondió con 401
 
     req.user = payload;
-    next();
+    return next();
 }
 
 /**
@@ -55,7 +55,7 @@ async function adminOnly(req, res, next) {
     }
 
     req.user = payload;
-    next();
+    return next();
 }
 
 module.exports = { adminOnly, isAuthenticated };
