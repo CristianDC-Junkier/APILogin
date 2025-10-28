@@ -43,11 +43,11 @@ class DepartmentController {
                 links: department.links || [],
             }));
 
-            res.json({ departments: dFormatted });
+            return res.json({ departments: dFormatted });
         } catch (error) {
             LoggerController.error('Error recogiendo los departamentos por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 
@@ -69,11 +69,11 @@ class DepartmentController {
             const department = await Department.create({ name });
 
             LoggerController.info('Nuevo departamento con id ' + department.id + ' creado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id: department.id });
+            return res.json({ id: department.id });
         } catch (error) {
             LoggerController.error('Error en la creación del departamento por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     }
 
@@ -101,11 +101,11 @@ class DepartmentController {
             await department.save();
 
             LoggerController.info('Departamento con id ' + department.id + ' actualizado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id: department.id });
+            return res.json({ id: department.id });
         } catch (error) {
             LoggerController.error('Error en la modificación del departamento por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     }
 
@@ -126,11 +126,11 @@ class DepartmentController {
             await department.destroy();
 
             LoggerController.info('Departamento con id ' + department.id + ' eliminado correctamente por el usuario con id ' + req.user.id);
-            res.json({ id });
+            return res.json({ id });
         } catch (error) {
             LoggerController.error('Error en la eliminación del departamento por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     }
     //#endregion
@@ -156,12 +156,12 @@ class DepartmentController {
             const links = await department.getLinks();
 
             LoggerController.info('Link con id ' + linkId + ' añadido correctamente al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
-            res.json({ linksSize: links.length });
+            return res.json({ linksSize: links.length });
 
         } catch (error) {
             LoggerController.error('Error al añadir el link' + linkId + ' al departamento' + id + 'por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     }
 
@@ -185,12 +185,12 @@ class DepartmentController {
             const links = await department.getLinks();
 
             LoggerController.info('Link con id ' + linkId + ' eliminado correctamente al departamento con id ' + id + ' por el usuario con id ' + req.user.id);
-            res.json({ linksSize: links.length });
+            return res.json({ linksSize: links.length });
 
         } catch (error) {
             LoggerController.error('Error al eliminar el link con id ' + linkId + ' del departamento con id ' + id + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     }
 
@@ -236,11 +236,11 @@ class DepartmentController {
                 links: department.links || [],
             }));
 
-            res.json({ departments: dFormatted });
+            return res.json({ departments: dFormatted });
         } catch (error) {
             LoggerController.error('Error recogiendo los departamentos desde el perfil por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 

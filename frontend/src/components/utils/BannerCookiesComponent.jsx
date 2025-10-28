@@ -10,19 +10,18 @@ const CookieBanner = () => {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
-        const accepted = localStorage.getItem("cookiesAccepted");
+        const accepted = localStorage.getItem("IEE-Almonte/cookiesAccepted");
         if (!accepted) {
             setVisible(true);
         }
     }, []);
 
     const handleAccept = () => {
-        localStorage.setItem("cookiesAccepted", "true");
+        localStorage.setItem("IEE-Almonte/cookiesAccepted", "true");
         setVisible(false);
     };
 
     if (!visible) return null;
-    if (document.querySelector(".cookie-banner")) return null;
 
     return (
         <div
