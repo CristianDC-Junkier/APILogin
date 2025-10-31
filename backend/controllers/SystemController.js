@@ -83,7 +83,7 @@ const SystemController = {
                 return res.status(404).json({ error: "Archivo log no encontrado" });
             }
 
-            return res.download(logPath, log);
+            return res.download(logPath);
 
         } catch (error) {
             LoggerController.error('Error al descargar el archivo de log ' + req.params.log + ' por el usuario con id ' + req.user.id);
