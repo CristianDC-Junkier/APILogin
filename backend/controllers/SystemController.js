@@ -61,7 +61,7 @@ const SystemController = {
             return res.type("text/plain").send(content);
 
         } catch (error) {
-            LoggerController.error('Error al leer el archivo de log ' + log + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error al leer el archivo de log ' + req.params.log + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             return res.status(500).json({ error: error.message });
         }
@@ -86,7 +86,7 @@ const SystemController = {
             return res.download(logPath, log);
 
         } catch (error) {
-            LoggerController.error('Error al descargar el archivo de log ' + log + ' por el usuario con id ' + req.user.id);
+            LoggerController.error('Error al descargar el archivo de log ' + req.params.log + ' por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             return res.status(500).json({ error: error.message });
         }
