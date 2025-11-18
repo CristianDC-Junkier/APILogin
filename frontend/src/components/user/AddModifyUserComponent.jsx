@@ -35,7 +35,7 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
     const labelStyle = 'width:180px; font-weight:bold; text-align:left;';
     const inputStyle = 'flex:1; padding:0.35rem; font-size:1rem; border:1px solid #ccc; border-radius:4px;';
 
-    const step1Html = `
+    const stepHtml = `
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <div>
         <div style="${rowStyle} margin-top: 5vh">
@@ -64,7 +64,7 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
 
     const swalStep = await Swal.fire({
         title: action === "create" ? "Crear Usuario" : "Modificar Usuario",
-        html: step1Html,
+        html: stepHtml,
         focusConfirm: false,
         width: '600px',
         showCancelButton: true,
