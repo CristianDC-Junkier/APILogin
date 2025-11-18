@@ -9,7 +9,9 @@ const { encrypt, decrypt, hash } = require("../utils/Crypto");
  * Campos:
  * - id   → Identificador único autoincremental.
  * - name → Nombre del link, único (encriptado).
+ * - name_hash → Hash del nombre para búsquedas rápidas y únicas.
  * - web  → Ip de la web externa (encriptada).
+ * - web_hash → Hash de la web para búsquedas rápidas y únicas.
  */
 const Links = sequelize.define("Links", {
     id: {

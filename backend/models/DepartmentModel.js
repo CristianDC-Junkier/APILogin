@@ -9,6 +9,7 @@ const { encrypt, decrypt, hash } = require("../utils/Crypto");
  * Campos:
  * - id   → Identificador único autoincremental.
  * - name → Nombre del departamento, único (encriptado).
+ * - name_hash → Hash del nombre para búsquedas rápidas y únicas.
  */
 const Department = sequelize.define("Department", {
     id: {
