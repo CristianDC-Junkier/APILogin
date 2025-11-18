@@ -27,7 +27,7 @@ const User = sequelize.define("UserAccount", {
         allowNull: false,
         unique: {
             name: 'unique_username',
-            msg: 'Nombre de usuario ya existente' // mensaje personalizado
+            msg: 'Nombre de usuario ya existente' 
         },
     },
     password: {
