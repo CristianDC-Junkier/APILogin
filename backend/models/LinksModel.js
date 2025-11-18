@@ -1,6 +1,6 @@
 ﻿const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const { encrypt, decrypt } = require("../utils/Crypto");
+const { encrypt, decrypt, hash } = require("../utils/Crypto");
 
 /**
  * Modelo Sequelize para los enlaces.
@@ -20,24 +20,41 @@ const Links = sequelize.define("Links", {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: {
-            name: 'unique_linkname',
-            msg: 'Nombre del link ya existente'
+        set(value) {
+            this.setDataValue("name", encrypt(value));
+            this.setDataValue("name_hash", hash(value));
         },
-        set(value) { this.setDataValue("name", encrypt(value)); },
         get() {
             const val = this.getDataValue("name");
             return val ? decrypt(val) : null;
         },
     },
+    name_hash: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        unique: {
+            name: 'unique_linkname',
+            msg: 'Nombre del link ya existente'
+        },
+    },
     web: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
-        set(value) { this.setDataValue("web", encrypt(value)); },
+        set(value) {
+            this.setDataValue("web", encrypt(value));
+            this.setDataValue("web_hash", hash(value));
+        },
         get() {
             const val = this.getDataValue("web");
             return val ? decrypt(val) : null;
+        },
+    },
+    web_hash: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        unique: {
+            name: 'unique_webname',
+            msg: 'Link de la web ya existente'
         },
     },
 });
