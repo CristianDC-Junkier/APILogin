@@ -94,7 +94,7 @@ api.interceptors.response.use(
          *
          * Si la sesión ha expirado o el token es inválido, se intenta refrescar el token de acceso.
          * Este bloque se evalúa antes que el 409, ya que sin un token válido no se pueden
-         * ejecutar operaciones autenticadas, incluida la actualización del usuario.
+         * ejecutar operaciones autentificadas, incluida la actualización del usuario.
          */
         if (
             status === 401 &&
