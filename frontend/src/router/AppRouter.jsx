@@ -3,14 +3,15 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import MainLayout from '../layouts/MainLayout';
 import ExternalLayout from '../layouts/ExternalLayout';
+import HomeLayout from '../layouts/HomeLayout';
 
 import PublicRoute from './PublicRoute';
 import PrivateRoute from './PrivateRoute';
 import RoleRoute from './RoleRoute';
 
-
 import LoginPage from '../pages/Login';
 import HomePage from '../pages/Home';
+import Home2Page from '../pages/Home2';
 
 import NotFoundPage from '../pages/NotFound';
 import AccessDeniedPage from '../pages/AccessDenied';
@@ -60,6 +61,9 @@ const AppRouter = () => {
             </Route>
             <Route element={<ExternalLayout />}>
                 <Route path="/web" element={<PrivateRoute><ExternalWebPage /></PrivateRoute>} />
+            </Route>
+            <Route element={<HomeLayout />}>
+                <Route path="/home2" element={<PrivateRoute> <Home2Page /> </PrivateRoute>} />
             </Route>
 
         </Routes>

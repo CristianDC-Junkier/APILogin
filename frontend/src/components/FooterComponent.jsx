@@ -12,9 +12,9 @@ const FooterComponent = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <footer className="bg-dark text-white py-2 mt-auto">
+        <footer className="bg-dark text-white py-2 mt-auto " style={{ zIndex: 9999 }} >
 
-            <div className="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-between px-3">
+            <div className="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-between px-3 ">
 
                 {/* Izquierda: Logo */}
                 <div className="footer-logo">

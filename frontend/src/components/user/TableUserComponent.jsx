@@ -186,7 +186,8 @@ const TableUserComponent = ({
     const handlePWDC = async userItem => {
         const password = await PWDAskComponent({ userItem });
         if (!password) return;
-        const result = markPWDCUser(userItem.id, { password }, userItem.version);
+        const result = await markPWDCUser(userItem.id, { password }, userItem.version);//TENIA UN FALLO HAY QUE COMPROBARLO EN EL SERVER
+        console.log(result);
         if (result.success) {
             Swal.fire("¡Éxito!", "Contraseña reiniciada correctamente", "success");
         } else {
