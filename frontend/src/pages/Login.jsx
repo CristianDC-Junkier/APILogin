@@ -73,7 +73,7 @@ const Login = () => {
             const response = await login({ username, password, finalRemember });
 
             if (response.success) {
-                navigate('/home');
+                navigate('/home2');
             } else {
                 Swal.fire('Error', response.error || 'Login fallido', 'error');
             }
