@@ -10,8 +10,8 @@ import PrivateRoute from './PrivateRoute';
 import RoleRoute from './RoleRoute';
 
 import LoginPage from '../pages/Login';
-import HomePage from '../pages/Home';
-import Home2Page from '../pages/Home2';
+import HomePage from '../pages/home/Home';
+//import HomeOld from '../pages/old-pages/Home-old';
 
 import NotFoundPage from '../pages/NotFound';
 import AccessDeniedPage from '../pages/AccessDenied';
@@ -20,7 +20,7 @@ import DashBoardUserPage from '../pages/users/DashboardUser';
 import DashboardSystemPage from '../pages/system/DashboardSystem';
 import DashboardDepartmentPage from '../pages/department/DashboardDepartment';
 import ExternalWebPage from '../pages/web/ExternalWeb';
-import WebListPage from '../pages/web/WebList';
+//import WebListPage from '../pages/old-pages/WebList-old';
 
 import ProfileUserPage from '../pages/users/ProfileUser';
 
@@ -49,8 +49,6 @@ const AppRouter = () => {
 
                 {/* Rutas privadas */}
                 <Route path="/profile" element={<PrivateRoute><ProfileUserPage /> </PrivateRoute>} />
-                <Route path="/home" element={<PrivateRoute> <HomePage /> </PrivateRoute>} />
-                <Route path="/list" element={<PrivateRoute><WebListPage /></PrivateRoute>} />
 
                 {/* Rutas privadas por rol */}
                 <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashBoardUserPage /></RoleRoute>} />
@@ -63,7 +61,7 @@ const AppRouter = () => {
                 <Route path="/web" element={<PrivateRoute><ExternalWebPage /></PrivateRoute>} />
             </Route>
             <Route element={<HomeLayout />}>
-                <Route path="/home2" element={<PrivateRoute> <Home2Page /> </PrivateRoute>} />
+                <Route path="/home" element={<PrivateRoute> <HomePage /> </PrivateRoute>} />
             </Route>
 
         </Routes>
