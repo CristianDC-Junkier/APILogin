@@ -47,6 +47,8 @@ app.use(basePath, (req, res) => {
     res.sendFile(path.join(__dirname, "./dist/index.html"));
 })*/
 
+app.use(basePath + '/i-links', express.static(path.join(__dirname, 'images/links')));
+
 app.use('/', (req, res) => {
     res.redirect(`${basePath}/`);
 });

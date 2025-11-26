@@ -26,7 +26,7 @@ function formatUptime(totalSeconds) {
 /**
  * Página encarga de mostrar los logs y las estadísticas del servidor
  */
-export default function DashboardSystemPage() {
+export default function DashboardSystem() {
 
 
     const [logs, setLogs] = useState([]);

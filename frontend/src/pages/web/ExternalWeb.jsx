@@ -7,7 +7,7 @@ import BackButtonComponent from "../../components/utils/BackButtonComponent";
 /**
  * Página encarga de mostrar la página elegida en el WebList
  */
-const ExternalWebPage = () => {
+const ExternalWeb = () => {
     const { user } = useAuth();
     const location = useLocation();
 
@@ -33,7 +33,7 @@ const ExternalWebPage = () => {
             {/* Botonera arriba */}
             <Row className="align-items-center m-0 p-0 mb-1">
                 <Col className="d-flex justify-content-start p-0">
-                    <BackButtonComponent back="/list" />
+                    <BackButtonComponent back="/home" />
                 </Col>
             </Row>
 
@@ -70,4 +70,4 @@ const ExternalWebPage = () => {
     );
 };
 
-export default ExternalWebPage;
+export default ExternalWeb;

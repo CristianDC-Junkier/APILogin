@@ -216,7 +216,7 @@ class DepartmentController {
                     {
                         model: Links,
                         as: 'links',
-                        attributes: ['id', 'name', 'web'],
+                        attributes: ['id', 'name', 'web', 'description', 'image'],
                         through: { attributes: [] }
                     },
                     {

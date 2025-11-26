@@ -31,7 +31,7 @@ const imageBackground = {
 const ExternalLayout = () => (
     <div style={imageBackground}>
         {/* Contenedor principal para el contenido */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", maxHeight: "90vh" }}>
+        <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
             <Outlet /> {/* Aquí se renderizan las rutas hijas */}
         </div>
         {/* Footer de la página */}

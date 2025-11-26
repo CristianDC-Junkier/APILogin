@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'reactstrap';
 import { faUsers, faUserAlt, faGlobeEurope, faScroll, faBriefcase } from '@fortawesome/free-solid-svg-icons';
 
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 
-import HomeButtonComponent from '../components/utils/HomeButtonComponent';
-import LogoutButton from '../components/utils/LogoutComponent';
+import HomeButtonComponent from '../../components/utils/HomeButtonComponent';
+import LogoutButton from '../../components/utils/LogoutComponent';
 
 /**
  * Página que muestra las acciones disponibles al usuario
