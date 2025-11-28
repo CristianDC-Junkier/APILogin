@@ -1,67 +1,29 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faUserAlt, faScroll, faBriefcase } from '@fortawesome/free-solid-svg-icons';
-import { FaMoon, FaSun, FaSignOutAlt } from "react-icons/fa";
+import { FaMoon, FaSun, FaSignInAlt } from "react-icons/fa";
 
-import { useAuth } from '../../hooks/useAuth';
-import { getLinksByProfileList } from "../../services/DepartmentService";
 import logo from "../../assets/ayto_almonte_notext.png";
 
 import SidebarItem from '../../components/home/SideBardComponent';
-import DepartmentLinks from '../../components/home/DepartmentLinksComponent';
-import SpinnerComponent from '../../components/utils/SpinnerComponent';
-
 
 /**
- * Página que muestra las acciones disponibles al usuario
+ * Página pública sin elementos de perfil ni opciones de usuario.
  */
-const Home = () => {
+const PublicHome = () => {
     const navigate = useNavigate();
-    const { user, logout, version } = useAuth();
 
     const [darkMode, setDarkMode] = useState(false);
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const [visibleSections, setVisibleSections] = useState({});
-    const [departments, setDepartments] = useState([]);
-    const [loading, setLoading] = useState(false);
+
+    const toggleMode = () => setDarkMode(!darkMode);
 
     const handleMouseEnter = () => {
-        if (window.innerWidth >= 768) {
+        if (window.innerWidth >= 768) { 
             setSidebarExpanded(true);
         }
     };
-
-
-    useEffect(() => {
-        const fetchLinks = async () => {
-            setLoading(true);
-            try {
-                const response = await getLinksByProfileList(version);
-                setDepartments(response.data.departments || []);
-            } finally {
-                setLoading(false);
-            }
-        };
-        if (version) fetchLinks();
-    }, [version]);
-
-    const actions = (() => {
-        switch (user.usertype) {
-            case 'USER': return [
-                { label: 'Mi Perfil', icon: faUserAlt, action: () => navigate('/profile') },
-            ];
-            default: return [
-                { label: 'Gestión de Usuarios', icon: faUsers, action: () => navigate('/users') },
-                { label: 'Gestión de Departamentos', icon: faBriefcase, action: () => navigate('/departments') },
-                { label: 'Acceder Logs', icon: faScroll, action: () => navigate('/logs') },
-                { label: 'Mi Perfil', icon: faUserAlt, action: () => navigate('/profile') },
-            ];
-        }
-    })();
-
-    const toggleMode = () => setDarkMode(!darkMode);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -80,7 +42,6 @@ const Home = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    if (loading) return <SpinnerComponent />;
 
     return (
         <div style={{
@@ -110,7 +71,6 @@ const Home = () => {
                     transition: "all 0.3s",
                 }}
             >
-
                 <div>
                     <div  style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
                         <a href="https://almonte.es/es/" target="_blank" rel="noopener noreferrer">
@@ -118,17 +78,16 @@ const Home = () => {
                         </a>
                     </div>
 
-                    {actions.map((item, i) => (
-                        <SidebarItem
-                            key={i}
-                            icon={<FontAwesomeIcon icon={item.icon} />}
-                            text={item.label}
-                            expanded={sidebarExpanded}
-                            onClick={item.action}
-                            darkMode={darkMode}
-                        />
-                    ))}
+                    {/* Botón Login */}
+                    <SidebarItem
+                        icon={<FaSignInAlt />}
+                        text={"Iniciar Sesión"}
+                        expanded={sidebarExpanded}
+                        onClick={toggleMode}
+                        darkMode={darkMode}
+                    />
 
+                    {/* Modo oscuro / claro */}
                     <SidebarItem
                         icon={darkMode ? <FaSun /> : <FaMoon />}
                         text={darkMode ? "Modo Claro" : "Modo Oscuro"}
@@ -137,14 +96,6 @@ const Home = () => {
                         darkMode={darkMode}
                     />
                 </div>
-
-                <SidebarItem
-                    icon={<FaSignOutAlt />}
-                    text="Cerrar sesión"
-                    expanded={sidebarExpanded}
-                    onClick={logout}
-                    darkMode={darkMode}
-                />
             </div>
 
             {/* CONTENIDO */}
@@ -175,40 +126,16 @@ const Home = () => {
                         transition: "all 0.5s"
                     }}>
                         <h3><strong>Plataforma IDE</strong></h3>
-                        <p>Información geoespacial del Ayuntamiento de Almonte.</p>
+                        <p>
+                            Bienvenido a la plataforma geoespacial del Ayuntamiento de Almonte.
+                            Para acceder a los departamentos y herramientas, por favor inicia sesión.
+                        </p>
                     </div>
 
-                    {/* DEPARTAMENTOS DINÁMICOS */}
-                    {departments.length === 0 ? (
-                        <div className="fade-section" style={{
-                            background: darkMode ? "rgba(25,25,30,0.8)" : "rgba(255,255,255,0.8)",
-                            borderRadius: "12px",
-                            border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)",
-                            padding: "20px",
-                            marginBottom: "25px",
-                            opacity: visibleSections[0] ? 1 : 0,
-                            transform: visibleSections[0] ? 'translateY(0)' : 'translateY(25px)',
-                            transition: "all 0.5s",
-                            textAlign: "center"
-                        }}>
-                            <h3 style={{ color: darkMode ? "white" : "#222" }}>Aún no tienes ningún departamento asociado.</h3>
-                        </div>
-                    ) : (
-                        departments.map((dep, i) => (
-                            <DepartmentLinks
-                                key={dep.id}
-                                title={dep.name}
-                                links={dep.links}
-                                darkMode={darkMode}
-                                visibleSections={visibleSections}
-                                indexOffset={i + 1}
-                            />
-                        ))
-                    )}
                 </div>
             </div>
         </div>
     );
 }
 
-export default Home;
+export default PublicHome;

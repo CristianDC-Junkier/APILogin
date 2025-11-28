@@ -3,20 +3,21 @@ import { CardBody, Button } from "reactstrap";
 import logo from "../../assets/ayto_almonte_notext.png";
 import { useNavigate } from "react-router-dom";
 
-const CARD_HEIGHT = 365; // Altura total de la tarjeta
-const IMG_HEIGHT = 175;  // Altura del contenedor de la imagen
+const MIN_CARD_HEIGHT = 300;
+const IMG_HEIGHT = 125;
 
 const AnimatedCard = ({ title, web, desc, img, darkMode }) => {
     const navigate = useNavigate();
 
     return (
         <div
+            className="animated-card"
             style={{
-                height: `${CARD_HEIGHT}px`,
                 width: "100%",
+                minHeight: `${MIN_CARD_HEIGHT}px`,
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
                 padding: "15px",
                 background: darkMode ? "rgba(30,30,30,0.8)" : "rgba(255,255,255,0.8)",
                 borderRadius: "12px",
@@ -25,17 +26,20 @@ const AnimatedCard = ({ title, web, desc, img, darkMode }) => {
                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
                 overflow: "hidden",
             }}
-            className= "animated-card">
-            {/* Contenedor de la imagen */}
+        >
+
+            {/* Imagen */}
             <div
                 style={{
                     height: `${IMG_HEIGHT}px`,
                     overflow: "hidden",
-                    borderRadius: "8px 8px 0px 0px",
+                    borderRadius: "8px 8px 0 0",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    borderBottom: darkMode ? "1px solid rgba(256,256,256,0.5)" : "1px solid rgba(0,0,0,0.5)", 
+                    borderBottom: darkMode
+                        ? "1px solid rgba(255,255,255,0.4)"
+                        : "1px solid rgba(0,0,0,0.3)",
                     marginBottom: "10px",
                 }}
             >
@@ -44,20 +48,29 @@ const AnimatedCard = ({ title, web, desc, img, darkMode }) => {
                     alt={title}
                     style={{
                         maxHeight: "92%",
-                        with: "auto",
+                        width: "auto",
                         objectFit: "contain",
                     }}
                 />
             </div>
 
             {/* Contenido */}
-            <CardBody style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                <h5 style={{ color: darkMode ? "white" : "#222", marginBottom: "5px" }}><strong>{title}</strong></h5>
+            <CardBody style={{ flex: 1, display: "flex", flexDirection: "column",  }}>
+                <h5 style={{ color: darkMode ? "white" : "#222", marginBottom: "5px", fontWeight: 700, margin: 0, fontSize: "clamp(0.9rem, 1.9vw, 1.25rem)" }}>
+                    {title}
+                </h5>
+
                 {desc && (
-                    <p style={{ opacity: 0.8, color: darkMode ? "white" : "#222", fontSize: "0.85rem", marginBottom: "10px" }}>
+                    <p style={{
+                        opacity: 0.8,
+                        color: darkMode ? "white" : "#222",
+                        fontSize: "clamp(0.75rem, 1.00vw, 1.0rem)",
+                        marginBottom: "10px",
+                    }}>
                         {desc}
                     </p>
                 )}
+
                 <Button
                     size="sm"
                     color="primary"
@@ -69,7 +82,7 @@ const AnimatedCard = ({ title, web, desc, img, darkMode }) => {
                         marginTop: "auto",
                     }}
                     onClick={(e) => {
-                        e.stopPropagation(); 
+                        e.stopPropagation();
                         navigate("/web", { state: { url: web } });
                     }}
                 >
@@ -77,15 +90,18 @@ const AnimatedCard = ({ title, web, desc, img, darkMode }) => {
                 </Button>
             </CardBody>
 
-            <style jsx>{`
+            {/* Animación válida en React */}
+            <style>
+                {`
                 .animated-card {
-                  transform: scale(0.98);
+                    transform: scale(0.98);
                 }
-                .animated-card:hover  {
-                  transform: scale(1);
-                  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                .animated-card:hover {
+                    transform: scale(1);
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
                 }
-            `}</style>
+                `}
+            </style>
         </div>
     );
 };

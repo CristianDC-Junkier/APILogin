@@ -8,15 +8,14 @@ const DepartmentLinks = ({ title, links = [], darkMode, visibleSections, indexOf
             background: darkMode ? "rgba(25,25,30,0.8)" : "rgba(255,255,255,0.8)",
             borderRadius: "12px",
             border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)",
-            padding: "20px",
-            marginBottom: "25px",
+            padding: "10px",
             opacity: visibleSections[indexOffset] ? 1 : 0,
             transform: visibleSections[indexOffset] ? 'translateY(0)' : 'translateY(25px)',
             transition: "all 0.5s"
         }}>
 
-            <h3 style={{ color: darkMode ? "white" : "#222" }}>
-                <strong>Departamento de {title}</strong>
+            <h3 style={{ color: darkMode ? "white" : "#222", fontWeight: 700, margin: 0, fontSize: "clamp(1rem, 1.9vw, 1.75rem)" }}>
+                Departamento de {title}
             </h3>
 
             <Row className="mt-4 justify-content-center">
