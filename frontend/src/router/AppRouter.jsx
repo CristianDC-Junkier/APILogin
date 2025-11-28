@@ -11,7 +11,7 @@ import RoleRoute from './RoleRoute';
 
 import LoginPage from '../pages/Login';
 import HomePage from '../pages/home/Home';
-//import HomeOld from '../pages/old-pages/Home-old';
+import PublicHomePage from '../pages/home/PublicHome';
 
 import NotFoundPage from '../pages/NotFound';
 import AccessDeniedPage from '../pages/AccessDenied';
@@ -20,7 +20,6 @@ import DashBoardUserPage from '../pages/users/DashboardUser';
 import DashboardSystemPage from '../pages/system/DashboardSystem';
 import DashboardDepartmentPage from '../pages/department/DashboardDepartment';
 import ExternalWebPage from '../pages/web/ExternalWeb';
-//import WebListPage from '../pages/old-pages/WebList-old';
 
 import ProfileUserPage from '../pages/users/ProfileUser';
 
@@ -37,7 +36,7 @@ const AppRouter = () => {
     return (
         <Routes>
             <Route element={<MainLayout />}>
-                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/" element={<Navigate to="/public-home" replace />} />
                 <Route path="/accessdenied" element={<AccessDeniedPage />} />
 
                 <Route path="/privacity-politic" element={<PrivacityPage />} />
@@ -62,6 +61,7 @@ const AppRouter = () => {
             </Route>
             <Route element={<HomeLayout />}>
                 <Route path="/home" element={<PrivateRoute> <HomePage /> </PrivateRoute>} />
+                <Route path="/public-home" element={<PublicRoute> <PublicHomePage /> </PublicRoute>} />
             </Route>
 
         </Routes>

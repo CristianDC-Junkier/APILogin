@@ -12,11 +12,12 @@ const imageBackground = {
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
-    backgroundAttachment: "fixed", 
+    backgroundAttachment: "fixed",
     width: "100%",
-    minHeight: "100vh",
+    height: "100vh",     
     display: "flex",
     flexDirection: "column",
+    overflow: "hidden",  
 };
 
 
@@ -28,10 +29,10 @@ const imageBackground = {
  * - Renderiza el contenido interno a través de <Outlet /> de React Router.
  * - Mantiene flexibilidad para que el contenido interno se ajuste al tamaño disponible.
  */
-const ExternalLayout = () => (
+const HomeLayout = () => (
     <div style={imageBackground}>
         {/* Contenedor principal para el contenido */}
-        <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1, display: "flex", width: "100%", overflow: "auto" }}>
             <Outlet /> {/* Aquí se renderizan las rutas hijas */}
         </div>
         {/* Footer de la página */}
@@ -41,4 +42,4 @@ const ExternalLayout = () => (
     </div>
 );
 
-export default ExternalLayout;
+export default HomeLayout;
