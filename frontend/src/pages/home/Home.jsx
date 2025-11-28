@@ -1,5 +1,6 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
+import { useOutletContext } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faUserAlt, faScroll, faBriefcase } from '@fortawesome/free-solid-svg-icons';
@@ -20,19 +21,19 @@ import SpinnerComponent from '../../components/utils/SpinnerComponent';
 const Home = () => {
     const navigate = useNavigate();
     const { user, logout, version } = useAuth();
-
-    const [darkMode, setDarkMode] = useState(false);
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const [visibleSections, setVisibleSections] = useState({});
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const { darkMode, toggleMode } = useOutletContext();
+
 
     const handleMouseEnter = () => {
         if (window.innerWidth >= 768) {
             setSidebarExpanded(true);
         }
     };
-
 
     useEffect(() => {
         const fetchLinks = async () => {
@@ -60,8 +61,6 @@ const Home = () => {
             ];
         }
     })();
-
-    const toggleMode = () => setDarkMode(!darkMode);
 
     useEffect(() => {
         const handleScroll = () => {

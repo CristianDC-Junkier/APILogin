@@ -1,5 +1,6 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
+import { useOutletContext } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaMoon, FaSun, FaSignInAlt } from "react-icons/fa";
 
@@ -12,12 +13,9 @@ import SidebarItem from '../../components/home/SideBardComponent';
  */
 const PublicHome = () => {
     const navigate = useNavigate();
-
-    const [darkMode, setDarkMode] = useState(false);
+    const { darkMode, toggleMode } = useOutletContext();
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const [visibleSections, setVisibleSections] = useState({});
-
-    const toggleMode = () => setDarkMode(!darkMode);
 
     const handleMouseEnter = () => {
         if (window.innerWidth >= 768) { 
@@ -83,7 +81,7 @@ const PublicHome = () => {
                         icon={<FaSignInAlt />}
                         text={"Iniciar Sesión"}
                         expanded={sidebarExpanded}
-                        onClick={toggleMode}
+                        onClick={() => navigate('/login')}
                         darkMode={darkMode}
                     />
 

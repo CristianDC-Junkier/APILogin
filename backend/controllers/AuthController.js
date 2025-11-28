@@ -78,7 +78,7 @@ class AuthController {
             try {
                 payload = verifyToken(token, "refresh");
             } catch {
-                res.clearCookie("refreshToken", {
+                res.clearCookie("IDEE-AlmonteRT", {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                     sameSite: "Strict",
@@ -88,7 +88,7 @@ class AuthController {
             }
 
             await RefreshToken.destroy({ where: { uuid: payload.uuid } });
-            res.clearCookie("refreshToken", {
+            res.clearCookie("IDEE-AlmonteRT", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
@@ -146,7 +146,7 @@ class AuthController {
                 const newRefreshToken = await generateRefreshToken(user.id, payload.remember);
 
                 // Cookie con nuevo refreshToken
-                res.cookie("refreshToken", newRefreshToken, {
+                res.cookie("IDEE-AlmonteRT", newRefreshToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                     sameSite: "Strict",
