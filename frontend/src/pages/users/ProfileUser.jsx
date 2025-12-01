@@ -46,7 +46,7 @@ const ProfileUser = () => {
                     const deptResp = await getDepartmentList();
                     if (deptResp.success) {
                         const availableDepartmentsAux = deptResp.data.departments
-                            .filter(d => !fullProfile.departments.some(pd => pd.id === d.id))
+                            .filter(d => !fullProfile.departments.some(pd => pd.id === d.id) && d.id !== 1)
                             .sort((a, b) => a.name.localeCompare(b.name));
                         setAvailableDepartments(availableDepartmentsAux);
                     }

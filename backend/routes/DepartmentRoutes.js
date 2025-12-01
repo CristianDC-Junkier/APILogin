@@ -10,6 +10,7 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  *
  * Endpoints:
  * - GET    /                       → Listar todos los departamento (solo ADMIN o SUPERADMIN).
+ * - GET    /public                 → Recoger el departamento público y todos sus links (cualquier usuario).
  * - POST   /                       → Crear un nuevo departamento (solo ADMIN o SUPERADMIN).
  * - PUT    /:id                    → Actualizar datos de un departamento por ID (solo ADMIN o SUPERADMIN).
  * - DELETE /:id                    → Eliminar un departamento por ID (solo ADMIN o SUPERADMIN).
@@ -24,6 +25,7 @@ const { isAuthenticated, adminOnly } = require("../middlewares/Auth");
  */
 
 router.get("/", adminOnly, DepartmentController.list);
+router.get("/public", DepartmentController.getPublicDepartment);
 router.post("/", adminOnly, DepartmentController.create);
 router.put("/:id", adminOnly, DepartmentController.update);
 router.delete("/:id", adminOnly, DepartmentController.delete);

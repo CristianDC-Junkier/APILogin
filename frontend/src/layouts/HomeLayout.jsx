@@ -9,13 +9,13 @@ const HomeLayout = () => {
     const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => {
-        const savedMode = localStorage.getItem("darkMode");
+        const savedMode = localStorage.getItem("IDEE-Almonte/darkMode");
         if (savedMode === "true") setDarkMode(true);
     }, []);
 
     const toggleMode = () => {
         setDarkMode(prev => {
-            localStorage.setItem("darkMode", !prev);
+            localStorage.setItem("IDEE-Almonte/darkMode", !prev);
             return !prev;
         });
     };

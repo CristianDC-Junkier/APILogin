@@ -10,16 +10,10 @@ const MainLayout = () => {
 
     // Recupera el modo guardado al cargar
     useEffect(() => {
-        const savedMode = localStorage.getItem("darkMode");
+        const savedMode = localStorage.getItem("IDEE-Almonte/darkMode");
         if (savedMode === "true") setDarkMode(true);
     }, []);
 
-    const toggleMode = () => {
-        setDarkMode(prev => {
-            localStorage.setItem("darkMode", !prev);
-            return !prev;
-        });
-    };
 
     const imageBackground = {
         backgroundImage: darkMode
@@ -44,7 +38,7 @@ const MainLayout = () => {
                 className="flex-grow-1 d-flex flex-column"
                 style={{ justifyContent: 'center' }}
             >
-                <Outlet context={{ darkMode, toggleMode }} /> {/* pasa darkMode y toggleMode */}
+                <Outlet context={{ darkMode }} /> {/* pasa darkMode y toggleMode */}
             </Container>
 
             {/* Footer de la página */}

@@ -64,7 +64,7 @@ const Login = () => {
             await showCaptcha();
 
             // Comprobamos si el usuario aceptó cookies
-            const cookiesAccepted = localStorage.getItem("cookiesAccepted") === "true";
+            const cookiesAccepted = localStorage.getItem("IEE-Almonte/cookiesAccepted") === "true";
 
             // Si no ha aceptado cookies, forzamos remember a false
             const finalRemember = cookiesAccepted ? remember : false;
@@ -73,7 +73,7 @@ const Login = () => {
             const response = await login({ username, password, finalRemember });
 
             if (response.success) {
-                navigate('/home2');
+                navigate('/home');
             } else {
                 Swal.fire('Error', response.error || 'Login fallido', 'error');
             }

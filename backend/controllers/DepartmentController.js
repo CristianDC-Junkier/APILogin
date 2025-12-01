@@ -1,4 +1,5 @@
 ﻿const { UserAccount, Department, Links } = require("../models/Relations");
+const Sequelize = require('sequelize');
 
 const LoggerController = require("../controllers/LoggerController");
 
@@ -6,7 +7,8 @@ const LoggerController = require("../controllers/LoggerController");
  * Controlador de departamentos.
  * 
  * Proporciona métodos estáticos para:           
- *  - Listar todos los departamentos                   
+ *  - Listar todos los departamentos
+ *  - Recoger el departamento público                   
  *  - Crear un departamento 
  *  - Modificar un departamento
  *  - Eliminar un departamento
@@ -35,6 +37,7 @@ class DepartmentController {
                         through: { attributes: [] }
                     },
                 ],
+                order: [["id", "ASC"]]
             });
 
             const dFormatted = departments.map(department => ({
@@ -46,6 +49,35 @@ class DepartmentController {
             return res.json({ departments: dFormatted });
         } catch (error) {
             LoggerController.error('Error recogiendo los departamentos por el usuario con id ' + req.user.id);
+            LoggerController.error('Error - ' + error.message);
+            return res.status(500).json({ error: error.message });
+        }
+    }
+
+    /**
+    * Recoge el departamento público (id = 1).
+    * 
+    * @param {Object} req - Objeto de petición de Express.
+    * @param {Object} res - Objeto de respuesta de Express.
+    * @returns {JSON} - Array de departamentos o mensaje de error.
+    */
+    static async getPublicDepartment(req, res) {
+        try {
+            const publicDepartment = await Department.findOne({
+                include: [
+                    {
+                        model: Links,
+                        as: 'links',
+                        attributes: ['id', 'name', 'web'],
+                        through: { attributes: [] }
+                    },
+                ],
+                where: { id: "1" }
+            });
+
+            return res.json({ publicDepartment });
+        } catch (error) {
+            LoggerController.error('Error recogiendo el departamento público por el usuario con id ' + req.user.id);
             LoggerController.error('Error - ' + error.message);
             return res.status(500).json({ error: error.message });
         }
@@ -89,6 +121,9 @@ class DepartmentController {
             const { id } = req.params;
             const { name } = req.body;
 
+            if (id === "1") {
+                return res.status(400).json({ error: "No se puede modificar el departamento público" });
+            }
             if (!name) {
                 return res.status(400).json({ error: "Debe indicar un nombre correcto" });
             }
@@ -120,6 +155,9 @@ class DepartmentController {
         try {
             const { id } = req.params;
 
+            if (id === "1") {
+                return res.status(400).json({ error: "No se puede eliminar el departamento público" });
+            }
             const department = await Department.findByPk(id);
             if (!department) return res.status(404).json({ error: "Departamento no encontrado" });
 
@@ -222,19 +260,36 @@ class DepartmentController {
                     {
                         model: UserAccount,
                         as: 'useraccounts',
+                        required: false, 
                         where: { id: user.id },
                         attributes: [],
                         through: { attributes: [] }
                     }
                 ],
-
+                where: {
+                    [Sequelize.Op.or]: [
+                        { '$useraccounts.id$': user.id },
+                        { '$Department.id$': 1 }                       
+                    ]
+                },
+                order: [
+                    [Sequelize.literal(`CASE WHEN "Department"."id" = 1 THEN 1 ELSE 0 END`), 'ASC'],
+                    ["name", "ASC"]
+                ]
             });
 
-            const dFormatted = departments.map(department => ({
-                id: department.id,
-                name: department.name,
-                links: department.links || [],
-            }));
+            const dFormatted = departments
+                .map(department => ({
+                    id: department.id,
+                    name: department.name,
+                    links: department.links || [],
+                }))
+                .sort((a, b) => {
+                    if (a.id === 1) return 1;    
+                    if (b.id === 1) return -1;
+                    return a.name.localeCompare(b.name); 
+                });
+
 
             return res.json({ departments: dFormatted });
         } catch (error) {

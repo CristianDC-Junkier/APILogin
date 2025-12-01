@@ -20,6 +20,10 @@ const DashBoardUser = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedUser, setSelectedUser]);
+
     // Estado de estadísticas
     const [stats, setStats] = useState({ total: 0, admin: 0, user: 0 });
 

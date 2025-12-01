@@ -35,7 +35,7 @@ class AuthController {
             const refreshToken = await generateRefreshToken(user.id, remember);
 
             // Envía refreshToken en cookie HTTP-only
-            res.cookie("refreshToken", refreshToken, {
+            res.cookie("IDEERT", refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
@@ -78,7 +78,7 @@ class AuthController {
             try {
                 payload = verifyToken(token, "refresh");
             } catch {
-                res.clearCookie("IDEE-AlmonteRT", {
+                res.clearCookie("IDEERT", {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                     sameSite: "Strict",
@@ -88,7 +88,7 @@ class AuthController {
             }
 
             await RefreshToken.destroy({ where: { uuid: payload.uuid } });
-            res.clearCookie("IDEE-AlmonteRT", {
+            res.clearCookie("IDEERT", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
@@ -113,7 +113,7 @@ class AuthController {
      */
     static async refreshToken(req, res) {
         try {
-            const token = req.cookies?.refreshToken;
+            const token = req.cookies?.IDEERT;
             if (!token) return res.status(200).send("No existen tokens");
 
             let payload;
@@ -146,7 +146,7 @@ class AuthController {
                 const newRefreshToken = await generateRefreshToken(user.id, payload.remember);
 
                 // Cookie con nuevo refreshToken
-                res.cookie("IDEE-AlmonteRT", newRefreshToken, {
+                res.cookie("IDEERT", newRefreshToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                     sameSite: "Strict",

@@ -4,9 +4,13 @@ import { useOutletContext } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaMoon, FaSun, FaSignInAlt } from "react-icons/fa";
 
+import { getDepartmentPublic } from "../../services/DepartmentService";
+
 import logo from "../../assets/ayto_almonte_notext.png";
 
 import SidebarItem from '../../components/home/SideBardComponent';
+import DepartmentLinks from '../../components/home/DepartmentLinksComponent';
+import SpinnerComponent from '../../components/utils/SpinnerComponent';
 
 /**
  * Página pública sin elementos de perfil ni opciones de usuario.
@@ -16,12 +20,27 @@ const PublicHome = () => {
     const { darkMode, toggleMode } = useOutletContext();
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const [visibleSections, setVisibleSections] = useState({});
+    const [publicDepartment, setPublicDepartment] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleMouseEnter = () => {
-        if (window.innerWidth >= 768) { 
+        if (window.innerWidth >= 768) {
             setSidebarExpanded(true);
         }
     };
+
+    useEffect(() => {
+        const fetchLinks = async () => {
+            setLoading(true);
+            try {
+                const response = await getDepartmentPublic();
+                setPublicDepartment(response.data.publicDepartment || null);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchLinks();
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -40,6 +59,7 @@ const PublicHome = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    if (loading) return <SpinnerComponent />;
 
     return (
         <div style={{
@@ -70,9 +90,9 @@ const PublicHome = () => {
                 }}
             >
                 <div>
-                    <div  style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
                         <a href="https://almonte.es/es/" target="_blank" rel="noopener noreferrer">
-                            <img class='nav-logo' src={logo} alt="Ayuntamiento de Almonte" style={{ height: "30px" }} />
+                            <img className='nav-logo' src={logo} alt="Ayuntamiento de Almonte" style={{ height: "30px" }} />
                         </a>
                     </div>
 
@@ -97,7 +117,7 @@ const PublicHome = () => {
             </div>
 
             {/* CONTENIDO */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column'}}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div style={{
                     padding: "15px 30px",
                     background: darkMode ? "rgba(33,37,41,0.8)" : "rgba(255,255,255,0.8)",
@@ -130,6 +150,17 @@ const PublicHome = () => {
                         </p>
                     </div>
 
+                    {/* DEPARTAMENTOS DINÁMICOS */}
+                    {publicDepartment && (
+                        <DepartmentLinks
+                            key={publicDepartment.id}
+                            title={publicDepartment.name}
+                            links={publicDepartment.links}
+                            darkMode={darkMode}
+                            visibleSections={visibleSections}
+                            indexOffset={1}
+                        />
+                    )}
                 </div>
             </div>
         </div>

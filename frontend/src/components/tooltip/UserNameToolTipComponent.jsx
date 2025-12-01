@@ -41,7 +41,7 @@ const UserNameToolTipComponent = ({ user, isSmallScreen_v0, isSmallScreen_v1, is
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    color: isCurrentUser ? "blue" : "inherit",
+                    color: isCurrentUser ? "blue" : "black",
                     fontWeight: isCurrentUser ? "bold" : "normal",
                     cursor: isTruncated ? "help" : "default",
                 }}
