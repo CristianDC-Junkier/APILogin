@@ -2,25 +2,36 @@
 import { Row, Col } from "reactstrap";
 import AnimatedCard from "./AnimatedCardComponent";
 
-const DepartmentLinks = ({ title, links = [], darkMode, visibleSections, indexOffset }) => {
+const DepartmentLinks = ({ title, links = [], darkMode }) => {
+
     return (
         <div className="fade-section" style={{
             background: darkMode ? "rgba(25,25,30,0.8)" : "rgba(255,255,255,0.8)",
             borderRadius: "12px",
             border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)",
             padding: "10px",
-            opacity: visibleSections[indexOffset] ? 1 : 0,
-            transform: visibleSections[indexOffset] ? 'translateY(0)' : 'translateY(25px)',
-            transition: "all 0.5s"
+            transition: "all 0.5s",
+            marginBottom: "25px"
         }}>
 
-            <h3 style={{ color: darkMode ? "white" : "#222", fontWeight: 700, margin: 0, fontSize: "clamp(1rem, 1.9vw, 1.75rem)" }}>
-                Departamento de {title}
+            <h3
+                style={{
+                    color: darkMode ? "white" : "#222",
+                    fontWeight: 700,
+                    margin: 0,
+                    fontSize: "clamp(1rem, 1.9vw, 1.75rem)"
+                }}
+            >
+                {title === "Publico" ? "Visita nuestras herramientas" : `Departamento de ${title}`}
             </h3>
 
             <Row className="mt-4 justify-content-center">
-                {links.length === 0 && (
-                    <p style={{ opacity: 0.7 }}>Este departamento no tiene enlaces añadidos.</p>
+                {!links || links.length === 0 && (
+                    <Col md="3" sm="6" xs="12" className="mb-3" style={{ textAlign: "center" }}>
+                        <p style={{ opacity: 0.7, margin: 0 }}>
+                            Este departamento no tiene enlaces añadidos.
+                        </p>
+                    </Col>
                 )}
 
                 {links.map(link => (

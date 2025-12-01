@@ -187,7 +187,6 @@ const TableUserComponent = ({
         const password = await PWDAskComponent({ userItem });
         if (!password) return;
         const result = await markPWDCUser(userItem.id, { password }, userItem.version);//TENIA UN FALLO HAY QUE COMPROBARLO EN EL SERVER
-        console.log(result);
         if (result.success) {
             Swal.fire("¡Éxito!", "Contraseña reiniciada correctamente", "success");
         } else {
@@ -222,7 +221,9 @@ const TableUserComponent = ({
                             user.usertype !== "SUPERADMIN" ||
                             (user.usertype === "SUPERADMIN" && currentUser.usertype === "SUPERADMIN");
 
-                        const userAviableDeps = departments.filter(d => !userDeps.some(ud => ud.id === d.id));
+                        const userAvailableDeps = departments.filter(
+                            d => !userDeps.some(ud => ud.id === d.id) && d.id !== 1
+                        );
 
                         return (
                             <tr key={idx}>
@@ -243,7 +244,7 @@ const TableUserComponent = ({
                                                     canModify={canModify}
                                                     objType="departamento"
                                                     userObjects={userDeps}
-                                                    availableObjs={userAviableDeps}
+                                                    availableObjs={userAvailableDeps}
                                                     onAdded={async dep => {
                                                         await addDepartment(user.id, dep.id, user.version);
                                                         window.dispatchEvent(new Event("refresh-users"));
@@ -255,7 +256,7 @@ const TableUserComponent = ({
                                                 />
                                             ) : canModify && !isCurrentUser ? (
                                                 <AddBadgeComponent
-                                                    availableObjs={userAviableDeps}
+                                                    availableObjs={userAvailableDeps}
                                                     objType="departamento"
                                                     onAdded={async dep => {
                                                         await addDepartment(user.id, dep.id, user.version);
@@ -288,7 +289,7 @@ const TableUserComponent = ({
                                                         canModify={canModify}
                                                         objType="departamento"
                                                         userObjects={userDeps}
-                                                        availableObjs={userAviableDeps}
+                                                        availableObjs={userAvailableDeps}
                                                         onAdded={async dep => {
                                                             await addDepartment(user.id, dep.id, user.version);
                                                             window.dispatchEvent(new Event("refresh-users"));
@@ -302,7 +303,7 @@ const TableUserComponent = ({
 
                                                 {userDeps?.length <= 3 && canModify && !isCurrentUser && (
                                                     <AddBadgeComponent
-                                                        availableObjs={userAviableDeps}
+                                                        availableObjs={userAvailableDeps}
                                                         objType="departamento"
                                                         onAdded={async dep => {
                                                             await addDepartment(user.id, dep.id, user.version);

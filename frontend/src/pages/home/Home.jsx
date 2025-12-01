@@ -113,7 +113,7 @@ const Home = () => {
                 <div>
                     <div  style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
                         <a href="https://almonte.es/es/" target="_blank" rel="noopener noreferrer">
-                            <img class='nav-logo' src={logo} alt="Ayuntamiento de Almonte" style={{ height: "30px" }} />
+                            <img className='nav-logo' src={logo} alt="Ayuntamiento de Almonte" style={{ height: "30px" }} />
                         </a>
                     </div>
 
@@ -193,14 +193,13 @@ const Home = () => {
                             <h3 style={{ color: darkMode ? "white" : "#222" }}>Aún no tienes ningún departamento asociado.</h3>
                         </div>
                     ) : (
-                        departments.map((dep, i) => (
+                            departments.map((dep, i) => (
                             <DepartmentLinks
                                 key={dep.id}
                                 title={dep.name}
                                 links={dep.links}
                                 darkMode={darkMode}
-                                visibleSections={visibleSections}
-                                indexOffset={i + 1}
+                                indexOffset={i}
                             />
                         ))
                     )}

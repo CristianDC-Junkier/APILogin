@@ -11,16 +11,10 @@ const ExternalLayout = () => {
 
     // Al cargar, recupera la preferencia guardada
     useEffect(() => {
-        const savedMode = localStorage.getItem("darkMode");
+        const savedMode = localStorage.getItem("IDEE-Almonte/darkMode");
         if (savedMode === "true") setDarkMode(true);
     }, []);
 
-    const toggleMode = () => {
-        setDarkMode(prev => {
-            localStorage.setItem("darkMode", !prev); // persistente
-            return !prev;
-        });
-    };
 
     const imageBackground = {
         backgroundImage: darkMode
@@ -40,7 +34,7 @@ const ExternalLayout = () => {
         <div style={imageBackground}>
             {/* Contenedor principal para el contenido */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", background: darkMode ? "rgba(27, 27, 37, 0.6)" : "transparent", }}>
-                <Outlet context={{ darkMode, toggleMode }} /> {/* pasa darkMode y toggleMode a los hijos */}
+                <Outlet context={{ darkMode }} /> {/* pasa darkMode y toggleMode a los hijos */}
             </div>
             {/* Banner de cookies */}
             <BannerCookies />

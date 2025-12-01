@@ -36,6 +36,8 @@ const DepartmentNameToolTipComponent = ({ depItem, isSmallScreen_v0, isSmallScre
                 id={elementId}
                 ref={tdRef}
                 style={{
+                    color: depItem.id === 1 ? "#0d6efd" : undefined,
+                    fontWeight: 500,
                     maxWidth: isSmallScreen_v1
                         ? "120px"
                         : isSmallScreen_v0

@@ -22,10 +22,14 @@ const DepartmentList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
 
-
     // Estado de estadísticas
     const [statsDepart, setStatsDepart] = useState(0);
     const [statsLink, setStatsLink] = useState(0);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, setSearch]);
+
 
     // Ajuste dinámico de filas según ventana
     useEffect(() => {

@@ -24,7 +24,7 @@ class LinksController {
      */
     static async list(req, res) {
         try {
-            const links = await Links.findAll();
+            const links = await Links.findAll({ order: [["id", "ASC"]] });
             return res.json({ links });
         } catch (error) {
             LoggerController.error('Error recogiendo los links por el usuario con id ' + req.user.id);
