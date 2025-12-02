@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 
 import { getDepartmentList, modifyDepartment, deleteDepartment, addLinkToDepartment, deleteLinkToDepartment } from "../../services/DepartmentService";
 import { getAllLinks } from "../../services/LinkService";
+import { useTheme } from '../../hooks/UseTheme';
 
 import PaginationComponent from "../../components/PaginationComponent";
 import CaptchaSliderComponent from '../utils/CaptchaSliderComponent';
@@ -37,6 +38,8 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
     const [departments, setDepartments] = useState([]);
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { darkMode } = useTheme();
 
     /** Detectar pantallas pequeñas */
     const useIsSmallScreen = (breakpoint) => {
@@ -86,7 +89,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                 }
                 
             } catch {
-                Swal.fire("Error", "No se pudieron cargar los datos", "error");
+                Swal.fire({ title: "Error", text: "No se pudieron cargar los datos", icon: "error", theme: darkMode ? "dark" : "" });
             } finally {
                 setLoading(false);
             }
@@ -96,7 +99,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
         const handler = () => fetchAll();
         window.addEventListener("refresh-departments", handler);
         return () => window.removeEventListener("refresh-departments", handler);
-    }, [onStatsDepartsUpdate, onStatsLinksUpdate, sortBy]);
+    }, [onStatsDepartsUpdate, onStatsLinksUpdate, sortBy, darkMode]);
 
     /** Filtrado por búsqueda **/
     const filteredDepartments = useMemo(
@@ -117,12 +120,14 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
         let completed = false;
 
         reactRoot.render(
-            <CaptchaSliderComponent onSuccess={() => {
-                completed = true;
-                Swal.close();
-                resolve(true);
-                setTimeout(() => reactRoot.unmount(), 0);
-            }} />
+            <CaptchaSliderComponent
+                darkMode={darkMode}
+                onSuccess={() => {
+                    completed = true;
+                    Swal.close();
+                    resolve(true);
+                    setTimeout(() => reactRoot.unmount(), 0);
+                }} />
         );
 
         Swal.fire({
@@ -133,6 +138,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
             showCancelButton: true,
             cancelButtonText: 'Cancelar',
             allowOutsideClick: false,
+            theme: darkMode ? "dark" : "",
             preConfirm: () => {
                 if (!completed) Swal.showValidationMessage('Debes completar el captcha');
             }
@@ -142,20 +148,21 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
     /** Modificar departamento **/
     const handleModify = async (depItem) => {
         if (depItem.id === 1) {
-            Swal.fire("Error", "Este departamento no se puede eliminar", "error");
+            Swal.fire({ title: "Error", text: "Este departamento no se puede eliminar", icon: "error", theme: darkMode ? "dark" : "" });
             return;
         }
 
         await AddModifyDepartmentComponent({
             depItem,
             action: "modify",
+            darkMode: darkMode,
             onConfirm: async (formValues) => {
                 const result = await modifyDepartment(depItem.id, formValues);
                 if (result.success) {
-                    Swal.fire("Éxito", "Departamento modificado correctamente", "success");
+                    Swal.fire({ title: "Éxito", text: "Departamento modificado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                     window.dispatchEvent(new Event("refresh-departments"));
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo modificar el departamento", "error");
+                    Swal.fire({ title: "Error", text: result.error || "No se pudo modificar el departamento", icon: "error", theme: darkMode ? "dark" : "" });
                 }
             }
         });
@@ -167,13 +174,13 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
         catch { return; }
 
         if (depItem.id === 1) {
-            Swal.fire("Error", "Este departamento no se puede eliminar", "error");
+            Swal.fire({ title: "Error", text: "Este departamento no se puede eliminar", icon: "error", theme: darkMode ? "dark" : "" });
             return;
         }
 
         const result = await deleteDepartment(depItem.id);
         if (result.success) {
-            Swal.fire("Éxito", "Departamento eliminado correctamente", "success");
+            Swal.fire({ title: "Éxito", text: "Departamento eliminado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
 
             // Calculamos si era el último elemento de la página
             const newFilteredLength = filteredDepartments.length - 1;
@@ -185,7 +192,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
 
             window.dispatchEvent(new Event("refresh-departments"));
         } else {
-            Swal.fire("Error", result.error || "No se pudo eliminar el departamento", "error");
+            Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar el departamento", icon: "error", theme: darkMode ? "dark" : "" });
         }
     };
 
@@ -193,7 +200,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
 
     return (
         <>
-            <Table striped responsive>
+            <Table dark={darkMode} striped responsive>
                 <thead>
                     <tr>
                         <th style={{ width: "5%" }}> ID</th>
@@ -242,6 +249,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                             <AddBadgeComponent
                                                 availableObjs={depAvailableLinks}
                                                 objType="enlace"
+                                                darkMode={darkMode}
                                                 onAdded={async l => {
                                                     await addLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
@@ -251,7 +259,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                     ) : (
                                         <>
                                             {depLinks.slice(0, 3).map(l => canModifyLinks
-                                                ? <RemovableBadgeComponent key={l.id} objName={l.name} objType="enlace" onDelete={async () => {
+                                                ? <RemovableBadgeComponent key={l.id} objName={l.name} objType="enlace" darkMode={darkMode} onDelete={async () => {
                                                     await deleteLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }} />
@@ -275,8 +283,8 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                                     }}
                                                 />
                                             )}
-                                            {depLinks?.length <= 3 && canModifyLinks && (
-                                                <AddBadgeComponent availableObjs={depAvailableLinks} objType="enlace" onAdded={async l => {
+                                                {depLinks?.length <= 3 && canModifyLinks && (
+                                                    <AddBadgeComponent availableObjs={depAvailableLinks} objType="enlace" darkMode={darkMode} onAdded={async l => {
                                                     await addLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }} />

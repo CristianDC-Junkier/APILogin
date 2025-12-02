@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, CardBody, CardTitle, CardText } from 'reactstrap';
+import { useTheme } from '../../hooks/UseTheme';
 import Swal from 'sweetalert2';
 
 import { getLogs, getLog, downloadLog, getSystemMetrics } from '../../services/SystemService';
@@ -27,7 +28,7 @@ function formatUptime(totalSeconds) {
  * Página encarga de mostrar los logs y las estadísticas del servidor
  */
 export default function DashboardSystem() {
-
+    const { darkMode } = useTheme();
 
     const [logs, setLogs] = useState([]);
     const [selectedLog, setSelectedLog] = useState(null);
@@ -94,6 +95,7 @@ export default function DashboardSystem() {
                     icon: 'error',
                     title: 'Error',
                     text: `No se pudo descargar el archivo: ${error.message}`,
+                    theme: darkMode ? "dark" : ""
                 });
             } else {
                 Swal.fire({
@@ -101,7 +103,8 @@ export default function DashboardSystem() {
                     title: 'Descarga iniciada',
                     text: `El archivo "${log}" se está descargando.`,
                     timer: 2000,
-                    showConfirmButton: false
+                    showConfirmButton: false,
+                    theme: darkMode ? "dark" : ""                
                 });
             }
         });
@@ -127,9 +130,9 @@ export default function DashboardSystem() {
                 ].map((metric, idx) => (
                     <Col key={idx} xs={6} md={6} lg={3}>
                         <Card className={`border-${metric.type} shadow-sm`}>
-                            <CardBody>
-                                <CardTitle tag="h6">{metric.label}</CardTitle>
-                                <CardText className="fs-4 fw-bold">
+                            <CardBody style={darkMode ? { backgroundColor: "grey" } : {}}>
+                                <CardTitle tag="h6" style={darkMode ? { color: "white" } : {}}>{metric.label}</CardTitle>
+                                <CardText className="fs-4 fw-bold" style={darkMode ? { color: "white" } : {} }>
                                     {metric.value !== null && metric.value !== undefined
                                         ? (() => {
                                             switch (metric.label) {

@@ -1,4 +1,5 @@
 ﻿import Swal from "sweetalert2";
+import '../../styles/component/ComponentsDark.css';
 
 /**
  * Componente que permite crear o modificar un departamento mediante un modal de SweetAlert2.
@@ -8,7 +9,7 @@
  * @param {string} props.action - "create" o "modify".
  * @param {Function} props.onConfirm - Callback que se ejecuta al confirmar los datos, recibe { formValues }.
  */
-const AddModifyDepartmentComponent = async ({ depItem, action, onConfirm }) => {
+const AddModifyDepartmentComponent = async ({ depItem, action, darkMode, onConfirm }) => {
 
     const rowStyle = "display:flex; align-items:center; margin-top:1rem; margin-bottom:1rem; font-size:1rem;";
     const labelStyle = "width:150px; font-weight:bold; text-align:left;";
@@ -18,7 +19,7 @@ const AddModifyDepartmentComponent = async ({ depItem, action, onConfirm }) => {
             <div style="${rowStyle}">
                <label style="${labelStyle}">Nombre del Departamento</label>
                 <div style="flex:1; display:flex; align-items:center;">
-                    <input id="swal-name" type="text" style="${inputStyle}" placeholder="Nombre" value="${depItem?.name ? depItem?.name : ""}"/>
+                    <input id="swal-name" type="text" style="${inputStyle}" class="${darkMode ? "input_dark" : ""}" placeholder="Nombre" value="${depItem?.name ? depItem?.name : ""}"/>
                 </div>
             </div>
         `;
@@ -31,6 +32,7 @@ const AddModifyDepartmentComponent = async ({ depItem, action, onConfirm }) => {
         showCancelButton: true,
         cancelButtonText: "Cancelar",
         confirmButtonText: action === "create" ? "Crear" : "Modificar",
+        theme: darkMode ? "dark" : "",
         preConfirm: () => {
             const name = document.getElementById("swal-name").value.trim();
             if (!name) {

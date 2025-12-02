@@ -2,6 +2,7 @@
 import { Table, Button } from "reactstrap";
 import Swal from "sweetalert2";
 import { createRoot } from "react-dom/client";
+import { useTheme } from '../../hooks/UseTheme';
 
 import { getAllLinks, modifyLink, deleteLink } from "../../services/LinkService";
 
@@ -28,6 +29,8 @@ import PaginationComponent from "../PaginationComponent";
 const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate, sortBy }) => {
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { darkMode } = useTheme();
 
     /** Detectar pantallas pequeñas */
     const useIsSmallScreen = (breakpoint) => {
@@ -67,7 +70,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
                     }
                 }
             } catch {
-                Swal.fire("Error", "No se pudieron cargar los datos", "error");
+                Swal.fire({ title: "Error", text: "No se pudieron cargar los datos", icon: "error", theme: darkMode ? "dark" : "" });
             } finally {
                 setLoading(false);
             }
@@ -77,7 +80,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         const handler = () => fetchAll();
         window.addEventListener("refresh-links", handler);
         return () => window.removeEventListener("refresh-links", handler);
-    }, [onStatsUpdate, sortBy]);
+    }, [onStatsUpdate, sortBy, darkMode]);
 
     /** Filtrado por búsqueda **/
     const filteredLinks = useMemo(
@@ -97,12 +100,14 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         let completed = false;
 
         reactRoot.render(
-            <CaptchaSlider onSuccess={() => {
-                completed = true;
-                Swal.close();
-                resolve(true);
-                setTimeout(() => reactRoot.unmount(), 0);
-            }} />
+            <CaptchaSlider
+                darkMode={darkMode}
+                onSuccess={() => {
+                    completed = true;
+                    Swal.close();
+                    resolve(true);
+                    setTimeout(() => reactRoot.unmount(), 0);
+                }} />
         );
 
         Swal.fire({
@@ -113,6 +118,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
             showCancelButton: true,
             cancelButtonText: 'Cancelar',
             allowOutsideClick: false,
+            theme: darkMode ? "dark" : "",
             preConfirm: () => {
                 if (!completed) Swal.showValidationMessage('Debes completar el captcha');
             }
@@ -124,13 +130,14 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         await AddModifyLinkComponent({
             linkItem,
             action: "modify",
+            darkMode: darkMode,
             onConfirm: async formValues => {
                 const result = await modifyLink(linkItem.id, formValues);
                 if (result.success) {
-                    Swal.fire("Éxito", "Enlace modificado correctamente", "success");
+                    Swal.fire({ title: "Éxito", text: "Enlace modificado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                     window.dispatchEvent(new Event("refresh-links"));
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo modificar el enlace", "error");
+                    Swal.fire({ title: "Error", text: result.error || "No se pudo modificar el enlace", icon: "error", theme: darkMode ? "dark" : "" });
                 }
             }
         });
@@ -141,7 +148,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         await showCaptcha();
         const result = await deleteLink(linkItem.id);
         if (result.success) {
-            Swal.fire("Éxito", "Enlace eliminado correctamente", "success");
+            Swal.fire({ title: "Éxito", text: "Enlace eliminado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
 
             // Calculamos si era el último elemento de la página
             const newFilteredLength = filteredLinks.length - 1;
@@ -153,7 +160,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
 
             window.dispatchEvent(new Event("refresh-links"));
         } else {
-            Swal.fire("Error", result.error || "No se pudo eliminar el enlace", "error");
+            Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar el enlace", icon: "error", theme: darkMode ? "dark" : "" });
         }
     };
 
@@ -161,7 +168,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
 
     return (
         <>
-            <Table striped responsive>
+            <Table dark={ darkMode } striped responsive>
                 <thead>
                     <tr>
                         <th style={{ width: "5%" }}>ID</th>

@@ -6,6 +6,7 @@ import BadgeComponent from "./BadgeComponent";
 import AddBadgeComponent from "./AddBadgeComponent";
 import RemovableBadgeComponent from "./RemovableBadgeComponent";
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../hooks/UseTheme';
 
 /**
 * Badge para mostrar "Mostrar más" 
@@ -29,6 +30,7 @@ const ShowMoreDepartmentBadgeComponent = ({
     onDeleted,
 }) => {
     const navigate = useNavigate();
+    const { darkMode } = useTheme();
 
     const handleShowMore = () => {
         if (currentUser.id !== user.id || objType === "enlace") {
@@ -50,7 +52,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                     minHeight: '200px',  
                                     padding: '12px',
                                     borderRadius: '12px',
-                                    backgroundColor: '#f9f9f9',
+                                    backgroundColor: darkMode ? '#060606' : '#f9f9f9',
                                     alignItems: 'flex-start',
                                     boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)',
                                 }}
@@ -62,6 +64,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                                 key={obj.id}
                                                 objName={obj.name}
                                                 objType={objType}
+                                                darkMode={darkMode}
                                                 onDelete={async () => {
                                                     await onDeleted(obj);
                                                     userObjects = userObjects.filter(o => o.id !== obj.id);
@@ -73,6 +76,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                         <AddBadgeComponent
                                             availableObjs={availableObjs}
                                             objType={objType}
+                                            darkMode={darkMode}
                                             onAdded={async (obj) => {
                                                 await onAdded(obj); 
                                                 availableObjs = availableObjs.filter(d => d.id !== obj.id);
@@ -94,6 +98,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                 confirmButtonText: 'Cerrar',
                 width: '600px',
                 buttonsStyling: true,
+                theme: darkMode ? "dark" : "",
             });
         }
         else {
@@ -109,7 +114,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                 display: "inline-block",
                 padding: "4px 12px",
                 borderRadius: "50px",
-                backgroundColor: "#e0e0e0",
+                backgroundColor: "#9CC2CF",
                 color: "#333",
                 fontWeight: 500,
                 fontSize: "0.8rem",

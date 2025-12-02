@@ -1,6 +1,7 @@
 ﻿import Swal from "sweetalert2";
+import '../../styles/component/ComponentsDark.css';
 
-const AddModifyLinkComponent = async ({ linkItem, action, onConfirm }) => {
+const AddModifyLinkComponent = async ({ linkItem, action, darkMode, onConfirm }) => {
 
     const swalHtml = `
 <style>
@@ -86,20 +87,20 @@ const AddModifyLinkComponent = async ({ linkItem, action, onConfirm }) => {
     <!-- Fila Nombre -->
     <div class="swal-row-first">
         <label class="swal-label">Nombre <span style="color:red">*</span></label>
-        <input id="swal-name" class="swal-input" type="text" value="${linkItem?.name || ''}" />
+        <input id="swal-name" class="swal-input ${darkMode ? "input_dark" : ""}" type="text" placeholder="Nombre" value="${linkItem?.name || ''}" />
     </div>
 
     <!-- Fila Dirección -->
     <div class="swal-row-first">
         <label class="swal-label">Dirección <span style="color:red">*</span></label>
-        <input id="swal-web" class="swal-input" type="text" value="${linkItem?.web || ''}" />
+        <input id="swal-web" class="swal-input ${darkMode ? "input_dark" : ""}" type="text" placeholder="Dirección web" value="${linkItem?.web || ''}" />
     </div>
 
     <!-- Imagen -->
     <div class="swal-row-second" style="grid-template-columns: 1fr;">
         <div>
             <label class="swal-label">Imagen</label>
-            <button id="btn-img" class="swal-input" style="cursor:pointer;">Seleccionar Imagen</button>
+            <button id="btn-img" class="swal-input ${darkMode ? "button_dark" : ""}" style="cursor:pointer;">Seleccionar Imagen</button>
             <input id="swal-img" type="file" accept="image/*" style="display:none;">
 
             <div class="img-wrapper">
@@ -114,7 +115,7 @@ const AddModifyLinkComponent = async ({ linkItem, action, onConfirm }) => {
     <div class="swal-row-second" style="grid-template-columns: 1fr;">
         <div>
             <label class="swal-label">Descripción</label>
-            <textarea id="swal-desc" class="swal-textarea">${linkItem?.description || ''}</textarea>
+            <textarea id="swal-desc" class="swal-textarea ${darkMode ? "input_dark" : ""}">${linkItem?.description || ''}</textarea>
             <div id="char-counter" class="swal-small">${(linkItem?.description?.length || 0)}/128</div>
         </div>
     </div>
@@ -128,6 +129,7 @@ const AddModifyLinkComponent = async ({ linkItem, action, onConfirm }) => {
         width: "600px",
         showCancelButton: true,
         confirmButtonText: action === "create" ? "Crear" : "Modificar",
+        theme: darkMode ? "dark" : "",
         didRender: () => {
             const fileInput = document.getElementById("swal-img");
             const btnImg = document.getElementById("btn-img");

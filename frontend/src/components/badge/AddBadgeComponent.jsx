@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import Swal from "sweetalert2";
+import '../../styles/component/ComponentsDark.css';
 
 /**
  * Badge para añadir un objeto (solo para admins/superadmins)
@@ -8,11 +9,11 @@ import Swal from "sweetalert2";
  * @param {Array} props.availableObjs Lista de objetos disponibles // departamento -> [{id, name}] - enlace -> [{id, name, web}]
  * @param {Function} props.onAdded Callback que recibe el resultado de la operación
  */
-const AddBadgeComponent = ({ objType, availableObjs = [], onAdded }) => {
+const AddBadgeComponent = ({ objType, availableObjs = [], onAdded, darkMode }) => {
 
     const handleAddClick = async () => {
         if (!availableObjs.length) {
-            return Swal.fire("Info", `No hay ${objType}s disponibles para añadir`, "info");
+            return Swal.fire({ title: "Info", text: `No hay ${objType}s disponibles para añadir`, icon: "info", theme: darkMode ? "dark" : "" });
         }
 
         const sortedOptions = [...availableObjs].sort((a, b) =>
@@ -22,21 +23,21 @@ const AddBadgeComponent = ({ objType, availableObjs = [], onAdded }) => {
         const { value: selectedId } = await Swal.fire({
             title: `<strong>Asignar ${objType}s</strong>`,
             html: `
-        <select id="swal-select" style="
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 0.9rem;
-        ">
-            <option value="" disabled selected>Seleccione un ${objType}</option>
-            ${sortedOptions.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
-        </select>
-    `,
+                <select id="swal-select" style="
+                    width: 100%;
+                    padding: 8px 10px;
+                    border-radius: 8px;
+                    border: 1px solid #ccc;
+                    font-size: 0.9rem;
+                " class="${darkMode ? "input_dark" : ""}">
+                    <option value hidden>Seleccione un ${objType}</option>
+                    ${sortedOptions.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
+                </select>`,
             showCancelButton: true,
             confirmButtonText: 'Agregar',
             cancelButtonText: 'Cancelar',
             buttonsStyling: true,
+            theme: darkMode ? "dark" : "",
             preConfirm: () => {
                 const select = Swal.getPopup().querySelector('#swal-select');
                 if (!select.value) {
@@ -65,7 +66,7 @@ const AddBadgeComponent = ({ objType, availableObjs = [], onAdded }) => {
                 display: "inline-block",
                 padding: "4px 12px",
                 borderRadius: "50px",
-                backgroundColor: "#e0e0e0",
+                backgroundColor: "#82D682",
                 color: "#333",
                 fontWeight: 500,
                 fontSize: "0.8rem",

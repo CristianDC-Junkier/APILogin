@@ -5,9 +5,11 @@ import Swal from 'sweetalert2';
 
 import { createRoot } from 'react-dom/client';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../hooks/UseTheme';
 import CaptchaSliderComponent from '../components/utils/CaptchaSliderComponent';
 import '../styles/Global.css';
 import '../styles/auth/Login.css';
+import '../styles/component/ComponentsDark.css';
 
 /**
  * Página de inicio de sesión
@@ -19,6 +21,7 @@ const Login = () => {
 
     const navigate = useNavigate();
     const { login } = useAuth();
+    const { darkMode } = useTheme();
 
     useEffect(() => {
         document.title = "Inicio de Sesión - IDEE Almonte";
@@ -33,6 +36,7 @@ const Login = () => {
 
             reactRoot.render(
                 <CaptchaSliderComponent
+                    darkMode={darkMode}
                     onSuccess={() => {
                         completed = true;
                         resolve(true);
@@ -47,6 +51,7 @@ const Login = () => {
                 html: container,
                 showConfirmButton: true,
                 allowOutsideClick: false,
+                theme: darkMode ? 'dark' : '',
                 preConfirm: () => {
                     if (!completed) {
                         Swal.showValidationMessage('Debes completar el captcha antes de continuar');
@@ -79,10 +84,10 @@ const Login = () => {
             if (response.success) {
                 navigate('/home');
             } else {
-                Swal.fire('Error', response.error || 'Login fallido', 'error');
+                Swal.fire({ title: 'Error', text: response.error || 'Login fallido', icon: 'error', theme: darkMode ? 'dark' : '' });
             }
         } catch (err) {
-            Swal.fire('Error', err?.error || err?.message || 'Captcha no completado', 'error');
+            Swal.fire({ title: 'Error', text: err?.error || err?.message || 'Captcha no completado', icon: 'error', theme: darkMode ? 'dark' : '' });
         }
     };
 
@@ -102,7 +107,7 @@ const Login = () => {
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
                                     placeholder="Usuario"
-                                    className="border-0 border-bottom border-dark rounded-0 bg-white px-3 py-2"
+                                    className={`border-0 border-bottom border-dark rounded-0 px-3 py-2 ${darkMode ? "input_dark" : ""}`}
                                 />
                             </FormGroup>
                             {/* Campo de entrada de la contraseña */}
@@ -114,7 +119,7 @@ const Login = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                     placeholder="Contraseña"
-                                    className="border-0 border-bottom border-dark rounded-0 bg-white px-3 py-2"
+                                    className={`border-0 border-bottom border-dark rounded-0 px-3 py-2 ${darkMode ? "input_dark" : ""}`}
                                 />
                             </FormGroup>
 
@@ -127,6 +132,7 @@ const Login = () => {
                                             id="rememberMe"
                                             checked={remember}
                                             onChange={(e) => setRemember(e.target.checked)}
+                                            className={`${darkMode ? "border-1 border-dark bg-secondary" : ""}`}
                                         />
                                         <Label for="rememberMe" check className="fw-semibold ms-2">
                                             Recuerdame

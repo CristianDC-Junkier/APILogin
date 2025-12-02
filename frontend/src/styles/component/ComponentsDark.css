@@ -1,0 +1,26 @@
+﻿.input_dark {
+    color: white !important;
+    background-color: dimgrey !important;
+}
+
+    .input_dark:focus {
+        color: white !important;
+        background-color: dimgrey !important;
+    }
+
+    .input_dark:disabled {
+        color: darkgrey !important;
+    }
+
+    .input_dark::placeholder {
+        color: lightgrey !important;
+    }
+
+.button_dark {
+    color: white !important;
+    background-color: dimgrey !important;
+}
+
+    .button_dark:hover {
+        background-color: lightslategrey !important;
+    }

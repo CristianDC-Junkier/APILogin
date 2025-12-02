@@ -3,6 +3,9 @@ import Swal from "sweetalert2";
 import { changePasswordPWD } from "../../services/UserService";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from '../../hooks/UseTheme';
+
+import "../../styles/component/ComponentsDark.css"
 
 /**
  * Componente encargado de mostrar y gestionar el marcar a un usuario para cambio de contraseña
@@ -12,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 const PWDChangeComponent = ({ user }) => {
     const { update, logout } = useAuth();
     const navigate = useNavigate();
+    const { darkMode } = useTheme();
 
     useEffect(() => {
         const askPassword = async () => {
@@ -27,9 +31,9 @@ const PWDChangeComponent = ({ user }) => {
                     <div style="${rowStyle}">
                         <label style="${labelStyle}">Contraseña</label>
                         <div style="flex:1; display:flex; align-items:center;">
-                            <input id="swal-password" type="password" style="${inputStyle}" placeholder="Nueva contraseña" />
+                            <input id="swal-password" type="password" style="${inputStyle}" class="${darkMode ? "input_dark" : ""}" placeholder="Nueva contraseña" />
                             <button id="toggle-pass" type="button" style="margin-left:4px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; width:32px; height:32px;">
-                                <i id="icon-pass" class="fas fa-eye-slash" style="font-size:1rem;"></i>
+                                <i id="icon-pass" class="fas fa-eye-slash" style="font-size:1rem; ${darkMode ? "color: white;" : ""}"></i>
                             </button>
                         </div>
                     </div>
@@ -42,6 +46,7 @@ const PWDChangeComponent = ({ user }) => {
                 allowEscapeKey: false,
                 allowEnterKey: true,
                 showCloseButton: false,
+                theme: darkMode ? "dark" : "",
                 preConfirm: () => {
                     const input = document.getElementById("swal-password");
                     const value = input.value.trim();
@@ -66,9 +71,9 @@ const PWDChangeComponent = ({ user }) => {
 
                 if (res.success) {
                     update({ ...user, forcePwdChange: false });
-                    await Swal.fire("¡Éxito!", "Contraseña actualizada correctamente", "success");
+                    await Swal.fire({ title: "¡Éxito!", text: "Contraseña actualizada correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                 } else {
-                    await Swal.fire("Error", res.error || "No se pudo cambiar la contraseña", "error");
+                    await Swal.fire({ title: "Error", text: res.error || "No se pudo cambiar la contraseña", icon: "error", theme: darkMode ? "dark" : "" });
                     await logout();
                     navigate("/login", { replace: true });
                 }
@@ -76,7 +81,7 @@ const PWDChangeComponent = ({ user }) => {
         };
 
         askPassword();
-    }, [user, update, logout, navigate]);
+    }, [user, update, logout, navigate, darkMode]);
 
     return null; // No renderiza nada
 };

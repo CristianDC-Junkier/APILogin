@@ -1,4 +1,5 @@
 ﻿import Swal from "sweetalert2";
+import '../../styles/component/ComponentsDark.css';
 
 /**
  * Componente que permite crear o modificar un usuario mediante un modal de SweetAlert2.
@@ -14,7 +15,7 @@
  * @param {string} props.action - "create" o "modify".
  * @param {Function} props.onConfirm - Callback que se ejecuta al confirmar los datos, recibe { userAccount, userData, userAccountId? }.
  */
-const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm }) => {
+const AddModifyUserComponent = async ({ userItem, currentUser, action, darkMode, onConfirm }) => {
 
     // Tipos de usuario disponibles según permisos del usuario actual
     const types = [
@@ -40,13 +41,14 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
     <div>
         <div style="${rowStyle} margin-top: 5vh">
             <label style="${labelStyle}">Usuario <span style="color:red">*</span></label>
-            <input id="swal-username" style="${inputStyle}" placeholder="Usuario" value="${userItem?.username || ""}">
+            <input id="swal-username" style="${inputStyle}" placeholder="Usuario" value="${userItem?.username || ""}" class="${darkMode ? "input_dark" : ""}">
         </div>
         <div style="${rowStyle}">
             <label style="${labelStyle}">Contraseña <span style="color:red">*</span></label>
             <div style="flex:1; display:flex; align-items:center;">
-                <input id="swal-password" type="password" style="${inputStyle}" placeholder="Contraseña">
-                <button type="button" id="toggle-pass" style="margin-left:4px; border:none; background:transparent; cursor:pointer; width:36px; display:flex; justify-content:center; align-items:center;">
+                <input id="swal-password" type="password" style="${inputStyle}" placeholder="Contraseña" class="${darkMode ? "input_dark" : ""}">
+                <button type="button" id="toggle-pass" style="margin-left:4px; border:none; background:transparent;
+                                                            cursor:pointer; width:36px; display:flex; justify-content:center; align-items:center; color:${darkMode ? "white" : ""};">
                     <i id="icon-pass" class="fas fa-eye-slash"></i>
                 </button>
             </div>
@@ -57,7 +59,7 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
         </div>` : ''}
         <div style="${rowStyle}">
             <label style="${labelStyle}">Tipo de Usuario <span style="color:red">*</span></label>
-            <select id="swal-type" style="${inputStyle}">${optionsHtml}</select>
+            <select id="swal-type" style="${inputStyle}" class="${darkMode ? "input_dark" : ""}">${optionsHtml}</select>
         </div>
         <div style="font-size:0.75rem; color:red; text-align:right;">* Campos obligatorios</div>
     </div>`;
@@ -70,6 +72,7 @@ const AddModifyUserComponent = async ({ userItem, currentUser, action, onConfirm
         showCancelButton: true,
         cancelButtonText: "Cancelar",
         confirmButtonText: action === "create" ? "Crear" : "Modificar",
+        theme: darkMode ? "dark" : "",
         didOpen: () => {
             const PwdInput = document.getElementById("swal-password");
             const PwdToggle = document.getElementById("toggle-pass");
