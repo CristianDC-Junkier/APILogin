@@ -1,12 +1,12 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { useOutletContext } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faUserAlt, faScroll, faBriefcase } from '@fortawesome/free-solid-svg-icons';
 import { FaMoon, FaSun, FaSignOutAlt } from "react-icons/fa";
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/UseAuth';
+import { useTheme } from '../../hooks/UseTheme';
 import { getLinksByProfileList } from "../../services/DepartmentService";
 import logo from "../../assets/ayto_almonte_notext.png";
 
@@ -21,13 +21,15 @@ import SpinnerComponent from '../../components/utils/SpinnerComponent';
 const Home = () => {
     const navigate = useNavigate();
     const { user, logout, version } = useAuth();
+    const { darkMode, toggleMode } = useTheme(); 
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const [visibleSections, setVisibleSections] = useState({});
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const { darkMode, toggleMode } = useOutletContext();
-
+    useEffect(() => {
+        document.title = "Página principal - IDEE Almonte";
+    }, []);
 
     const handleMouseEnter = () => {
         if (window.innerWidth >= 768) {

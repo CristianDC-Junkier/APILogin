@@ -25,8 +25,13 @@ const ProfileUser = () => {
     const [availableDepartments, setAvailableDepartments] = useState([]);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        document.title = "Mi Perfil - IDEE Almonte";
+    }, []);
+
     // Desde el AuthContext
     const { version, logout, update } = useAuth();
+
     /**
      * Cargar perfil del usuario
      */

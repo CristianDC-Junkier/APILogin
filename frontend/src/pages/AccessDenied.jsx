@@ -1,10 +1,15 @@
-﻿import React from 'react';
+﻿import { useEffect } from 'react';
 import logo from '../assets/ayto_almonte.png';
 
 /**
  * Página que aparece cuando un usuario intenta acceder a una pagína a la que no tiene permisos
  */
 const AccessDenied = () => {
+
+    useEffect(() => {
+        document.title = "Sin permisos 401 - IDE Almonte";
+    }, []);
+
     return (
         <div class="row vh-80 d-flex align-items-center justify-content-center">
             <div class="col">

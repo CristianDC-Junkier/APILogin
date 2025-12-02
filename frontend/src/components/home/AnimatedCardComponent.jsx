@@ -83,7 +83,7 @@ const AnimatedCard = ({ title, web, desc, img, darkMode }) => {
                     }}
                     onClick={(e) => {
                         e.stopPropagation();
-                        navigate("/web", { state: { url: web } });
+                        navigate("/web", { state: { url: web, name: title } });
                     }}
                 >
                     Entrar

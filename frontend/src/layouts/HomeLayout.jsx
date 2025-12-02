@@ -1,24 +1,13 @@
-﻿// HomeLayout.jsx
-import React, { useState, useEffect } from 'react';
+﻿import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { useTheme } from '../hooks/UseTheme';
 import Footer from '../components/FooterComponent';
 import BannerCookies from '../components/utils/BannerCookiesComponent';
 import background from '../../src/assets/vista-aérea-municipio-de-almonte.png';
 
 const HomeLayout = () => {
-    const [darkMode, setDarkMode] = useState(false);
 
-    useEffect(() => {
-        const savedMode = localStorage.getItem("IDEE-Almonte/darkMode");
-        if (savedMode === "true") setDarkMode(true);
-    }, []);
-
-    const toggleMode = () => {
-        setDarkMode(prev => {
-            localStorage.setItem("IDEE-Almonte/darkMode", !prev);
-            return !prev;
-        });
-    };
+    const { darkMode } = useTheme(); 
 
     return (
         <div style={{
@@ -35,7 +24,7 @@ const HomeLayout = () => {
             color: darkMode ? "white" : "#222"
         }}>
             <div style={{ flex: 1, display: "flex", width: "100%", overflow: "auto" }}>
-                <Outlet context={{ darkMode, toggleMode }} />
+                <Outlet />
             </div>
             <Footer />
             <BannerCookies />

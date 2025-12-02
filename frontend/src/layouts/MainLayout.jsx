@@ -1,19 +1,14 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React from 'react';
 import { Container } from 'reactstrap';
 import { Outlet } from 'react-router-dom';
+import { useTheme } from '../hooks/UseTheme';
 import Footer from '../components/FooterComponent';
 import BannerCookies from '../components/utils/BannerCookiesComponent';
 import background from '../../src/assets/background.jpg';
 
 const MainLayout = () => {
-    const [darkMode, setDarkMode] = useState(false);
 
-    // Recupera el modo guardado al cargar
-    useEffect(() => {
-        const savedMode = localStorage.getItem("IDEE-Almonte/darkMode");
-        if (savedMode === "true") setDarkMode(true);
-    }, []);
-
+    const { darkMode } = useTheme(); 
 
     const imageBackground = {
         backgroundImage: darkMode
@@ -38,7 +33,7 @@ const MainLayout = () => {
                 className="flex-grow-1 d-flex flex-column"
                 style={{ justifyContent: 'center' }}
             >
-                <Outlet context={{ darkMode }} /> {/* pasa darkMode y toggleMode */}
+                <Outlet />
             </Container>
 
             {/* Footer de la página */}

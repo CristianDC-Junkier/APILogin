@@ -1,18 +1,24 @@
-﻿import React from "react";
+﻿import { useEffect } from 'react';
 import { Container, Row, Col } from "reactstrap";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import BackButtonComponent from "../../components/utils/BackButtonComponent";
 
 /**
- * Página encarga de mostrar la página elegida en el WebList
+ * Página encarga de mostrar la página elegida en el Home
  */
 const ExternalWeb = () => {
     const { user } = useAuth();
     const location = useLocation();
 
-    // URL oculta que llega desde WebListPage
+    // Datos ocultos que llega desde Home
     let url = location.state?.url;
+    let name = location.state?.name;
+
+    useEffect(() => {
+        document.title = name + " - IDEE Almonte";
+    }, [name]);
+
 
     try {
         if (url) {

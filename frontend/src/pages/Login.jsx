@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, FormGroup, Input, Row, Col, Card, CardBody,Label } from 'reactstrap';
 import Swal from 'sweetalert2';
@@ -19,6 +19,10 @@ const Login = () => {
 
     const navigate = useNavigate();
     const { login } = useAuth();
+
+    useEffect(() => {
+        document.title = "Inicio de Sesión - IDEE Almonte";
+    }, []);
 
     //Función que gestiona el Captcha
     const showCaptcha = () => {
