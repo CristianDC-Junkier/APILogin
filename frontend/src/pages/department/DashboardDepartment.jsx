@@ -20,6 +20,7 @@ const DepartmentList = () => {
     const [currentView, setCurrentView] = useState("departments"); // "departments" | "links"
     const [rowsPerPage, setRowsPerPage] = useState(8);
     const [currentPage, setCurrentPage] = useState(1);
+    const [sortBy, setSortBy] = useState("name");
     const [search, setSearch] = useState("");
 
     useEffect(() => {
@@ -83,7 +84,7 @@ const DepartmentList = () => {
     };
 
     return (
-        <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
+        <Container className="mt-4 d-flex flex-column">
             {/* Botón Volver arriba a la izquierda */}
             <div className="position-absolute top-0 start-0">
                 <BackButtonComponent back="/home" />
@@ -128,14 +129,17 @@ const DepartmentList = () => {
                 </Col>
             </Row>
 
-            <div className="d-flex justify-content-between mb-2 align-items-center">
+            {/* Buscador + Filtros + Orden */}
+            <div className="d-flex flex-column flex-md-row justify-content-between mb-2 align-items-start align-items-md-center gap-2">
+
                 {/* Título */}
-                <div className="fw-bold fs-6 d-flex justify-content-between mb-2 align-items-center">
+                <div className="fw-bold fs-6 text-center text-md-start w-100 w-md-auto">
                     {currentView === "links" ? "Enlaces" : "Departamentos"}
                 </div>
-                <div className="d-flex  gap-2">
 
-                    {/* Input de búsqueda siempre visible */}
+                <div className="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+
+                    {/* Input de búsqueda */}
                     <Input
                         type="text"
                         placeholder="Buscar por nombre..."
@@ -143,8 +147,19 @@ const DepartmentList = () => {
                         onChange={e => setSearch(e.target.value)}
                         style={{ minWidth: "200px" }}
                     />
+
+                    {/* Botón Ordenación responsive */}
+                    <Button
+                        color="secondary"
+                        className="w-100 w-md-auto"
+                        style={{ width: "auto" }}
+                        onClick={() => setSortBy(sortBy === "name" ? "id" : "name")}
+                    >
+                        {sortBy === "name" ? "Identificador" : "Nombre"}
+                    </Button>
                 </div>
             </div>
+
 
             {/* Tabla */}
             {currentView === "departments" ? (
@@ -156,6 +171,7 @@ const DepartmentList = () => {
                     currentUser={currentUser}
                     onStatsDepartsUpdate={setStatsDepart}
                     onStatsLinksUpdate={setStatsLink}
+                    sortBy={sortBy}
                 />
             ) : (
                 <TableLinkComponent
@@ -164,6 +180,7 @@ const DepartmentList = () => {
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
                     onStatsUpdate={setStatsLink}
+                    sortBy={sortBy}
                 />
             )}
         </Container>

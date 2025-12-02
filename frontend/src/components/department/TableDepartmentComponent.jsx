@@ -33,7 +33,7 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
  * @param {function} props.onStatsLinksUpdate - Callback para actualizar estadísticas de enlaces.
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
-const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate }) => {
+const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate, sortBy }) => {
     const [departments, setDepartments] = useState([]);
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -61,13 +61,24 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                     getDepartmentList(),
                     getAllLinks()
                 ]);
+
                 if (depRes.success) {
-                    setDepartments(depRes.data.departments || []);
+                    let depts = depRes.data.departments ?? [];
+
+                    // Orden dinámico
+                    depts = depts.sort((a, b) => {
+                        if (sortBy === "name") return a.name.localeCompare(b.name);
+                        return a.id - b.id;
+                    });
+
+                    setDepartments(depts);
 
                     if (onStatsDepartsUpdate) {
                         onStatsDepartsUpdate(depRes.data.departments.length);
                     }
                 }
+
+
                 if (linkRes.success) {
                     setLinks(linkRes.data.links ?? []);
                     if (onStatsLinksUpdate) {
@@ -85,7 +96,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
         const handler = () => fetchAll();
         window.addEventListener("refresh-departments", handler);
         return () => window.removeEventListener("refresh-departments", handler);
-    }, [onStatsDepartsUpdate, onStatsLinksUpdate]);
+    }, [onStatsDepartsUpdate, onStatsLinksUpdate, sortBy]);
 
     /** Filtrado por búsqueda **/
     const filteredDepartments = useMemo(
@@ -192,7 +203,8 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                             <tr key={idx}>
                                 <td style={{
                                     color: depItem.id === 1 ? "#0d6efd" : undefined,
-                                    fontWeight: 500}}> {depItem.id} </td>
+                                    fontWeight: 500
+                                }}> {depItem.id} </td>
                                 <DepartmentNameToolTipComponent
                                     depItem={depItem}
                                     isSmallScreen_v0={isSmallScreen_v0}

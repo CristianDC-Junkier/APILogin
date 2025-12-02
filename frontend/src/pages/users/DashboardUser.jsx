@@ -19,6 +19,8 @@ const DashBoardUser = () => {
     const [selectedUser, setSelectedUser] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
+    const [sortBy, setSortBy] = useState("name");
+
 
     useEffect(() => {
         document.title = "Panel de control de Usuarios - IDEE Almonte";
@@ -64,7 +66,7 @@ const DashBoardUser = () => {
     };
 
     return (
-        <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
+        <Container className="mt-4 d-flex flex-column" >
             {/* Botón Volver arriba a la izquierda */}
             <div className="position-absolute top-0 start-0">
                 <BackButtonComponent back="/home" />
@@ -82,7 +84,7 @@ const DashBoardUser = () => {
             </div>
 
             {/* Tarjetas de estadísticas */}
-            <Row className="mb-1 mt-4 justify-content-center g-2">
+            <Row className="mb-3 mt-4 justify-content-center g-3">
                 {[
                     { label: "Total", value: stats.total, type: "All" },
                     { label: "Administradores", value: stats.admin, type: "Admin" },
@@ -108,12 +110,15 @@ const DashBoardUser = () => {
             </Row>
 
             {/* Fila con tipo de usuario seleccionado + búsqueda */}
-            <div className="d-flex justify-content-between mb-2 align-items-center">
-                <div className="fw-bold fs-6">
+            <div className="d-flex flex-column flex-md-row justify-content-between mb-2 align-items-start align-items-md-center gap-2">
+
+                {/* Título */}
+                <div className="fw-bold fs-6 text-center text-md-start w-100 w-md-auto">
                     {selectedType === "All" ? "Todos los usuarios" : selectedType === "Admin" ? "Administradores" : "Usuarios"}
                 </div>
 
-                <div className="d-flex gap-2">
+                {/* Contenedor inputs + botón */}
+                <div className="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
                     <Input
                         type="text"
                         placeholder="Buscar por usuario..."
@@ -122,6 +127,14 @@ const DashBoardUser = () => {
                         style={{ minWidth: "200px" }}
                     />
                 </div>
+                {/* Botón Ordenación */}
+                <Button
+                    color="secondary"
+                    className="w-100 w-md-auto"
+                    onClick={() => setSortBy(sortBy === "name" ? "id" : "name")}
+                >
+                    {sortBy === "name" ? "Identificador" : "Nombre"}
+                </Button>
             </div>
 
             {/* Tabla de usuarios */}
@@ -133,6 +146,7 @@ const DashBoardUser = () => {
                 rowsPerPage={rowsPerPage}
                 filterType={selectedType}
                 onStatsUpdate={setStats}
+                sortBy={sortBy}
             />
         </Container>
     );
