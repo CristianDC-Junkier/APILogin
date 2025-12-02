@@ -26,6 +26,9 @@ import AddBadgeComponent from "../badge/AddBadgeComponent";
 import RemovableBadgeComponent from "../badge/RemovableBadgeComponent";
 import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
 
+import { useTheme } from '../../hooks/UseTheme';
+
+
 /**
  * Componente encargado de mostrar la tabla de usuarios del sistema.
  *
@@ -54,6 +57,8 @@ const TableUserComponent = ({
 
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { darkMode } = useTheme();
 
     /** Detectar pantallas pequeñas */
     const useIsSmallScreen = (breakpoint) => {
@@ -103,7 +108,7 @@ const TableUserComponent = ({
                 if (depRes.success) setDepartments(depRes.data.departments ?? []);
 
             } catch {
-                Swal.fire("Error", "No se pudieron cargar los datos", "error");
+                Swal.fire({ title: "Error", text: "No se pudieron cargar los datos", icon: "error", theme: darkMode ? "dark" : "" });
             } finally {
                 setLoading(false);
             }
@@ -113,7 +118,7 @@ const TableUserComponent = ({
         const handler = () => fetchAll();
         window.addEventListener("refresh-users", handler);
         return () => window.removeEventListener("refresh-users", handler);
-    }, [onStatsUpdate, sortBy]);
+    }, [onStatsUpdate, sortBy, darkMode]);
 
 
     /** Filtrado por búsqueda y tipo **/
@@ -141,12 +146,14 @@ const TableUserComponent = ({
         let completed = false;
 
         reactRoot.render(
-            <CaptchaSliderComponent onSuccess={() => {
-                completed = true;
-                Swal.close();
-                resolve(true);
-                setTimeout(() => reactRoot.unmount(), 0);
-            }} />
+            <CaptchaSliderComponent
+                darkMode={darkMode}
+                onSuccess={() => {
+                    completed = true;
+                    Swal.close();
+                    resolve(true);
+                    setTimeout(() => reactRoot.unmount(), 0);
+                }} />
         );
 
         Swal.fire({
@@ -157,6 +164,7 @@ const TableUserComponent = ({
             showCancelButton: true,
             cancelButtonText: "Cancelar",
             allowOutsideClick: false,
+            theme: darkMode ? "dark" : "",
             preConfirm: () => {
                 if (!completed) Swal.showValidationMessage("Debes completar el captcha");
             }
@@ -169,12 +177,13 @@ const TableUserComponent = ({
             userItem,
             currentUser,
             action: "modify",
+            darkMode,
             onConfirm: async formValues => {
                 const result = await modifyUser(userItem.id, formValues);
                 if (result.success) {
-                    Swal.fire("Éxito", "Usuario modificado correctamente", "success");
+                    Swal.fire({ title: "Éxito", text: "Usuario modificado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo modificar el usuario, reintentelo de nuevo", "error");
+                    Swal.fire({ title: "Error", text: result.error || "No se pudo modificar el usuario, reintentelo de nuevo", icon: "error", theme: darkMode ? "dark" : "" });
                 }
                 window.dispatchEvent(new Event("refresh-users"));
             }
@@ -186,7 +195,7 @@ const TableUserComponent = ({
         await showCaptcha();
         const result = await deleteUser(userItem.id, userItem.version);
         if (result.success) {
-            Swal.fire("Éxito", "Usuario eliminado correctamente", "success");
+            Swal.fire({ title: "Éxito", text: "Usuario eliminado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
 
             // Calculamos si era el último elemento de la página
             const newFilteredLength = filterType.length - 1;
@@ -197,20 +206,20 @@ const TableUserComponent = ({
             setCurrentPage(newPage);
 
         } else {
-            Swal.fire("Error", result.error || "No se pudo eliminar el usuario, reintentelo de nuevo", "error");
+            Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar el usuario, reintentelo de nuevo", icon: "error", theme: darkMode ? "dark" : "" });
         }
         window.dispatchEvent(new Event("refresh-users"));
     };
 
     /** Cambio de contraseña */
     const handlePWDC = async userItem => {
-        const password = await PWDAskComponent({ userItem });
+        const password = await PWDAskComponent({ userItem, darkMode });
         if (!password) return;
         const result = await markPWDCUser(userItem.id, { password }, userItem.version);//TENIA UN FALLO HAY QUE COMPROBARLO EN EL SERVER
         if (result.success) {
-            Swal.fire("¡Éxito!", "Contraseña reiniciada correctamente", "success");
+            Swal.fire({ title: "¡Éxito!", text: "Contraseña reiniciada correctamente", icon: "success", theme: darkMode ? "dark" : "" });
         } else {
-            Swal.fire("Error", result.error || "No se pudo reiniciar la contraseña, reintentelo de nuevo", "error");
+            Swal.fire({ title: "Error", text: result.error || "No se pudo reiniciar la contraseña, reintentelo de nuevo", icon: "error", theme: darkMode ? "dark" : "" });
         }
         window.dispatchEvent(new Event("refresh-users"));
     };
@@ -220,7 +229,7 @@ const TableUserComponent = ({
 
     return (
         <>
-            <Table striped responsive>
+            <Table dark={darkMode} striped responsive>
                 <thead>
                     <tr>
                         <th style={{ width: "5%" }}>ID</th>
@@ -247,7 +256,7 @@ const TableUserComponent = ({
 
                         return (
                             <tr key={idx}>
-                                <td style={isCurrentUser ? { color: "blue", fontWeight: "bold" } : {}}>{user.id}</td>
+                                <td style={isCurrentUser ? { color: darkMode ? "#237bdb" : "blue", fontWeight: "bold" } : {}}>{user.id}</td>
                                 <UserNameToolTipComponent user={user} isSmallScreen_v0={isSmallScreen_v0}
                                     isSmallScreen_v1={isSmallScreen_v1} isSmallScreen_v2={isSmallScreen_v2}
                                     isCurrentUser={isCurrentUser} />
@@ -278,6 +287,7 @@ const TableUserComponent = ({
                                                 <AddBadgeComponent
                                                     availableObjs={userAvailableDeps}
                                                     objType="departamento"
+                                                    darkMode={darkMode}
                                                     onAdded={async dep => {
                                                         await addDepartment(user.id, dep.id, user.version);
                                                         window.dispatchEvent(new Event("refresh-users"));
@@ -292,6 +302,7 @@ const TableUserComponent = ({
                                                             key={dep.id}
                                                             objName={dep.name}
                                                             objType="departamento"
+                                                            darkMode={darkMode}
                                                             onDelete={async () => {
                                                                 await deleteDepartment(user.id, dep.id, user.version);
                                                                 window.dispatchEvent(new Event("refresh-users"));
@@ -325,6 +336,7 @@ const TableUserComponent = ({
                                                     <AddBadgeComponent
                                                         availableObjs={userAvailableDeps}
                                                         objType="departamento"
+                                                        darkMode={darkMode}
                                                         onAdded={async dep => {
                                                             await addDepartment(user.id, dep.id, user.version);
                                                             window.dispatchEvent(new Event("refresh-users"));

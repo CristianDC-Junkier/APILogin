@@ -1,5 +1,6 @@
 ﻿import { useState, useRef, useEffect } from "react";
 import { Tooltip } from "reactstrap";
+import { useTheme } from '../../hooks/UseTheme';
 
 /**
  * Componente que muestra el nombre del usuario
@@ -20,6 +21,7 @@ const UserNameToolTipComponent = ({ user, isSmallScreen_v0, isSmallScreen_v1, is
     const tdRef = useRef(null);
     const [isTruncated, setIsTruncated] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
+    const { darkMode } = useTheme();
 
     const toggleTooltip = () => setTooltipOpen(!tooltipOpen);
 
@@ -41,7 +43,7 @@ const UserNameToolTipComponent = ({ user, isSmallScreen_v0, isSmallScreen_v1, is
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    color: isCurrentUser ? "blue" : "black",
+                    color: isCurrentUser ? darkMode ? "#237bdb" : "blue" : "inherit",
                     fontWeight: isCurrentUser ? "bold" : "normal",
                     cursor: isTruncated ? "help" : "default",
                 }}

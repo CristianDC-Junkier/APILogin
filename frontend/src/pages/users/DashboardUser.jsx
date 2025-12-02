@@ -4,16 +4,20 @@ import Swal from "sweetalert2";
 
 import { useAuth } from "../../hooks/useAuth";
 import { createUser } from "../../services/UserService";
+import { useTheme } from '../../hooks/UseTheme';
 
 import BackButtonComponent from "../../components/utils/BackButtonComponent";
 import TableUserComponent from "../../components/user/TableUserComponent";
-import AddModifyUserComponent from "../../components/user/AddModifyUserComponent"; 
+import AddModifyUserComponent from "../../components/user/AddModifyUserComponent";
+
+import '../../styles/component/ComponentsDark.css';
 
 /**
  * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
  */
 const DashBoardUser = () => {
     const { user: currentUser } = useAuth();
+    const { darkMode } = useTheme();
 
     const [selectedType, setSelectedType] = useState("All");
     const [selectedUser, setSelectedUser] = useState("");
@@ -53,13 +57,14 @@ const DashBoardUser = () => {
         await AddModifyUserComponent({
             currentUser,
             action: "create",
+            darkMode,
             onConfirm: async (formValues) => {
                 const result = await createUser(formValues);
                 if (result.success) {
-                    Swal.fire("Éxito", "Usuario creado correctamente", "success");
+                    Swal.fire({ title: "Éxito", text: "Usuario creado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                     window.dispatchEvent(new Event("refresh-users"));
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo crear el usuario", "error");
+                    Swal.fire({ title: "Error", text: result.error || "No se pudo crear el usuario", icon: "error", theme: darkMode ? "dark" : "" });
                 }
             }
         });
@@ -76,7 +81,7 @@ const DashBoardUser = () => {
             <div className="position-absolute top-0 end-0 p-3">
                 <Button
                     color="transparent"
-                    style={{ color: 'black', border: 'none', padding: 0, fontWeight: 'bold' }}
+                    style={{ color: darkMode ? 'white' : 'black', border: 'none', padding: 0, fontWeight: 'bold' }}
                     onClick={handleCreate}
                 >
                     ➕ Crear Usuario
@@ -95,8 +100,9 @@ const DashBoardUser = () => {
                             className={`shadow-lg mb-2 border-2 ${selectedType === metric.type ? "border-primary" : "border-light"}`}
                             style={{
                                 cursor: 'pointer',
-                                backgroundColor: selectedType === metric.type ? "#e9f3ff" : "#fff",
-                                transition: "all 0.2s ease-in-out"
+                                backgroundColor: selectedType === metric.type ? (darkMode ? "#6f7a87" : "#e9f3ff") : (darkMode ? "#353535" : "#fff"),
+                                transition: "all 0.2s ease-in-out",
+                                color: darkMode ? "#fff" : "#000000"
                             }}
                             onClick={() => { setSelectedType(metric.type); setCurrentPage(1); }}
                         >
@@ -125,6 +131,7 @@ const DashBoardUser = () => {
                         value={selectedUser}
                         onChange={e => setSelectedUser(e.target.value)}
                         style={{ minWidth: "200px" }}
+                        className={ darkMode ? "input_dark" : "" }
                     />
                 </div>
                 {/* Botón Ordenación */}

@@ -47,7 +47,7 @@ const injectStyles = () => {
  * - Feedback visual cambia según progreso.
  * - Si no se completa correctamente, el slider se reinicia y muestra mensaje de error.
  */
-const CaptchaSliderComponent = ({ onSuccess }) => {
+const CaptchaSliderComponent = ({ onSuccess, darkMode }) => {
     const sliderRef = useRef(null);
     const feedbackRef = useRef(null);
 
@@ -66,7 +66,7 @@ const CaptchaSliderComponent = ({ onSuccess }) => {
             feedback.textContent = val < 100
                 ? "⬅️ Arrastra la flecha hasta el final"
                 : "✅ Captcha completado";
-            feedback.className = `mt-2 ${val < 100 ? "text-muted" : "text-success fw-bold"}`;
+            feedback.className = `mt-2 ${val < 100 ? darkMode ? "text-light" : "text-muted" : "text-success fw-bold"}`;
         };
 
         /**
@@ -110,7 +110,7 @@ const CaptchaSliderComponent = ({ onSuccess }) => {
     return (
         <div className="custom-slider-container mt-3">
             <input ref={sliderRef} type="range" min="0" max="100" step="1" defaultValue="0" />
-            <div ref={feedbackRef} className="mt-2 text-muted" style={{ fontSize: "0.9rem" }}>
+            <div ref={feedbackRef} className={`mt-2 ${darkMode ? "text-light" : "text-muted"}`} style={{ fontSize: "0.9rem" }}>
                 ⬅️ Arrastra la flecha
             </div>
         </div>

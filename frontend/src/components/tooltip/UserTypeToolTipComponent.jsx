@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
 import { Tooltip } from "reactstrap";
+import { useTheme } from '../../hooks/UseTheme';
 
 /**
  * Componente que muestra el tipo de usuario (Usuario, Administrador, Super Administrador)
@@ -15,6 +16,7 @@ import { Tooltip } from "reactstrap";
  * @returns {JSX.Element} Elemento visual que muestra el tipo de usuario con o sin tooltip según el tamaño de la pantalla.
  */
 const UserTypeToolTipComponent = ({ user, isSmallScreen, isCurrentUser }) => {
+    const { darkMode } = useTheme();
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const tooltipId = `type-${user.id}`;
 
@@ -40,7 +42,7 @@ const UserTypeToolTipComponent = ({ user, isSmallScreen, isCurrentUser }) => {
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                color: isCurrentUser ? "blue" : "inherit",
+                color: isCurrentUser ? darkMode ? "#237bdb" : "blue" : "inherit",
                 fontWeight: isCurrentUser ? "bold" : "normal",
                 cursor: isSmallScreen ? "help" : "default",
             }}

@@ -1,12 +1,12 @@
 ﻿import { useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useTheme } from '../hooks/UseTheme';
 import logo from '../assets/ayto_almonte.png';
 
 /**
  * Página comodín que se muestra cuando se introduce una página que no se recoge en el AppRouter
  */
 const NotFound = () => {
-  const { darkMode } = useOutletContext(); // obtiene darkMode del layout
+    const { darkMode } = useTheme(); // obtiene darkMode del layout
 
     useEffect(() => {
         document.title = "Página no encontrada 404 - IDEE Almonte";
@@ -29,8 +29,8 @@ const NotFound = () => {
         />
       </div>
       <div className="col">
-        <h2 className="text-center" style={{ color: darkMode ? "#ff6b6b" : "#dc3545" }}>{"Error 404"}</h2>
-        <h3 className="text-center" style={{ color: darkMode ? "#ccc" : "#666" }}>{"La página no existe"}</h3>
+        <h2 className="text-center" style={{ color: "#dc3545" }}>{"Error 404"}</h2>
+        <h3 className="text-center" style={{ color: darkMode ? "#ddd" : "#666" }}>{"La página no existe"}</h3>
       </div>
     </div>
   );
