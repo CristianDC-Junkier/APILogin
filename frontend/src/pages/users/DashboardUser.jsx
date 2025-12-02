@@ -21,6 +21,10 @@ const DashBoardUser = () => {
     const [rowsPerPage, setRowsPerPage] = useState(8);
 
     useEffect(() => {
+        document.title = "Panel de control de Usuarios - IDEE Almonte";
+    }, []);
+
+    useEffect(() => {
         setCurrentPage(1);
     }, [selectedUser, setSelectedUser]);
 

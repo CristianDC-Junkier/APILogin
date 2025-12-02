@@ -1,10 +1,10 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { useOutletContext } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaMoon, FaSun, FaSignInAlt } from "react-icons/fa";
 
 import { getDepartmentPublic } from "../../services/DepartmentService";
+import { useTheme } from '../../hooks/UseTheme';
 
 import logo from "../../assets/ayto_almonte_notext.png";
 
@@ -17,11 +17,15 @@ import SpinnerComponent from '../../components/utils/SpinnerComponent';
  */
 const PublicHome = () => {
     const navigate = useNavigate();
-    const { darkMode, toggleMode } = useOutletContext();
+    const { darkMode, toggleMode } = useTheme();
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const [visibleSections, setVisibleSections] = useState({});
     const [publicDepartment, setPublicDepartment] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        document.title = "Página Inicial - IDEE Almonte";
+    }, []);
 
     const handleMouseEnter = () => {
         if (window.innerWidth >= 768) {

@@ -40,6 +40,10 @@ export default function DashboardSystem() {
     const [threadsCount, setThreadsCount] = useState(null);
     const [uptimeSeconds, setUptimeSeconds] = useState(null);
 
+    useEffect(() => {
+        document.title = "Panel de Métricas - IDEE Almonte";
+    }, [])
+
     //Función encargada de obtener la información para la tabla
     useEffect(() => {
         const fetchLogs = async () => {

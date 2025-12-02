@@ -1,5 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { useTheme } from '../hooks/UseTheme';
 import BannerCookies from '../components/utils/BannerCookiesComponent';
 import background from '../../src/assets/background.jpg';
 
@@ -7,14 +8,8 @@ import background from '../../src/assets/background.jpg';
  * Estilos de fondo con imagen para toda la página.
  */
 const ExternalLayout = () => {
-    const [darkMode, setDarkMode] = useState(false);
 
-    // Al cargar, recupera la preferencia guardada
-    useEffect(() => {
-        const savedMode = localStorage.getItem("IDEE-Almonte/darkMode");
-        if (savedMode === "true") setDarkMode(true);
-    }, []);
-
+    const { darkMode } = useTheme(); 
 
     const imageBackground = {
         backgroundImage: darkMode

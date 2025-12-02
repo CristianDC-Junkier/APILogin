@@ -22,6 +22,10 @@ const DepartmentList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
 
+    useEffect(() => {
+        document.title = "Panel de control de Departamentos - IDEE Almonte";
+    }, []);
+
     // Estado de estadísticas
     const [statsDepart, setStatsDepart] = useState(0);
     const [statsLink, setStatsLink] = useState(0);
