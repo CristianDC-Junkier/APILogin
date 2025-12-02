@@ -272,10 +272,7 @@ class DepartmentController {
                         { '$Department.id$': 1 }                       
                     ]
                 },
-                order: [
-                    [Sequelize.literal(`CASE WHEN "Department"."id" = 1 THEN 1 ELSE 0 END`), 'ASC'],
-                    ["name", "ASC"]
-                ]
+                order: [["id", "ASC"]]
             });
 
             const dFormatted = departments

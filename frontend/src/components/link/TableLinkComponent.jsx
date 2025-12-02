@@ -25,7 +25,7 @@ import PaginationComponent from "../PaginationComponent";
  * @param {function} props.onStatsUpdate - Callback para actualizar estadísticas de links.
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
-const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate }) => {
+const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate, sortBy }) => {
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -51,7 +51,16 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
             try {
                 const res = await getAllLinks();
                 if (res.success) {
-                    setLinks(res.data.links || []);
+
+                    let links = res.data.links ?? [];
+
+                    // Orden dinámico
+                    links = links.sort((a, b) => {
+                        if (sortBy === "name") return a.name.localeCompare(b.name);
+                        return a.id - b.id;
+                    });
+
+                    setLinks(links);
 
                     if (onStatsUpdate) {
                         onStatsUpdate(res.data.links.length);
@@ -68,7 +77,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         const handler = () => fetchAll();
         window.addEventListener("refresh-links", handler);
         return () => window.removeEventListener("refresh-links", handler);
-    }, [onStatsUpdate]);
+    }, [onStatsUpdate, sortBy]);
 
     /** Filtrado por búsqueda **/
     const filteredLinks = useMemo(

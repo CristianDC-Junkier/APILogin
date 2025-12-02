@@ -47,7 +47,8 @@ const TableUserComponent = ({
     setCurrentPage,
     rowsPerPage,
     onStatsUpdate,
-    filterType = "All"
+    filterType = "All",
+    sortBy
 }) => {
     const [users, setUsers] = useState([]);
 
@@ -80,7 +81,16 @@ const TableUserComponent = ({
                     getDepartmentList()
                 ]);
                 if (userRes.success) {
-                    setUsers(userRes.data.users ?? []);
+                    let users = userRes.data.users ?? [];
+
+                    // Orden dinámico
+                    users = users.sort((a, b) => {
+                        if (sortBy === "name") return a.user.username.localeCompare(b.user.username);
+                        return a.id - b.id;
+                    });
+
+                    setUsers(users);
+
                     if (onStatsUpdate) {
                         const stats = {
                             total: userRes.data.users.length,
@@ -102,7 +112,7 @@ const TableUserComponent = ({
         const handler = () => fetchAll();
         window.addEventListener("refresh-users", handler);
         return () => window.removeEventListener("refresh-users", handler);
-    }, [onStatsUpdate]);
+    }, [onStatsUpdate, sortBy]);
 
 
     /** Filtrado por búsqueda y tipo **/
