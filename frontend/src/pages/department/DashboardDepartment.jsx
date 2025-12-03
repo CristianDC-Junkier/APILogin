@@ -20,7 +20,7 @@ const DepartmentList = () => {
     const [currentView, setCurrentView] = useState("departments"); // "departments" | "links"
     const [rowsPerPage, setRowsPerPage] = useState(8);
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortBy, setSortBy] = useState("name");
+    const [sortBy, setSortBy] = useState("id");
     const [search, setSearch] = useState("");
 
     useEffect(() => {

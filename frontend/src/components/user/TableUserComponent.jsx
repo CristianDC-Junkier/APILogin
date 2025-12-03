@@ -47,7 +47,7 @@ const TableUserComponent = ({
     setCurrentPage,
     rowsPerPage,
     onStatsUpdate,
-    filterType = "All",
+    filterType,
     sortBy
 }) => {
     const [users, setUsers] = useState([]);
@@ -101,6 +101,7 @@ const TableUserComponent = ({
                     }
                 }
                 if (depRes.success) setDepartments(depRes.data.departments ?? []);
+
             } catch {
                 Swal.fire("Error", "No se pudieron cargar los datos", "error");
             } finally {
@@ -186,6 +187,15 @@ const TableUserComponent = ({
         const result = await deleteUser(userItem.id, userItem.version);
         if (result.success) {
             Swal.fire("Éxito", "Usuario eliminado correctamente", "success");
+
+            // Calculamos si era el último elemento de la página
+            const newFilteredLength = filterType.length - 1;
+            const newTotalPages = Math.ceil(newFilteredLength / rowsPerPage);
+
+            // Si la página actual queda vacía, ir a la anterior o a la 1
+            const newPage = currentPage > newTotalPages ? Math.max(newTotalPages, 1) : currentPage;
+            setCurrentPage(newPage);
+
         } else {
             Swal.fire("Error", result.error || "No se pudo eliminar el usuario, reintentelo de nuevo", "error");
         }
