@@ -19,7 +19,7 @@ const DashBoardUser = () => {
     const [selectedUser, setSelectedUser] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
-    const [sortBy, setSortBy] = useState("name");
+    const [sortBy, setSortBy] = useState("id");
 
 
     useEffect(() => {

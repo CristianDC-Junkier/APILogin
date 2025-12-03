@@ -11,7 +11,7 @@ const DepartmentLinks = ({ title, links = [], darkMode }) => {
             border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)",
             padding: "10px",
             transition: "all 0.5s",
-            marginBottom: "25px"
+            marginBottom: "15px"
         }}>
 
             <h3

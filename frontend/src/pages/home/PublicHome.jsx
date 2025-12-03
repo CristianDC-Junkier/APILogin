@@ -147,11 +147,29 @@ const PublicHome = () => {
                         transform: visibleSections[0] ? 'translateY(0)' : 'translateY(25px)',
                         transition: "all 0.5s"
                     }}>
-                        <h3><strong>Plataforma IDE</strong></h3>
-                        <p>
-                            Bienvenido a la plataforma geoespacial del Ayuntamiento de Almonte.
-                            Para acceder a los departamentos y herramientas, por favor inicia sesión.
-                        </p>
+                        <h3><strong>La Plataforma IDEE Almonte</strong></h3>
+                        <p>IDEE Almonte es la Plataforma de Datos Espaciales del Ayuntamiento de Almonte.
+                            Ofrece acceso a mapas, datos y servicios geográficos del municipio,
+                            facilitando la consulta, análisis y difusión de la información territorial.
+                            Esta plataforma buscar mejorar y facilitar el conocimiento del territorio además
+                            de apoyar la planificación y gestión municipal.</p>
+                    </div>
+
+                    {/* TEXTO PRINCIPAL 2 */}
+                    <div className="fade-section" style={{
+                        background: darkMode ? "rgba(25,25,30,0.8)" : "rgba(255,255,255,0.9)",
+                        borderRadius: "12px",
+                        border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)",
+                        padding: "20px",
+                        marginBottom: "20px",
+                        opacity: visibleSections[0] ? 1 : 0,
+                        transform: visibleSections[0] ? 'translateY(0)' : 'translateY(25px)',
+                        transition: "all 0.5s"
+                    }}>
+                        <h3><strong>¿Qué son los datos espaciales?</strong></h3>
+                        <p>Los datos espaciales son información geográfica que describe la localización y las características de lugares,
+                            infraestructuras y recursos en el municipio de Almonte. Incluyen mapas, planos y capas de información que permiten
+                            xanalizar el territorio y tomar decisiones informadas.</p>
                     </div>
 
                     {/* DEPARTAMENTOS DINÁMICOS */}
