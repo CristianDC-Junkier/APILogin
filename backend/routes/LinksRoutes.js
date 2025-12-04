@@ -4,7 +4,7 @@ const router = express.Router();
 
 const LinksController = require("../controllers/LinksController");
 const { adminOnly } = require("../middlewares/Auth");
-const upload = require("../middlewares/multer");
+const upload = require("../middlewares/Multer");
 
 /**
  * Rutas para gestión de links.

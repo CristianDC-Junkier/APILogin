@@ -95,7 +95,7 @@ class LinksController {
             link.web = web ?? link.web;
             link.description = description ?? null;
 
-            // SOLO si llega archivo nuevo
+            // Solo si llega archivo nuevo
             if (req.file) {
                 // borrar vieja si existía
                 if (link.image) {

@@ -13,7 +13,7 @@ const { encrypt, decrypt, hash } = require("../utils/Crypto");
  * - web         → URL de la web externa (encriptada).
  * - web_hash    → Hash de la web para búsquedas rápidas y únicas.
  * - description → Descripción del link (encriptada, opcional).
- * - image       → Nombre de archivo de la imagen. La ruta completa siempre es "../assets/images/{nombre}".
+ * - image       → Nombre de archivo de la imagen. La ruta completa siempre es "../images/{nombre}".
  */
 const Links = sequelize.define("Links", {
     id: {
