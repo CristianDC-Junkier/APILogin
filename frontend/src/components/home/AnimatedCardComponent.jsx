@@ -6,6 +6,17 @@ import { useNavigate } from "react-router-dom";
 const MIN_CARD_HEIGHT = 300;
 const IMG_HEIGHT = 125;
 
+/**
+ * Componente para crear una Card animada para representar los enlaces
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.title - Nombre del enlace
+ * @param {string} props.web - Dirección del enlace
+ * @param {string} props.desc - Descripción de la página web del enlace
+ * @param {string} props.img - Nombre del archivo de imagen asociado al enlace
+ * @param {boolean} props.darkMode - booleano que indica si el Modo Oscuro está activo
+ * @returns
+ */
 const AnimatedCard = ({ title, web, desc, img, darkMode }) => {
     const navigate = useNavigate();
 

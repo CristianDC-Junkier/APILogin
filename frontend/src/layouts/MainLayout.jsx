@@ -6,6 +6,9 @@ import Footer from '../components/FooterComponent';
 import BannerCookies from '../components/utils/BannerCookiesComponent';
 import background from '../../src/assets/background.jpg';
 
+/**
+ * Estilos de fondo con imagen para toda la página.
+ */
 const MainLayout = () => {
 
     const { darkMode } = useTheme(); 

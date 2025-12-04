@@ -5,6 +5,9 @@ import Footer from '../components/FooterComponent';
 import BannerCookies from '../components/utils/BannerCookiesComponent';
 import background from '../../src/assets/vista-aérea-municipio-de-almonte.png';
 
+/**
+ * Estilos de fondo para la páginas Home y PublicHome.
+ */
 const HomeLayout = () => {
 
     const { darkMode } = useTheme(); 

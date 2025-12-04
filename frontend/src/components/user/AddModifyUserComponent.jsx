@@ -13,6 +13,7 @@ import '../../styles/component/ComponentsDark.css';
  * @param {Object} [props.userItem] - Usuario a modificar (si action === "modify").
  * @param {Object} props.currentUser - Usuario que está realizando la acción.
  * @param {string} props.action - "create" o "modify".
+ * @param {boolean} props.darkMode - booleano que indica si el Modo Oscuro está activo
  * @param {Function} props.onConfirm - Callback que se ejecuta al confirmar los datos, recibe { userAccount, userData, userAccountId? }.
  */
 const AddModifyUserComponent = async ({ userItem, currentUser, action, darkMode, onConfirm }) => {

@@ -24,6 +24,7 @@ import PaginationComponent from "../PaginationComponent";
  * @param {number} props.currentPage - Página actual de la tabla.
  * @param {function} props.setCurrentPage - Función para cambiar la página actual.
  * @param {function} props.onStatsUpdate - Callback para actualizar estadísticas de links.
+ * @param {string} props.sortBy - Indica como ordenar la tabla
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
 const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate, sortBy }) => {

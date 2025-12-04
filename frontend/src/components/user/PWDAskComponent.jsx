@@ -6,6 +6,7 @@ import '../../styles/component/ComponentsDark.css';
  *
  * @param {Object} options
  * @param {Object} options.userItem - Usuario al que pedir la contraseña
+ * @param {boolean} options.darkMode - booleano que indica si el Modo Oscuro está activo
  * @returns {Promise<string|null>} - Contraseña ingresada o null si se cancela
  */
 const PWDAskComponent = async ({ userItem, darkMode }) => {

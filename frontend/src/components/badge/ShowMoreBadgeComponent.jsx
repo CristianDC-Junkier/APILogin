@@ -14,10 +14,10 @@ import { useTheme } from '../../hooks/UseTheme';
 * @param {Object} user usuario al que se le muestran los departamentos
 * @param {boolean} canModify Indica si el usuario puede modificar
 * @param {String} objType Cadena para aplicar en los menús
-* @param {Array} userObjects Lista de objetos del usuario // departamento -> [{id, name}] || enlace -> [{id, name, web}]
-* @param {Array} availableObjs Lista de objetos libres // departamento -> [{id, name}] || enlace -> [{id, name, web}]
-* @param {Function} onAdded Callback cuando se agrega un departamento
-* @param {Function} onDeleted Callback cuando se elimina un departamento
+* @param {Array} userObjects Lista de objetos del usuario // departamento -> [{id, name}] || enlace -> [{id, name, web, description, image}]
+* @param {Array} availableObjs Lista de objetos libres // departamento -> [{id, name}] || enlace -> [{id, name, web, description, image}]
+* @param {Function} onAdded Callback cuando se agrega un objeto
+* @param {Function} onDeleted Callback cuando se elimina un objeto
 */
 const ShowMoreDepartmentBadgeComponent = ({
     currentUser,
