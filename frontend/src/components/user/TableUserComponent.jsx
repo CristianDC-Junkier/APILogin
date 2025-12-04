@@ -41,6 +41,7 @@ import { useTheme } from '../../hooks/UseTheme';
  * @param {number} props.rowsPerPage - Número de filas que se muestran por página.
  * @param {function} props.onStatsUpdate - Callback para actualizar las estadísticas generales de usuarios.
  * @param {string} [props.filterType="All"] - Tipo de usuario por el cual se filtran los resultados (ej. "USER", "ADMIN", "SUPERADMIN").
+ * @param {string} props.sortBy - Indica como ordenar la tabla
  * @returns {JSX.Element} Tabla interactiva con los usuarios del sistema.
  */
 const TableUserComponent = ({

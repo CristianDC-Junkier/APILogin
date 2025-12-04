@@ -5,7 +5,7 @@ import BannerCookies from '../components/utils/BannerCookiesComponent';
 import background from '../../src/assets/background.jpg';
 
 /**
- * Estilos de fondo con imagen para toda la página.
+ * Estilos de fondo para la página ExternalWeb.
  */
 const ExternalLayout = () => {
 

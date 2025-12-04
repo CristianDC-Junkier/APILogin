@@ -6,7 +6,7 @@ import '../../styles/component/ComponentsDark.css';
  * Badge para añadir un objeto (solo para admins/superadmins)
  * @param {Object} props
  * @param {String} props.objType Cadena de texto para aplicar en los menús
- * @param {Array} props.availableObjs Lista de objetos disponibles // departamento -> [{id, name}] - enlace -> [{id, name, web}]
+ * @param {Array} props.availableObjs Lista de objetos disponibles // departamento -> [{id, name}] - enlace -> [{id, name, web, description, image}]
  * @param {Function} props.onAdded Callback que recibe el resultado de la operación
  */
 const AddBadgeComponent = ({ objType, availableObjs = [], onAdded, darkMode }) => {

@@ -6,6 +6,7 @@ import "../../styles/component/ComponentsDark.css"
  *
  * @param {Object} props
  * @param {Object} props.profile - Usuario a modificar
+ * @param {boolean} props.darkMode - booleano que indica si el Modo Oscuro está activo
  * @param {Function} props.onConfirm - Callback que recibe { username, oldPassword, newPassword, usertype }
  */
 const ModifyUserAccountComponent = async ({ profile, darkMode, onConfirm }) => {

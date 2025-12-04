@@ -7,6 +7,7 @@ import '../../styles/component/ComponentsDark.css';
  * @param {Object} props
  * @param {Object} [props.depItem] - Departamento a modificar (si action === "modify").
  * @param {string} props.action - "create" o "modify".
+ * @param {boolean} props.darkMode - booleano que indica si el Modo Oscuro está activo
  * @param {Function} props.onConfirm - Callback que se ejecuta al confirmar los datos, recibe { formValues }.
  */
 const AddModifyDepartmentComponent = async ({ depItem, action, darkMode, onConfirm }) => {

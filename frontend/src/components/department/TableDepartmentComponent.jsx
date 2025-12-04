@@ -32,6 +32,7 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
  * @param {Object} props.currentUser - Información del usuario autenticado.
  * @param {function} props.onStatsDepartsUpdate - Callback para actualizar estadísticas de departamentos.
  * @param {function} props.onStatsLinksUpdate - Callback para actualizar estadísticas de enlaces.
+ * @param {string} props.sortBy - Indica como ordenar la tabla
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
 const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate, sortBy }) => {

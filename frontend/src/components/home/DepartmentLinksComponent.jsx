@@ -2,6 +2,15 @@
 import { Row, Col } from "reactstrap";
 import AnimatedCard from "./AnimatedCardComponent";
 
+/**
+ * Componente que muestra los enlaces asociados a un departamento
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.title - Nombre del departamento
+ * @param {Array} props.links - Lista de los enlaces asignados al departamento
+ * @param {boolean} props.darkMode - booleano que indica si el Modo Oscuro está activo
+ * @returns
+ */
 const DepartmentLinks = ({ title, links = [], darkMode }) => {
 
     return (

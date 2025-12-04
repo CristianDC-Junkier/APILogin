@@ -1,5 +1,16 @@
 ﻿import React from "react";
 
+/**
+ * Componente encargado de crear los objetos que populan el menú lateral de la página Home
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {Object} props.icon - Icono de FontAwesomeIcon para el objeto
+ * @param {string} props.text - Texto para el objeto
+ * @param {function} props.onClick - Callback que determina el comportamiento del objeto al hacerle click
+ * @param {boolean} props.expanded - Booleano que determina el estado del menú lateral
+ * @param {boolean} props.darkMode - booleano que indica si el Modo Oscuro está activo
+ * @returns
+ */
 const SidebarItem = ({ icon, text, onClick, expanded, darkMode }) => {
     return (
         <div

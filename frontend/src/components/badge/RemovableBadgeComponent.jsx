@@ -2,7 +2,7 @@
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
 
-// Función encargada de determinar el color de fonde del badge
+// Función encargada de determinar el color de fondo del badge
 function stringToColor(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
