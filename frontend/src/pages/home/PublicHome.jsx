@@ -173,7 +173,7 @@ const PublicHome = () => {
                     </div>
 
                     {/* DEPARTAMENTOS DINÁMICOS */}
-                    {publicDepartment && (
+                    {publicDepartment && publicDepartment.links && publicDepartment.links.length > 0 && (
                         <DepartmentLinks
                             key={publicDepartment.id}
                             title={publicDepartment.name}
