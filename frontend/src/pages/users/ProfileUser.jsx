@@ -192,7 +192,7 @@ const ProfileUser = () => {
                                                                     if (result.success) {
                                                                         update(result.data.user);
                                                                     } else {
-                                                                        Swal.fire("Error", result.error || "No se pudo eliminar", "error");
+                                                                        Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar", icon: "error", theme: darkMode ? "dark" : "" });
                                                                     }
                                                                 }}
                                                             />
@@ -211,7 +211,7 @@ const ProfileUser = () => {
                                                             if (result.success) {
                                                                 update(result.data.user);
                                                             } else {
-                                                                Swal.fire("Error", result.error || "No se pudo eliminar", "error");
+                                                                Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar", icon: "error", theme: darkMode ? "dark" : "" });
                                                             }
                                                         }}
                                                     />

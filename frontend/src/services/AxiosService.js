@@ -2,6 +2,8 @@
 import Swal from "sweetalert2";
 import { getAccessToken, setAccessToken, refreshAccessToken, clearAccessToken } from "./AuthService";
 import { getUpdateUserState } from '../utils/AuthInterceptorHelper';
+import { useTheme } from '../hooks/UseTheme';
+
 
 /**
  * Servicio encargado de realizar las llamadas al servidor
@@ -88,7 +90,7 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const status = error.response?.status;
-
+        const { darkMode } = useTheme();
         /**
          * CASO 401 - Token expirado o inválido
          *
@@ -126,6 +128,7 @@ api.interceptors.response.use(
                         confirmButtonText: "Aceptar",
                         allowOutsideClick: false,
                         allowEscapeKey: false,
+                        theme: darkMode ? "dark" : ""
                     });
 
                     window.location.href = "/IDEE-Almonte/login";
