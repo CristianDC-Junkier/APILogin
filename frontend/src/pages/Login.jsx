@@ -98,6 +98,7 @@ const Login = () => {
             <div className="position-absolute top-0 start-0">
                 <BackButtonComponent back="/public-home" />
             </div>
+
             <Row className="w-100 flex-grow-1 justify-content-center align-items-center">
                 <Col xs="12" sm="10" md="6" lg="5" xl="4" xxl="4" className="cmaxW">
                     <Card className="Card-login position-relative">
