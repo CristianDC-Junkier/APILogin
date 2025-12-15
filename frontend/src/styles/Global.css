@@ -2,7 +2,61 @@
     font-family: 'Trebuchet MS', sans-serif;
 }
 
+/* TITULOS */
+h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem) !important;
+}
 
+h2 {
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem) !important;
+}
+
+h3 {
+    font-size: clamp(1.2rem, 3vw, 1.8rem) !important;
+}
+
+h4 {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem) !important;
+}
+
+h5 {
+    font-size: clamp(1rem, 2vw, 1.2rem) !important;
+}
+
+h6 {
+    font-size: clamp(0.9rem, 1.8vw, 1.05rem) !important;
+}
+
+/* TEXTOS GENERAL */
+p, span, li, a, small, button {
+    font-size: clamp(0.85rem, 1.5vw, 1rem) ;
+}
+
+
+/* SIDEBAR TEXTO */
+.sidebar-text {
+    font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+/* BOTONES */
+button, .btn {
+    font-size: clamp(0.85rem, 1.6vw, 1rem) !important;
+}
+
+/* TARJETAS */
+.card-title {
+    font-size: clamp(1rem, 2.8vw, 1.4rem) !important;
+}
+
+.card-desc {
+    font-size: clamp(0.85rem, 1.8vw, 1rem) !important;
+}
+
+.nav-logo:hover {
+    transform: scale(1.15); 
+    filter: saturate(1.25); 
+    transition: all 0.5s ease;
+}
 
 /* Estilo para scrollbars con color primario */
 .scrollbar-primary::-webkit-scrollbar {

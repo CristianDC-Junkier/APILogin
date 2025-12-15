@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 
 import { getDepartmentList, modifyDepartment, deleteDepartment, addLinkToDepartment, deleteLinkToDepartment } from "../../services/DepartmentService";
 import { getAllLinks } from "../../services/LinkService";
+import { useTheme } from '../../hooks/UseTheme';
 
 import PaginationComponent from "../../components/PaginationComponent";
 import CaptchaSliderComponent from '../utils/CaptchaSliderComponent';
@@ -31,12 +32,15 @@ import ShowMoreBadgeComponent from "../badge/ShowMoreBadgeComponent";
  * @param {Object} props.currentUser - Información del usuario autenticado.
  * @param {function} props.onStatsDepartsUpdate - Callback para actualizar estadísticas de departamentos.
  * @param {function} props.onStatsLinksUpdate - Callback para actualizar estadísticas de enlaces.
+ * @param {string} props.sortBy - Indica como ordenar la tabla
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
-const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate }) => {
+const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, currentUser, onStatsDepartsUpdate, onStatsLinksUpdate, sortBy }) => {
     const [departments, setDepartments] = useState([]);
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { darkMode } = useTheme();
 
     /** Detectar pantallas pequeñas */
     const useIsSmallScreen = (breakpoint) => {
@@ -61,21 +65,32 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                     getDepartmentList(),
                     getAllLinks()
                 ]);
+
                 if (depRes.success) {
-                    setDepartments(depRes.data.departments || []);
+                    let depts = depRes.data.departments ?? [];
+
+                    // Orden dinámico
+                    depts = depts.sort((a, b) => {
+                        if (sortBy === "name") return a.name.localeCompare(b.name);
+                        return a.id - b.id;
+                    });
+
+                    setDepartments(depts);
 
                     if (onStatsDepartsUpdate) {
                         onStatsDepartsUpdate(depRes.data.departments.length);
                     }
                 }
+
                 if (linkRes.success) {
                     setLinks(linkRes.data.links ?? []);
                     if (onStatsLinksUpdate) {
                         onStatsLinksUpdate(linkRes.data.links.length);
                     }
                 }
+                
             } catch {
-                Swal.fire("Error", "No se pudieron cargar los datos", "error");
+                Swal.fire({ title: "Error", text: "No se pudieron cargar los datos", icon: "error", theme: darkMode ? "dark" : "" });
             } finally {
                 setLoading(false);
             }
@@ -85,7 +100,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
         const handler = () => fetchAll();
         window.addEventListener("refresh-departments", handler);
         return () => window.removeEventListener("refresh-departments", handler);
-    }, [onStatsDepartsUpdate, onStatsLinksUpdate]);
+    }, [onStatsDepartsUpdate, onStatsLinksUpdate, sortBy, darkMode]);
 
     /** Filtrado por búsqueda **/
     const filteredDepartments = useMemo(
@@ -106,12 +121,14 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
         let completed = false;
 
         reactRoot.render(
-            <CaptchaSliderComponent onSuccess={() => {
-                completed = true;
-                Swal.close();
-                resolve(true);
-                setTimeout(() => reactRoot.unmount(), 0);
-            }} />
+            <CaptchaSliderComponent
+                darkMode={darkMode}
+                onSuccess={() => {
+                    completed = true;
+                    Swal.close();
+                    resolve(true);
+                    setTimeout(() => reactRoot.unmount(), 0);
+                }} />
         );
 
         Swal.fire({
@@ -122,6 +139,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
             showCancelButton: true,
             cancelButtonText: 'Cancelar',
             allowOutsideClick: false,
+            theme: darkMode ? "dark" : "",
             preConfirm: () => {
                 if (!completed) Swal.showValidationMessage('Debes completar el captcha');
             }
@@ -130,16 +148,22 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
 
     /** Modificar departamento **/
     const handleModify = async (depItem) => {
+        if (depItem.id === 1) {
+            Swal.fire({ title: "Error", text: "Este departamento no se puede eliminar", icon: "error", theme: darkMode ? "dark" : "" });
+            return;
+        }
+
         await AddModifyDepartmentComponent({
             depItem,
             action: "modify",
+            darkMode: darkMode,
             onConfirm: async (formValues) => {
                 const result = await modifyDepartment(depItem.id, formValues);
                 if (result.success) {
-                    Swal.fire("Éxito", "Departamento modificado correctamente", "success");
+                    Swal.fire({ title: "Éxito", text: "Departamento modificado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                     window.dispatchEvent(new Event("refresh-departments"));
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo modificar el departamento", "error");
+                    Swal.fire({ title: "Error", text: result.error || "No se pudo modificar el departamento", icon: "error", theme: darkMode ? "dark" : "" });
                 }
             }
         });
@@ -150,12 +174,26 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
         try { await showCaptcha(); }
         catch { return; }
 
+        if (depItem.id === 1) {
+            Swal.fire({ title: "Error", text: "Este departamento no se puede eliminar", icon: "error", theme: darkMode ? "dark" : "" });
+            return;
+        }
+
         const result = await deleteDepartment(depItem.id);
         if (result.success) {
-            Swal.fire("Éxito", "Departamento eliminado correctamente", "success");
+            Swal.fire({ title: "Éxito", text: "Departamento eliminado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
+
+            // Calculamos si era el último elemento de la página
+            const newFilteredLength = filteredDepartments.length - 1;
+            const newTotalPages = Math.ceil(newFilteredLength / rowsPerPage);
+
+            // Si la página actual queda vacía, ir a la anterior o a la 1
+            const newPage = currentPage > newTotalPages ? Math.max(newTotalPages, 1) : currentPage;
+            setCurrentPage(newPage);
+
             window.dispatchEvent(new Event("refresh-departments"));
         } else {
-            Swal.fire("Error", result.error || "No se pudo eliminar el departamento", "error");
+            Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar el departamento", icon: "error", theme: darkMode ? "dark" : "" });
         }
     };
 
@@ -163,7 +201,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
 
     return (
         <>
-            <Table striped responsive>
+            <Table dark={darkMode} striped responsive>
                 <thead>
                     <tr>
                         <th style={{ width: "5%" }}> ID</th>
@@ -174,12 +212,16 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                 </thead>
                 <tbody>
                     {currentDepartments.map((depItem, idx) => {
-                        const canModify = ["ADMIN", "SUPERADMIN"].includes(currentUser.usertype);
+                        const canModifyLinks = ["ADMIN", "SUPERADMIN"].includes(currentUser.usertype);
+                        const canModifyorDelete = ["ADMIN", "SUPERADMIN"].includes(currentUser.usertype) && depItem.id !== 1;
                         const depLinks = depItem.links || [];
                         const depAvailableLinks = links.filter(l => !depLinks.some(dl => dl.id === l.id));
                         return (
                             <tr key={idx}>
-                                <td>{depItem.id}</td>
+                                <td style={{
+                                    color: depItem.id === 1 ? "#0d6efd" : undefined,
+                                    fontWeight: 500
+                                }}> {depItem.id} </td>
                                 <DepartmentNameToolTipComponent
                                     depItem={depItem}
                                     isSmallScreen_v0={isSmallScreen_v0}
@@ -191,7 +233,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                             <ShowMoreBadgeComponent
                                                 currentUser={currentUser}
                                                 user={depItem}
-                                                canModify={canModify}
+                                                canModify={canModifyLinks}
                                                 objType="enlace"
                                                 userObjects={depLinks}
                                                 availableObjs={depAvailableLinks}
@@ -204,10 +246,11 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }}
                                             />
-                                        ) : canModify ? (
+                                        ) : canModifyLinks ? (
                                             <AddBadgeComponent
                                                 availableObjs={depAvailableLinks}
                                                 objType="enlace"
+                                                darkMode={darkMode}
                                                 onAdded={async l => {
                                                     await addLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
@@ -216,8 +259,8 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                         ) : null
                                     ) : (
                                         <>
-                                            {depLinks.slice(0, 3).map(l => canModify
-                                                ? <RemovableBadgeComponent key={l.id} objName={l.name} objType="enlace" onDelete={async () => {
+                                            {depLinks.slice(0, 3).map(l => canModifyLinks
+                                                ? <RemovableBadgeComponent key={l.id} objName={l.name} objType="enlace" darkMode={darkMode} onDelete={async () => {
                                                     await deleteLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }} />
@@ -227,7 +270,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                                 <ShowMoreBadgeComponent
                                                     currentUser={currentUser}
                                                     user={depItem}
-                                                    canModify={canModify}
+                                                    canModify={canModifyLinks}
                                                     objType="enlace"
                                                     userObjects={depLinks}
                                                     availableObjs={depAvailableLinks}
@@ -241,8 +284,8 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                                     }}
                                                 />
                                             )}
-                                            {depLinks?.length <= 3 && canModify && (
-                                                <AddBadgeComponent availableObjs={depAvailableLinks} objType="enlace" onAdded={async l => {
+                                                {depLinks?.length <= 3 && canModifyLinks && (
+                                                    <AddBadgeComponent availableObjs={depAvailableLinks} objType="enlace" darkMode={darkMode} onAdded={async l => {
                                                     await addLinkToDepartment(depItem.id, l.id);
                                                     window.dispatchEvent(new Event("refresh-departments"));
                                                 }} />
@@ -252,7 +295,7 @@ const TableDepartmentComponent = ({ search, rowsPerPage, currentPage, setCurrent
                                 </td>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center flex-wrap gap-1">
-                                        {canModify && (
+                                        {canModifyorDelete && (
                                             <>
                                                 <Button color="warning" size="sm"
                                                     style={{

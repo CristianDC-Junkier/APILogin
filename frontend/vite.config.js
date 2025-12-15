@@ -9,7 +9,12 @@ export default () => {
             port: 61939,
             proxy: {
                 '/IDEE-Almonte/api': {
-                    target: 'http://localhost:5000',  
+                    target: 'http://localhost:5000',
+                    changeOrigin: true,
+                    secure: false,
+                },
+                '/IDEE-Almonte/i-links': {
+                    target: 'http://localhost:5000',
                     changeOrigin: true,
                     secure: false,
                 },

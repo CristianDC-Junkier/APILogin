@@ -2,6 +2,7 @@
 import { ListGroup, ListGroupItem, Tooltip } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { useTheme } from '../../hooks/UseTheme';
 
 /**
  * Componente para listar archivos de log.
@@ -20,6 +21,7 @@ import { faFileAlt, faDownload } from '@fortawesome/free-solid-svg-icons';
  */
 export default function LogListComponent({ logs, selectedLog, onSelectLog, onDownloadLog }) {
     const [tooltipOpen, setTooltipOpen] = useState({});
+    const { darkMode } = useTheme();
 
     if (logs.length === 0) return <p className="p-3 text-muted">No existen logs</p>;
 
@@ -42,11 +44,12 @@ export default function LogListComponent({ logs, selectedLog, onSelectLog, onDow
                         action
                         active={selectedLog === log}
                         onClick={() => onSelectLog(log)}
+                        color={darkMode ? "dark" : ""}
                         style={{
                             cursor: 'pointer',
                             display: 'flex',
                             justifyContent: 'space-between',
-                            alignItems: 'center'
+                            alignItems: 'center',
                         }}
                     >
                         <span

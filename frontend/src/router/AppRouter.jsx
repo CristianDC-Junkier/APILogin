@@ -3,14 +3,15 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import MainLayout from '../layouts/MainLayout';
 import ExternalLayout from '../layouts/ExternalLayout';
+import HomeLayout from '../layouts/HomeLayout';
 
 import PublicRoute from './PublicRoute';
 import PrivateRoute from './PrivateRoute';
 import RoleRoute from './RoleRoute';
 
-
 import LoginPage from '../pages/Login';
-import HomePage from '../pages/Home';
+import HomePage from '../pages/home/Home';
+import PublicHomePage from '../pages/home/PublicHome';
 
 import NotFoundPage from '../pages/NotFound';
 import AccessDeniedPage from '../pages/AccessDenied';
@@ -19,7 +20,6 @@ import DashBoardUserPage from '../pages/users/DashboardUser';
 import DashboardSystemPage from '../pages/system/DashboardSystem';
 import DashboardDepartmentPage from '../pages/department/DashboardDepartment';
 import ExternalWebPage from '../pages/web/ExternalWeb';
-import WebListPage from '../pages/web/WebList';
 
 import ProfileUserPage from '../pages/users/ProfileUser';
 
@@ -36,7 +36,7 @@ const AppRouter = () => {
     return (
         <Routes>
             <Route element={<MainLayout />}>
-                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/" element={<Navigate to="/public-home" replace />} />
                 <Route path="/accessdenied" element={<AccessDeniedPage />} />
 
                 <Route path="/privacity-politic" element={<PrivacityPage />} />
@@ -48,8 +48,6 @@ const AppRouter = () => {
 
                 {/* Rutas privadas */}
                 <Route path="/profile" element={<PrivateRoute><ProfileUserPage /> </PrivateRoute>} />
-                <Route path="/home" element={<PrivateRoute> <HomePage /> </PrivateRoute>} />
-                <Route path="/list" element={<PrivateRoute><WebListPage /></PrivateRoute>} />
 
                 {/* Rutas privadas por rol */}
                 <Route path="/users" element={<RoleRoute allowedRoles={['ADMIN', 'SUPERADMIN']}><DashBoardUserPage /></RoleRoute>} />
@@ -60,6 +58,10 @@ const AppRouter = () => {
             </Route>
             <Route element={<ExternalLayout />}>
                 <Route path="/web" element={<PrivateRoute><ExternalWebPage /></PrivateRoute>} />
+            </Route>
+            <Route element={<HomeLayout />}>
+                <Route path="/home" element={<PrivateRoute> <HomePage /> </PrivateRoute>} />
+                <Route path="/public-home" element={<PublicRoute> <PublicHomePage /> </PublicRoute>} />
             </Route>
 
         </Routes>

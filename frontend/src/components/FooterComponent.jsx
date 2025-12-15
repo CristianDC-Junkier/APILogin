@@ -12,12 +12,12 @@ const FooterComponent = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <footer className="bg-dark text-white py-2 mt-auto">
+        <footer className="bg-dark text-white py-2 mt-auto " >
 
-            <div className="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-between px-3">
+            <div className="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-between px-3 ">
 
                 {/* Izquierda: Logo */}
-                <div className="footer-logo">
+                <div className="footer-logo d-none d-md-block">
                     <a href="https://almonte.es/es/" target="_blank" rel="noopener noreferrer">
                         <img src={logo} alt="Ayuntamiento de Almonte" style={{ height: "30px" }} />
                     </a>

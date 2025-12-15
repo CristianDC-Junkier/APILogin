@@ -6,6 +6,7 @@ import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import { FaUser, FaEdit, FaTrash, FaCalendarAlt } from 'react-icons/fa';
 
 import { useAuth } from "../../hooks/useAuth";
+import { useTheme } from '../../hooks/UseTheme';
 import { getProfile, modifyProfile, deleteProfile, addDepartmentProfile, deleteDepartmentProfile } from "../../services/UserService";
 import { getDepartmentList } from "../../services/DepartmentService";
 
@@ -24,9 +25,15 @@ const ProfileUser = () => {
     const [loading, setLoading] = useState(true);
     const [availableDepartments, setAvailableDepartments] = useState([]);
     const navigate = useNavigate();
+    const { darkMode } = useTheme();
+
+    useEffect(() => {
+        document.title = "Mi Perfil - IDEE Almonte";
+    }, []);
 
     // Desde el AuthContext
     const { version, logout, update } = useAuth();
+
     /**
      * Cargar perfil del usuario
      */
@@ -46,7 +53,7 @@ const ProfileUser = () => {
                     const deptResp = await getDepartmentList();
                     if (deptResp.success) {
                         const availableDepartmentsAux = deptResp.data.departments
-                            .filter(d => !fullProfile.departments.some(pd => pd.id === d.id))
+                            .filter(d => !fullProfile.departments.some(pd => pd.id === d.id) && d.id !== 1)
                             .sort((a, b) => a.name.localeCompare(b.name));
                         setAvailableDepartments(availableDepartmentsAux);
                     }
@@ -74,19 +81,20 @@ const ProfileUser = () => {
         try {
             await ModifyUserAccountComponent({
                 profile: profile.user,
+                darkMode: darkMode,
                 action: "modify",
                 onConfirm: async (formValues) => {
                     const result = await modifyProfile(formValues, version);
                     if (result.success) {
-                        Swal.fire("Éxito", "Datos modificados correctamente", "success");
+                        Swal.fire({ title: "Éxito", text: "Datos modificados correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                         update(result.data.user);
                     } else {
-                        Swal.fire("Error", result.error || "No se pudo modificar el perfil, reintentelo de nuevo", "error");
+                        Swal.fire({ title: "Error", text: result.error || "No se pudo modificar el perfil, reintentelo de nuevo", icon: "error", theme: darkMode ? "dark" : "" });
                     }
                 }
             });
         } catch (err) {
-            Swal.fire("Error", err.message || "Error al modificar perfil", "error");
+            Swal.fire({ title: "Error", text: err.message || "Error al modificar perfil", icon: "error", theme: darkMode ? "dark" : "" });
         }
     };
 
@@ -94,26 +102,27 @@ const ProfileUser = () => {
      * Eliminar el Perfil
      */
     const handleDelete = async () => {
-            const swal = await Swal.fire({
-                title: "Eliminar su Cuenta",
-                html: "¿Está seguro de que quiere eliminar su usuario?<br>Esta acción no se podrá deshacer",
-                icon: 'warning',
-                iconColor: '#FF3131',
-                showCancelButton: true,
-                confirmButtonText: "Aceptar",
-                cancelButtonText: "Cancelar"
-            });
+        const swal = await Swal.fire({
+            title: "Eliminar su Cuenta",
+            html: "¿Está seguro de que quiere eliminar su usuario?<br>Esta acción no se podrá deshacer",
+            icon: 'warning',
+            iconColor: '#FF3131',
+            showCancelButton: true,
+            confirmButtonText: "Aceptar",
+            cancelButtonText: "Cancelar",
+            theme: darkMode ? "dark" : ""
+        });
 
-            if (swal.isConfirmed) {
-                const response = await deleteProfile(version);
-                if (response.success) {
-                    Swal.fire("Éxito", "Cuenta eliminada correctamente. Cerrando sesión", "success");
-                    logout();
-                    navigate('/');
-                } else {
-                    Swal.fire("Error", response.error || "No se eliminó el usuario", "error");
-                }
+        if (swal.isConfirmed) {
+            const response = await deleteProfile(version);
+            if (response.success) {
+                Swal.fire({ title: "Éxito", text: "Cuenta eliminada correctamente. Cerrando sesión", icon: "success", theme: darkMode ? "dark" : "" });
+                logout();
+                navigate('/');
+            } else {
+                Swal.fire({ title: "Error", text: response.error || "No se eliminó el usuario", icon: "error", theme: darkMode ? "dark" : "" });
             }
+        }
     };
 
     /**
@@ -138,7 +147,7 @@ const ProfileUser = () => {
                     {/* BLOQUE 1: Información de la cuenta */}
                     <Col xs="12" md="8" lg="6" xl="6" xxl="5" className="d-flex justify-content-center">
                         <Card
-                            className="h-100 shadow-lg rounded-4 bg-light border-0 mx-auto w-100"
+                            className={`h-100 shadow-lg rounded-4 ${darkMode ? "bg-dark" : "bg-light"} border-0 mx-auto w-100`}
                         >
                             <CardBody className="d-flex flex-column justify-content-between p-4"
                                 style={{
@@ -152,14 +161,14 @@ const ProfileUser = () => {
                                     </h4>
 
                                     <Row className="mb-2">
-                                        <Col md="5"><strong>Usuario:</strong></Col>
+                                        <Col md="5" style={{ color: darkMode ? "#fff" : "#000" }}><strong>Usuario:</strong></Col>
                                         <Col md="7">
-                                            <span style={{ marginLeft: "3px", fontWeight: "700", color: "#000" }}>{profile.user.username || "-"}</span>
+                                            <span style={{ marginLeft: "3px", fontWeight: "700", color: darkMode ? "#fff" : "#000" }}>{profile.user.username || "-"}</span>
                                         </Col>
                                     </Row>
 
                                     <Row className="mb-2">
-                                        <Col md="5"><strong>Departamentos:</strong></Col>
+                                        <Col md="5" style={{ color: darkMode ? "#fff" : "#000" }}><strong>Departamentos:</strong></Col>
                                         <Col md="7" className="d-flex flex-wrap gap-1 mt-1 mb-1">
                                             {profile.user.usertype === "USER" ? (
                                                 // Solo badges normales
@@ -176,13 +185,14 @@ const ProfileUser = () => {
                                                                 key={dep.id}
                                                                 objName={dep.name}
                                                                 objType="departamento"
+                                                                darkMode={darkMode}
                                                                 onDelete={async () => {
                                                                     const result = await deleteDepartmentProfile(dep.id, version);
 
                                                                     if (result.success) {
                                                                         update(result.data.user);
                                                                     } else {
-                                                                        Swal.fire("Error", result.error || "No se pudo eliminar", "error");
+                                                                        Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar", icon: "error", theme: darkMode ? "dark" : "" });
                                                                     }
                                                                 }}
                                                             />
@@ -194,13 +204,14 @@ const ProfileUser = () => {
                                                     <AddBadgeComponent
                                                         availableObjs={availableDepartments}
                                                         objType="departamento"
+                                                        darkMode={darkMode}
                                                         onAdded={async (dep) => {
                                                             const result = await addDepartmentProfile(dep.id, version);
 
                                                             if (result.success) {
                                                                 update(result.data.user);
                                                             } else {
-                                                                Swal.fire("Error", result.error || "No se pudo eliminar", "error");
+                                                                Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar", icon: "error", theme: darkMode ? "dark" : "" });
                                                             }
                                                         }}
                                                     />
@@ -212,7 +223,7 @@ const ProfileUser = () => {
 
 
                                     <Row className="mb-2">
-                                        <Col md="5" className="d-flex align-items-center">
+                                        <Col md="5" className="d-flex align-items-center" style={{ color: darkMode ? "#fff" : "#000" }}>
                                             <FaCalendarAlt className="me-2" /> Fecha de creación:
                                         </Col>
                                         <Col md="7">
@@ -221,7 +232,7 @@ const ProfileUser = () => {
                                     </Row>
 
                                     <Row className="mb-2">
-                                        <Col md="5" className="d-flex align-items-center">
+                                        <Col md="5" className="d-flex align-items-center" style={{ color: darkMode ? "#fff" : "#000" }}>
                                             <FaCalendarAlt className="me-2" /> Última modificación:
                                         </Col>
                                         <Col md="7">

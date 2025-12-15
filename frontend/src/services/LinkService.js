@@ -27,14 +27,31 @@ export const getAllLinks = async () => {
 }
 
 /**
- * Solicitud de creación de un nuevo enalce
- * @param {Object} link - la información del enlace que se quiere crear
- * @returns {JSON} - Devuelve la información recibida de la llamada
+ * Solicitud de creación de un nuevo enlace
+ * @param {Object} link - datos del formulario { name, web, description, imageFile }
+ * @returns {JSON}
  */
 export const createLink = async (link) => {
     try {
-        const res = await api.post('/link/', link);
+        const formData = new FormData();
+
+        formData.append("name", link.name);
+        formData.append("web", link.web);
+        formData.append("description", link.description || "");
+
+        // Solo si hay imagen
+        if (link.imageFile) {
+            formData.append("image", link.imageFile);
+        }
+
+        const res = await api.post('/link/', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+
         return { success: true, data: res.data };
+
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
     }
@@ -43,17 +60,35 @@ export const createLink = async (link) => {
 /**
  * Solicitud de modificación de un enlace existente
  * @param {int} linkId - ID del enlace que se va a modificar
- * @param {Object} link - la información del enlace que se quiere modificar
- * @returns {JSON} - Devuelve la información recibida de la llamada
+ * @param {Object} link - { name, web, description, imageFile }
+ * @returns {JSON}
  */
-export const modifyLink = async (linkId, link,) => {
+export const modifyLink = async (linkId, link) => {
     try {
-        const res = await api.put(`/link/${linkId}`, link);
+        const formData = new FormData();
+
+        formData.append("name", link.name);
+        formData.append("web", link.web);
+        formData.append("description", link.description || "");
+
+        // Solo si el usuario seleccionó una imagen
+        if (link.imageFile) {
+            formData.append("image", link.imageFile);
+        }
+
+        const res = await api.put(`/link/${linkId}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+
         return { success: true, data: res.data };
+
     } catch (error) {
         return { success: false, error: error.response?.data?.error };
     }
 }
+
 
 /**
  * Solicitud de eliminación de un enlace

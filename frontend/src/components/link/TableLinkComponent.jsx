@@ -2,6 +2,7 @@
 import { Table, Button } from "reactstrap";
 import Swal from "sweetalert2";
 import { createRoot } from "react-dom/client";
+import { useTheme } from '../../hooks/UseTheme';
 
 import { getAllLinks, modifyLink, deleteLink } from "../../services/LinkService";
 
@@ -23,11 +24,14 @@ import PaginationComponent from "../PaginationComponent";
  * @param {number} props.currentPage - Página actual de la tabla.
  * @param {function} props.setCurrentPage - Función para cambiar la página actual.
  * @param {function} props.onStatsUpdate - Callback para actualizar estadísticas de links.
+ * @param {string} props.sortBy - Indica como ordenar la tabla
  * @returns {JSX.Element} Tabla interactiva de departamentos.
  */
-const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate }) => {
+const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, onStatsUpdate, sortBy }) => {
     const [links, setLinks] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { darkMode } = useTheme();
 
     /** Detectar pantallas pequeñas */
     const useIsSmallScreen = (breakpoint) => {
@@ -51,14 +55,23 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
             try {
                 const res = await getAllLinks();
                 if (res.success) {
-                    setLinks(res.data.links || []);
+
+                    let links = res.data.links ?? [];
+
+                    // Orden dinámico
+                    links = links.sort((a, b) => {
+                        if (sortBy === "name") return a.name.localeCompare(b.name);
+                        return a.id - b.id;
+                    });
+
+                    setLinks(links);
 
                     if (onStatsUpdate) {
                         onStatsUpdate(res.data.links.length);
                     }
                 }
             } catch {
-                Swal.fire("Error", "No se pudieron cargar los datos", "error");
+                Swal.fire({ title: "Error", text: "No se pudieron cargar los datos", icon: "error", theme: darkMode ? "dark" : "" });
             } finally {
                 setLoading(false);
             }
@@ -68,7 +81,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         const handler = () => fetchAll();
         window.addEventListener("refresh-links", handler);
         return () => window.removeEventListener("refresh-links", handler);
-    }, [onStatsUpdate]);
+    }, [onStatsUpdate, sortBy, darkMode]);
 
     /** Filtrado por búsqueda **/
     const filteredLinks = useMemo(
@@ -88,12 +101,14 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         let completed = false;
 
         reactRoot.render(
-            <CaptchaSlider onSuccess={() => {
-                completed = true;
-                Swal.close();
-                resolve(true);
-                setTimeout(() => reactRoot.unmount(), 0);
-            }} />
+            <CaptchaSlider
+                darkMode={darkMode}
+                onSuccess={() => {
+                    completed = true;
+                    Swal.close();
+                    resolve(true);
+                    setTimeout(() => reactRoot.unmount(), 0);
+                }} />
         );
 
         Swal.fire({
@@ -104,6 +119,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
             showCancelButton: true,
             cancelButtonText: 'Cancelar',
             allowOutsideClick: false,
+            theme: darkMode ? "dark" : "",
             preConfirm: () => {
                 if (!completed) Swal.showValidationMessage('Debes completar el captcha');
             }
@@ -115,13 +131,14 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         await AddModifyLinkComponent({
             linkItem,
             action: "modify",
+            darkMode: darkMode,
             onConfirm: async formValues => {
                 const result = await modifyLink(linkItem.id, formValues);
                 if (result.success) {
-                    Swal.fire("Éxito", "Enlace modificado correctamente", "success");
+                    Swal.fire({ title: "Éxito", text: "Enlace modificado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                     window.dispatchEvent(new Event("refresh-links"));
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo modificar el enlace", "error");
+                    Swal.fire({ title: "Error", text: result.error || "No se pudo modificar el enlace", icon: "error", theme: darkMode ? "dark" : "" });
                 }
             }
         });
@@ -132,10 +149,19 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
         await showCaptcha();
         const result = await deleteLink(linkItem.id);
         if (result.success) {
-            Swal.fire("Éxito", "Enlace eliminado correctamente", "success");
+            Swal.fire({ title: "Éxito", text: "Enlace eliminado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
+
+            // Calculamos si era el último elemento de la página
+            const newFilteredLength = filteredLinks.length - 1;
+            const newTotalPages = Math.ceil(newFilteredLength / rowsPerPage);
+
+            // Si la página actual queda vacía, ir a la anterior o a la 1
+            const newPage = currentPage > newTotalPages ? Math.max(newTotalPages, 1) : currentPage;
+            setCurrentPage(newPage);
+
             window.dispatchEvent(new Event("refresh-links"));
         } else {
-            Swal.fire("Error", result.error || "No se pudo eliminar el enlace", "error");
+            Swal.fire({ title: "Error", text: result.error || "No se pudo eliminar el enlace", icon: "error", theme: darkMode ? "dark" : "" });
         }
     };
 
@@ -143,7 +169,7 @@ const TableLinkComponent = ({ search, rowsPerPage, currentPage, setCurrentPage, 
 
     return (
         <>
-            <Table striped responsive>
+            <Table dark={ darkMode } striped responsive>
                 <thead>
                     <tr>
                         <th style={{ width: "5%" }}>ID</th>

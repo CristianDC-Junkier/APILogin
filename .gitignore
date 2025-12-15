@@ -41,3 +41,5 @@ frontend/.env
 /backend/obj/Debug/backend.esproj.CoreCompileInputs.cache
 /frontend/obj/Debug
 /.vs/APIRESTLogin/CopilotIndices/17.14.1347.20289
+/frontend/obj/Debug/package.g.props
+/backend/images/links

@@ -9,13 +9,17 @@ const USER_TYPE = ['USER', 'ADMIN', 'SUPERADMIN'];
  *
  * Esta función realiza las siguientes tareas:
  *  1. Sincroniza todos los modelos de Sequelize con la base de datos (crea tablas si no existen).
- *  2. Comprueba si existe un usuario con tipo "SUPERADMIN".
- *  3. Si no existe, crea un usuario superadministrador por defecto.
- *  4. Registra información en LoggerController sobre la inicialización y la creación del superadmin.
+ *  2. Comprueba si existe un departamento público con id "1".
+ *  3. Si no existe, crea el departamento público por defecto.
+ *  4. Comprueba si existe un usuario con tipo "SUPERADMIN".
+ *  5. Si no existe, crea un usuario superadministrador por defecto.
+ *  6. Registra información en LoggerController sobre la inicialización y la creación del superadmin.
  *
  * Variables internas importantes:
+ *  - existingPublicDepartment: Resultado de la búsqueda del departamento público en la base de datos.
  *  - USER_TYPE: Array que define los tipos de usuario posibles ['USER', 'ADMIN', 'SUPERADMIN'].
  *  - superAdminType: Último elemento de USER_TYPE, usado para identificar al superadmin.
+ *  - existing: Resultado de la búsqueda del superadmin en la base de datos.
  *
  * Comportamiento en caso de error:
  *  - Registra el error en LoggerController.
@@ -33,34 +37,15 @@ async function initDatabase() {
 
         LoggerController.info('✅ Base de datos sincronizada correctamente');
 
-        // Comprobar si ya existen departamentos
-        const existingDepartments = await Department.count();
-        let departments = [];
+        // Comprobar si existe el departamento público
+        const existingPublicDepartment = await Department.findOne({ where: { id: "1" } });
 
-        /*if (existingDepartments === 0) {
-            // Crear departamentos de ejemplo
-            const departmentsData = [
-                { name: 'Ventanilla (SAC)' }, { name: 'Estadística' },
-                { name: 'Informática' }, { name: 'Rentas' }, { name: 'Tesorería' },
-                { name: 'Intervención' }, { name: 'Patrimonio' }, { name: 'Personal' },
-                { name: 'Contratación' }, { name: 'Archivo Municipal' }, { name: 'Secretaría' },
-                { name: 'Equipo de Gobierno' }, { name: 'Salud y Consumo' }, { name: 'Servicios Inseccion' },
-                { name: 'Servicios Sociales' }, { name: 'Turismo' }, { name: 'Policía Local' },
-                { name: 'Concejalía Matalascañas' }, { name: 'Desarrollo Local' }, { name: 'Agricultura' },
-                { name: 'Urbanismo' }, { name: 'Concejalía El Rocío' }, { name: 'Alcaldía' },
-                { name: 'Ciudad de la Cultura' }, { name: 'Otros' }, { name: 'Moviles Coporativos' },
-                { name: 'Escuelas Infatiles' }, { name: 'Part. Ciudadana y Dllo. Comunitario' },
-                { name: 'Institutos' }, { name: 'Centro Sociocultural Barrio Obrero' }
-            ];
-
-            for (const dep of departmentsData) {
-                const created = await Department.create(dep);
-                departments.push(created);
-            }
-            LoggerController.info('✅ Departamentos de ejemplo creados');
-        } else {
-            LoggerController.warn('ℹ️ Departamentos ya existentes, no se crean nuevos');
-        }*/
+        if (!existingPublicDepartment) {
+            await Department.create({
+                name: 'Publico',
+            });
+            LoggerController.info('✅ Departamento Público creado correctamente');
+        }
 
         // Comprobar si existe el superadmin
         const superAdminType = USER_TYPE[USER_TYPE.length - 1];
@@ -70,11 +55,11 @@ async function initDatabase() {
         if (!existing) {
 
             await UserAccount.create({
-                username: 'admin',//InformaticaAlcaldia
-                password: 'admin',//InformaticaAlcaldia#Almonte
+                username: 'admin',
+                password: 'admin',
                 usertype: superAdminType,
                 forcePwdChange: false,
-                version: 0,
+                version: 1,
             });
             LoggerController.info('✅ Superadmin creado correctamente');
         }

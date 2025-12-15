@@ -35,7 +35,7 @@ class AuthController {
             const refreshToken = await generateRefreshToken(user.id, remember);
 
             // Envía refreshToken en cookie HTTP-only
-            res.cookie("refreshToken", refreshToken, {
+            res.cookie("IDEERT", refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
@@ -65,20 +65,20 @@ class AuthController {
     /**
     * Cierra la sesión de un usuario eliminando su cookie HttpOnly.
     *
-    * @param {Object} req - Objeto de petición de Express, con { cookies: { refreshToken } }.
+    * @param {Object} req - Objeto de petición de Express, con { cookies: { IDEERT } }.
     * @param {Object} res - Objeto de respuesta de Express.
     * @returns {JSON} - Mensaje de éxito o error.
     */
     static async logout(req, res) {
         try {
-            const token = req.cookies?.refreshToken;
+            const token = req.cookies?.IDEERT;
             if (!token) return res.status(400).json({ error: "No hay sesión activa" });
 
             let payload;
             try {
                 payload = verifyToken(token, "refresh");
             } catch {
-                res.clearCookie("refreshToken", {
+                res.clearCookie("IDEERT", {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                     sameSite: "Strict",
@@ -88,7 +88,7 @@ class AuthController {
             }
 
             await RefreshToken.destroy({ where: { uuid: payload.uuid } });
-            res.clearCookie("refreshToken", {
+            res.clearCookie("IDEERT", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
@@ -107,13 +107,13 @@ class AuthController {
     /**
      * Devuelve la información del usuario basada en la cookie HttpOnly y la renueva si es necesario.
      * 
-     * @param {Object} req - Objeto de petición de Express, con { cookies: { refreshToken } }.
+     * @param {Object} req - Objeto de petición de Express, con { cookies: { IDEERT } }.
      * @param {Object} res - Objeto de respuesta de Express.
      * @returns {JSON} - JSON con nuevo accessToken y datos del usuario, o estado 401 si el token es inválido.
      */
     static async refreshToken(req, res) {
         try {
-            const token = req.cookies?.refreshToken;
+            const token = req.cookies?.IDEERT;
             if (!token) return res.status(200).send("No existen tokens");
 
             let payload;
@@ -146,7 +146,7 @@ class AuthController {
                 const newRefreshToken = await generateRefreshToken(user.id, payload.remember);
 
                 // Cookie con nuevo refreshToken
-                res.cookie("refreshToken", newRefreshToken, {
+                res.cookie("IDEERT", newRefreshToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                     sameSite: "Strict",
@@ -155,7 +155,6 @@ class AuthController {
                 });
             }
 
-            LoggerController.info(`Recarga de access token exitosa para el usuario con id ${user.id}`);
             return res.json({
                 accessToken,
                 user: {
