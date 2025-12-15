@@ -169,7 +169,7 @@ const PublicHome = () => {
                         <h3><strong>¿Qué son los datos espaciales?</strong></h3>
                         <p>Los datos espaciales son información geográfica que describe la localización y las características de lugares,
                             infraestructuras y recursos en el municipio de Almonte. Incluyen mapas, planos y capas de información que permiten
-                            xanalizar el territorio y tomar decisiones informadas.</p>
+                            analizar el territorio y tomar decisiones informadas.</p>
                     </div>
 
                     {/* DEPARTAMENTOS DINÁMICOS */}
