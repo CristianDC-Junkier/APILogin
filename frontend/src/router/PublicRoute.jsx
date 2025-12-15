@@ -24,8 +24,6 @@ const PublicRoute = ({ children }) => {
     useEffect(() => {
         if (!loading && user) {
             navigate('/home');
-        } else {
-            navigate('/login');
         }
     }, [loading, user, navigate]);
 

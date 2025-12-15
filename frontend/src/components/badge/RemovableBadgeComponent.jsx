@@ -2,7 +2,7 @@
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
 
-// Función encargada de determinar el color de fonde del badge
+// Función encargada de determinar el color de fondo del badge
 function stringToColor(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -23,7 +23,7 @@ function stringToColor(str) {
  * @param {Function} onDelete - Función encargada de gestionar la eliminación
  * @returns
  */
-const RemovableBadgeComponent = ({ objType, objName, onDelete }) => {
+const RemovableBadgeComponent = ({ objType, objName, onDelete, darkMode = false }) => {
     const bgColor = stringToColor(objName);
     const [hover, setHover] = useState(false);
 
@@ -36,6 +36,7 @@ const RemovableBadgeComponent = ({ objType, objName, onDelete }) => {
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
             cancelButtonText: "Cancelar",
+            theme: darkMode ? "dark" : ""
         });
         if (result.isConfirmed) onDelete();
     };

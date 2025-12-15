@@ -226,6 +226,7 @@ export const markPWDCUser = async (userId, password, version) => {
         const res = await api.patch(`/user/${userId}/forcepwd`, password, {
             params: { version }
         });
+        console.log(res);
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };

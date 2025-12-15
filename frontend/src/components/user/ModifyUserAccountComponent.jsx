@@ -1,13 +1,15 @@
 ﻿import Swal from "sweetalert2";
-;
+import "../../styles/component/ComponentsDark.css"
+
 /**
  * Componente para modificar usuario: solo permite cambiar username, password y usertype.
  *
  * @param {Object} props
  * @param {Object} props.profile - Usuario a modificar
+ * @param {boolean} props.darkMode - booleano que indica si el Modo Oscuro está activo
  * @param {Function} props.onConfirm - Callback que recibe { username, oldPassword, newPassword, usertype }
  */
-const ModifyUserAccountComponent = async ({ profile, onConfirm }) => {
+const ModifyUserAccountComponent = async ({ profile, darkMode, onConfirm }) => {
     const isAdmin = ["ADMIN", "SUPERADMIN"].includes(profile?.usertype);
 
     // Estilos inline
@@ -28,15 +30,15 @@ const ModifyUserAccountComponent = async ({ profile, onConfirm }) => {
     <div style="margin-top:5vh">
       <div style="${rowStyle}">
         <label style="${labelStyle}">Usuario <span style="color:red">*</span></label>
-        <input id="swal-username" style="${inputStyle}" placeholder="Usuario" value="${profile?.username || ""}">
+        <input id="swal-username" style="${inputStyle}" class="${darkMode ? "input_dark" : ""}" placeholder="Usuario" value="${profile?.username || ""}">
       </div>
 
       <div style="${rowStyle}">
         <label style="${labelStyle}">Contraseña actual <span style="color:red">*</span></label>
         <div style="flex:1; display:flex; align-items:center;">
-          <input id="swal-oldpassword" type="password" style="flex:1; ${inputStyle}" placeholder="Contraseña actual">
+          <input id="swal-oldpassword" type="password" style="flex:1; ${inputStyle}" class="${darkMode ? "input_dark" : ""}" placeholder="Contraseña actual">
           <button type="button" id="toggle-old" style="margin-left:4px; border:none; background:transparent; cursor:pointer; width:36px; display:flex; justify-content:center; align-items:center;">
-            <i id="icon-old" class="fas fa-eye-slash"></i>
+            <i id="icon-old" class="fas fa-eye-slash" ${darkMode ? 'style="color:white;"' : ''}></i>
           </button>
         </div>
       </div>
@@ -44,9 +46,9 @@ const ModifyUserAccountComponent = async ({ profile, onConfirm }) => {
       <div style="${rowStyle}">
         <label style="${labelStyle}">Nueva contraseña <span style="color:red">*</span></label>
         <div style="flex:1; display:flex; align-items:center;">
-          <input id="swal-newpassword" type="password" style="flex:1; ${inputStyle}" placeholder="Nueva contraseña">
+          <input id="swal-newpassword" type="password" style="flex:1; ${inputStyle}" class="${darkMode ? "input_dark" : ""}" placeholder="Nueva contraseña">
           <button type="button" id="toggle-new" style="margin-left:4px; border:none; background:transparent; cursor:pointer; width:36px; display:flex; justify-content:center; align-items:center;">
-            <i id="icon-new" class="fas fa-eye-slash"></i>
+            <i id="icon-new" class="fas fa-eye-slash" ${darkMode ? 'style="color:white;"' : ''}></i>
           </button>
         </div>
       </div>
@@ -54,7 +56,7 @@ const ModifyUserAccountComponent = async ({ profile, onConfirm }) => {
       ${isAdmin ? `
         <div style="${rowStyle}">
           <label style="${labelStyle}">Tipo de Usuario <span style="color:red">*</span></label>
-          <select id="swal-usertype" style="${inputStyle}" ${profile?.id === 1 ? "disabled" : ""}>
+          <select id="swal-usertype" style="${inputStyle}" ${profile?.id === 1 ? "disabled" : ""} class="${darkMode ? "input_dark" : ""}">
             ${usertypeOptions}
           </select>
         </div>
@@ -72,6 +74,7 @@ const ModifyUserAccountComponent = async ({ profile, onConfirm }) => {
         showCancelButton: true,
         cancelButtonText: "Cancelar",
         confirmButtonText: "Aceptar",
+        theme: darkMode ? "dark" : "",
         didOpen: () => {
             const oldPwdInput = document.getElementById("swal-oldpassword");
             const newPwdInput = document.getElementById("swal-newpassword");

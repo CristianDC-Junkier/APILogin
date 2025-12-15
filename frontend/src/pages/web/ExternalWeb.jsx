@@ -1,18 +1,24 @@
-﻿import React from "react";
+﻿import { useEffect } from 'react';
 import { Container, Row, Col } from "reactstrap";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import BackButtonComponent from "../../components/utils/BackButtonComponent";
 
 /**
- * Página encarga de mostrar la página elegida en el WebList
+ * Página encarga de mostrar la página elegida en el Home
  */
-const ExternalWebPage = () => {
+const ExternalWeb = () => {
     const { user } = useAuth();
     const location = useLocation();
 
-    // URL oculta que llega desde WebListPage
+    // Datos ocultos que llega desde Home
     let url = location.state?.url;
+    let name = location.state?.name;
+
+    useEffect(() => {
+        document.title = name + " - IDEE Almonte";
+    }, [name]);
+
 
     try {
         if (url) {
@@ -33,7 +39,7 @@ const ExternalWebPage = () => {
             {/* Botonera arriba */}
             <Row className="align-items-center m-0 p-0 mb-1">
                 <Col className="d-flex justify-content-start p-0">
-                    <BackButtonComponent back="/list" />
+                    <BackButtonComponent back="/home" />
                 </Col>
             </Row>
 
@@ -70,4 +76,4 @@ const ExternalWebPage = () => {
     );
 };
 
-export default ExternalWebPage;
+export default ExternalWeb;

@@ -6,6 +6,7 @@
  * 
  * Proporciona metodos para:
  *  - Listar todos los departamentos
+ *  - Recoger los links del departamento público
  *  - Crear un departamento
  *  - Modificar un departamento
  *  - Eliminar un usuario
@@ -21,6 +22,19 @@
 export const getDepartmentList = async () => {
     try {
         const res = await api.get('/department/');
+        return { success: true, data: res.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error };
+    }
+};
+
+/**
+ * Solicitud para obtener la lista de todos los departamentos existentes
+ * @returns {JSON} - Devuelve la información recibida de la llamada
+ */
+export const getDepartmentPublic = async () => {
+    try {
+        const res = await api.get('/department/public');
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.error };

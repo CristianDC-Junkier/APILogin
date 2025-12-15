@@ -6,6 +6,7 @@ import BadgeComponent from "./BadgeComponent";
 import AddBadgeComponent from "./AddBadgeComponent";
 import RemovableBadgeComponent from "./RemovableBadgeComponent";
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../hooks/UseTheme';
 
 /**
 * Badge para mostrar "Mostrar más" 
@@ -13,10 +14,10 @@ import { useNavigate } from 'react-router-dom';
 * @param {Object} user usuario al que se le muestran los departamentos
 * @param {boolean} canModify Indica si el usuario puede modificar
 * @param {String} objType Cadena para aplicar en los menús
-* @param {Array} userObjects Lista de objetos del usuario // departamento -> [{id, name}] || enlace -> [{id, name, web}]
-* @param {Array} availableObjs Lista de objetos libres // departamento -> [{id, name}] || enlace -> [{id, name, web}]
-* @param {Function} onAdded Callback cuando se agrega un departamento
-* @param {Function} onDeleted Callback cuando se elimina un departamento
+* @param {Array} userObjects Lista de objetos del usuario // departamento -> [{id, name}] || enlace -> [{id, name, web, description, image}]
+* @param {Array} availableObjs Lista de objetos libres // departamento -> [{id, name}] || enlace -> [{id, name, web, description, image}]
+* @param {Function} onAdded Callback cuando se agrega un objeto
+* @param {Function} onDeleted Callback cuando se elimina un objeto
 */
 const ShowMoreDepartmentBadgeComponent = ({
     currentUser,
@@ -29,6 +30,7 @@ const ShowMoreDepartmentBadgeComponent = ({
     onDeleted,
 }) => {
     const navigate = useNavigate();
+    const { darkMode } = useTheme();
 
     const handleShowMore = () => {
         if (currentUser.id !== user.id || objType === "enlace") {
@@ -50,7 +52,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                     minHeight: '200px',  
                                     padding: '12px',
                                     borderRadius: '12px',
-                                    backgroundColor: '#f9f9f9',
+                                    backgroundColor: darkMode ? '#060606' : '#f9f9f9',
                                     alignItems: 'flex-start',
                                     boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)',
                                 }}
@@ -62,6 +64,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                                 key={obj.id}
                                                 objName={obj.name}
                                                 objType={objType}
+                                                darkMode={darkMode}
                                                 onDelete={async () => {
                                                     await onDeleted(obj);
                                                     userObjects = userObjects.filter(o => o.id !== obj.id);
@@ -73,6 +76,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                                         <AddBadgeComponent
                                             availableObjs={availableObjs}
                                             objType={objType}
+                                            darkMode={darkMode}
                                             onAdded={async (obj) => {
                                                 await onAdded(obj); 
                                                 availableObjs = availableObjs.filter(d => d.id !== obj.id);
@@ -94,6 +98,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                 confirmButtonText: 'Cerrar',
                 width: '600px',
                 buttonsStyling: true,
+                theme: darkMode ? "dark" : "",
             });
         }
         else {
@@ -109,7 +114,7 @@ const ShowMoreDepartmentBadgeComponent = ({
                 display: "inline-block",
                 padding: "4px 12px",
                 borderRadius: "50px",
-                backgroundColor: "#e0e0e0",
+                backgroundColor: "#9CC2CF",
                 color: "#333",
                 fontWeight: 500,
                 fontSize: "0.8rem",

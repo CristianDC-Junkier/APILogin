@@ -7,11 +7,13 @@ const { encrypt, decrypt, hash } = require("../utils/Crypto");
  * Todos los campos tipo STRING se guardan cifrados para proteger datos sensibles.
  * 
  * Campos:
- * - id   → Identificador único autoincremental.
- * - name → Nombre del link, único (encriptado).
- * - name_hash → Hash del nombre para búsquedas rápidas y únicas.
- * - web  → Ip de la web externa (encriptada).
- * - web_hash → Hash de la web para búsquedas rápidas y únicas.
+ * - id          → Identificador único autoincremental.
+ * - name        → Nombre del link, único (encriptado).
+ * - name_hash   → Hash del nombre para búsquedas rápidas y únicas.
+ * - web         → URL de la web externa (encriptada).
+ * - web_hash    → Hash de la web para búsquedas rápidas y únicas.
+ * - description → Descripción del link (encriptada, opcional).
+ * - image       → Nombre de archivo de la imagen. La ruta completa siempre es "../images/{nombre}".
  */
 const Links = sequelize.define("Links", {
     id: {
@@ -59,7 +61,33 @@ const Links = sequelize.define("Links", {
             msg: 'Link de la web ya existente'
         },
     },
+    description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        set(value) {
+            if (value) this.setDataValue("description", encrypt(value));
+        },
+        get() {
+            const val = this.getDataValue("description");
+            return val ? decrypt(val) : null;
+        },
+    },
+    image: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        set(fileName) {
+            if (fileName) {
+                this.setDataValue("image", fileName);
+            }
+        },
+        get() {
+            return this.getDataValue("image");
+        },
+        unique: {
+            name: 'unique_image',
+            msg: 'Esa imagen ya existe'
+        },
+    },
 });
-
 
 module.exports = Links;

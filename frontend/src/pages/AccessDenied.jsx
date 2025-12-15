@@ -1,10 +1,18 @@
-﻿import React from 'react';
+﻿import { useEffect } from 'react';
 import logo from '../assets/ayto_almonte.png';
+import { useTheme } from '../hooks/UseTheme';
 
 /**
  * Página que aparece cuando un usuario intenta acceder a una pagína a la que no tiene permisos
  */
 const AccessDenied = () => {
+
+    useEffect(() => {
+        document.title = "Sin permisos 401 - IDE Almonte";
+    }, []);
+
+    const { darkMode } = useTheme();
+
     return (
         <div class="row vh-80 d-flex align-items-center justify-content-center">
             <div class="col">
@@ -19,7 +27,7 @@ const AccessDenied = () => {
             </div>
             <div class="col">
                 <h2 class="text-center" style={{ color: "#dc3545" }}>{"Error 403"}</h2>
-                <h3 class="text-center" style={{ color: "#666" }}>{"No tienes permisos suficientes para acceder a esta página."}</h3>
+                <h3 class="text-center" style={{ color: darkMode ? "#ddd" : "#666" }}>{"No tienes permisos suficientes para acceder a esta página."}</h3>
             </div>
         </div>
     );

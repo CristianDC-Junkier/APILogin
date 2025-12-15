@@ -50,7 +50,8 @@ class UserAccountController {
                                 attributes: ['id', 'name', 'web'],
                                 through: { attributes: [] } 
                             }
-                        ]
+                        ],
+                        order: [["id", "ASC"]]
                     }
                 ]
             });
@@ -473,6 +474,7 @@ class UserAccountController {
         try {
             const { id, departmentId } = req.params;
 
+            if (departmentId === 1) return res.status(404).json({ error: "Departamento no válido" });
             const user = await UserAccount.findByPk(id);
             if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
             const department = await Department.findByPk(departmentId);

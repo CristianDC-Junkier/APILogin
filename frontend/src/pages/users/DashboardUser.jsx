@@ -4,21 +4,35 @@ import Swal from "sweetalert2";
 
 import { useAuth } from "../../hooks/useAuth";
 import { createUser } from "../../services/UserService";
+import { useTheme } from '../../hooks/UseTheme';
 
 import BackButtonComponent from "../../components/utils/BackButtonComponent";
 import TableUserComponent from "../../components/user/TableUserComponent";
-import AddModifyUserComponent from "../../components/user/AddModifyUserComponent"; 
+import AddModifyUserComponent from "../../components/user/AddModifyUserComponent";
+
+import '../../styles/component/ComponentsDark.css';
 
 /**
  * Página encargada de mostrar la tabla de usuario y las acciones asociadas a la gestión de los mismos
  */
 const DashBoardUser = () => {
     const { user: currentUser } = useAuth();
+    const { darkMode } = useTheme();
 
     const [selectedType, setSelectedType] = useState("All");
     const [selectedUser, setSelectedUser] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
+    const [sortBy, setSortBy] = useState("id");
+
+
+    useEffect(() => {
+        document.title = "Panel de control de Usuarios - IDEE Almonte";
+    }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedUser, setSelectedUser]);
 
     // Estado de estadísticas
     const [stats, setStats] = useState({ total: 0, admin: 0, user: 0 });
@@ -43,20 +57,21 @@ const DashBoardUser = () => {
         await AddModifyUserComponent({
             currentUser,
             action: "create",
+            darkMode,
             onConfirm: async (formValues) => {
                 const result = await createUser(formValues);
                 if (result.success) {
-                    Swal.fire("Éxito", "Usuario creado correctamente", "success");
+                    Swal.fire({ title: "Éxito", text: "Usuario creado correctamente", icon: "success", theme: darkMode ? "dark" : "" });
                     window.dispatchEvent(new Event("refresh-users"));
                 } else {
-                    Swal.fire("Error", result.error || "No se pudo crear el usuario", "error");
+                    Swal.fire({ title: "Error", text: result.error || "No se pudo crear el usuario", icon: "error", theme: darkMode ? "dark" : "" });
                 }
             }
         });
     };
 
     return (
-        <Container className="mt-4 d-flex flex-column" style={{ minHeight: "80vh" }}>
+        <Container className="mt-4 d-flex flex-column" >
             {/* Botón Volver arriba a la izquierda */}
             <div className="position-absolute top-0 start-0">
                 <BackButtonComponent back="/home" />
@@ -66,7 +81,7 @@ const DashBoardUser = () => {
             <div className="position-absolute top-0 end-0 p-3">
                 <Button
                     color="transparent"
-                    style={{ color: 'black', border: 'none', padding: 0, fontWeight: 'bold' }}
+                    style={{ color: darkMode ? 'white' : 'black', border: 'none', padding: 0, fontWeight: 'bold' }}
                     onClick={handleCreate}
                 >
                     ➕ Crear Usuario
@@ -74,7 +89,7 @@ const DashBoardUser = () => {
             </div>
 
             {/* Tarjetas de estadísticas */}
-            <Row className="mb-1 mt-4 justify-content-center g-2">
+            <Row className="mb-3 mt-4 justify-content-center g-3">
                 {[
                     { label: "Total", value: stats.total, type: "All" },
                     { label: "Administradores", value: stats.admin, type: "Admin" },
@@ -85,8 +100,9 @@ const DashBoardUser = () => {
                             className={`shadow-lg mb-2 border-2 ${selectedType === metric.type ? "border-primary" : "border-light"}`}
                             style={{
                                 cursor: 'pointer',
-                                backgroundColor: selectedType === metric.type ? "#e9f3ff" : "#fff",
-                                transition: "all 0.2s ease-in-out"
+                                backgroundColor: selectedType === metric.type ? (darkMode ? "#6f7a87" : "#e9f3ff") : (darkMode ? "#353535" : "#fff"),
+                                transition: "all 0.2s ease-in-out",
+                                color: darkMode ? "#fff" : "#000000"
                             }}
                             onClick={() => { setSelectedType(metric.type); setCurrentPage(1); }}
                         >
@@ -100,20 +116,32 @@ const DashBoardUser = () => {
             </Row>
 
             {/* Fila con tipo de usuario seleccionado + búsqueda */}
-            <div className="d-flex justify-content-between mb-2 align-items-center">
-                <div className="fw-bold fs-6">
+            <div className="d-flex flex-column flex-md-row justify-content-between mb-2 align-items-start align-items-md-center gap-2">
+
+                {/* Título */}
+                <div className="fw-bold fs-6 text-center text-md-start w-100 w-md-auto">
                     {selectedType === "All" ? "Todos los usuarios" : selectedType === "Admin" ? "Administradores" : "Usuarios"}
                 </div>
 
-                <div className="d-flex gap-2">
+                {/* Contenedor inputs + botón */}
+                <div className="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
                     <Input
                         type="text"
                         placeholder="Buscar por usuario..."
                         value={selectedUser}
                         onChange={e => setSelectedUser(e.target.value)}
                         style={{ minWidth: "200px" }}
+                        className={ darkMode ? "input_dark" : "" }
                     />
                 </div>
+                {/* Botón Ordenación */}
+                <Button
+                    color="secondary"
+                    className="w-100 w-md-auto"
+                    onClick={() => setSortBy(sortBy === "name" ? "id" : "name")}
+                >
+                    {sortBy === "name" ? "Identificador" : "Nombre"}
+                </Button>
             </div>
 
             {/* Tabla de usuarios */}
@@ -125,6 +153,7 @@ const DashBoardUser = () => {
                 rowsPerPage={rowsPerPage}
                 filterType={selectedType}
                 onStatsUpdate={setStats}
+                sortBy={sortBy}
             />
         </Container>
     );

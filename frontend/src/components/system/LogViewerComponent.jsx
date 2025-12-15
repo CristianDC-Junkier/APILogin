@@ -1,5 +1,6 @@
 ﻿import React from 'react';
 import { Card, CardBody } from "reactstrap";
+import { useTheme } from '../../hooks/UseTheme';
 
 /**
  * Componente para visualizar el contenido de un log.
@@ -13,6 +14,8 @@ import { Card, CardBody } from "reactstrap";
  * - Mantiene formato de texto monoespaciado y saltos de línea.
  */
 export default function LogViewerComponent({ content }) {
+    const { darkMode } = useTheme();
+
     // Función para renderizar cada línea con color según el nivel
     const renderLine = (line, index) => {
         // Buscar patrón de log: [INFO], [WARN], [ERROR]
@@ -35,7 +38,7 @@ export default function LogViewerComponent({ content }) {
 
     return (
         <Card className="d-flex flex-column flex-grow-1" style={{ height: '100%', overflowY: 'auto' }}>
-            <CardBody style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: 0 }}>
+            <CardBody style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: 0, backgroundColor: darkMode ? "grey" : ""}}>
                 <div
                     style={{
                         whiteSpace: 'pre-wrap',
@@ -43,6 +46,7 @@ export default function LogViewerComponent({ content }) {
                         overflowY: 'auto',
                         flex: 1,
                         padding: '1rem',
+                        color: darkMode ? 'white' : ''
                     }}
                 >
                     {content.split('\n').map((line, index) => renderLine(line, index))}

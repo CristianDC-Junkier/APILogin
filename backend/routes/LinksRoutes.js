@@ -4,6 +4,7 @@ const router = express.Router();
 
 const LinksController = require("../controllers/LinksController");
 const { adminOnly } = require("../middlewares/Auth");
+const upload = require("../middlewares/Multer");
 
 /**
  * Rutas para gestión de links.
@@ -17,10 +18,9 @@ const { adminOnly } = require("../middlewares/Auth");
  * Middleware:
  * - `adminOnly`        → Restringe el acceso a usuarios con roles de administrador.
  */
-
 router.get("/", adminOnly, LinksController.list);
-router.post("/", adminOnly, LinksController.create);
-router.put("/:id", adminOnly, LinksController.update);
+router.post("/", adminOnly, upload.single("image"), LinksController.create);
+router.put("/:id", adminOnly, upload.single("image"), LinksController.update);
 router.delete("/:id", adminOnly, LinksController.delete);
 
 module.exports = router;
